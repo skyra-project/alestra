@@ -19,7 +19,8 @@ export default class Method {
 	 * @property {Map<string, Argument>} [properties]
 	 */
 
-	constructor() {
+	constructor(name) {
+		this.name = name;
 		this.arguments = [];
 		this.required = 0;
 	}
