@@ -1,7 +1,7 @@
-import { KlasaClient } from 'klasa';
 import { TOKEN } from '../config.mjs';
+import Smii from './lib/Smii';
 
-new KlasaClient({
+new Smii({
 	commandEditing: true,
 	commandLogging: false,
 	commandMessageLifetime: 200,

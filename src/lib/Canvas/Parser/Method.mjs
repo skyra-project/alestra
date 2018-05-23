@@ -4,7 +4,7 @@ import {
 	UnknownArgumentPropertyError,
 	IncorrectArgumentError,
 	ArgumentParseError
-} from './ValidateError.mjs';
+} from '../Util/ValidateError.mjs';
 import { get } from 'snekfetch';
 import { util } from 'klasa';
 
@@ -17,6 +17,7 @@ export default class Method {
 	 * @property {boolean} required
 	 * @property {string} type
 	 * @property {Map<string, Argument>} [properties]
+	 * @property {Function} [custom]
 	 */
 
 	constructor(name) {
@@ -25,9 +26,11 @@ export default class Method {
 		this.required = 0;
 	}
 
-	add({ name, required = false, type, properties = null }) {
+	add({ name, required = false, custom, type = typeof custom === 'function' ? 'custom' : null, properties = null }) {
 		this.arguments.push({ parent: this, name, required, type, properties });
 		if (required) this.required++;
+
+		return this;
 	}
 
 	async validate(params) {
@@ -35,8 +38,8 @@ export default class Method {
 		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
 
 		const output = [];
-		for (let i = 0; i < params.length; i++)
-			output[i] = Method._validateArg(this.arguments[i], parsed[i]);
+		for (let i = 0; i < parsed.length; i++)
+			output[i] = await Method._validateArg(this.arguments[i], parsed[i]);
 
 		return output;
 	}
@@ -75,7 +78,7 @@ export default class Method {
 				return input.substring(1, input.length - 1);
 			}
 			case 'buffer': {
-				const link = await Method._validateArg({ ...arg, type: 'string' });
+				const link = await Method._validateArg({ ...arg, type: 'string' }, input);
 
 				try {
 					const url = new URL(link);
@@ -103,7 +106,7 @@ export default class Method {
 			}
 			case 'custom': {
 				if (typeof arg.custom !== 'function') throw new Error(`${arg.parent.name}::${arg.name} does not have the resolver.`);
-				return arg.custom(input);
+				return arg.custom(arg, input);
 			}
 			default:
 				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type, please report this to this bot's owners.`);
