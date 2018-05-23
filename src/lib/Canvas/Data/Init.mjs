@@ -163,5 +163,19 @@ export default function init(evaluator) {
 		.add(new Method('setTextFont')
 			.add({ name: 'font', type: 'string', required: true }))
 		.add(new Method('setTextAlign')
-			.add({ name: 'align', type: 'custom', required: true, custom: multiOptions.bind(null, ['left', 'center', 'right', 'start', 'end']) }));
+			.add({ name: 'align', type: 'custom', required: true, custom: multiOptions.bind(null, ['left', 'center', 'right', 'start', 'end']) }))
+		.add(new Method('setTextBaseline')
+			.add({ name: 'baseline', type: 'custom', required: true, custom: multiOptions.bind(null, ['top', 'hanging', 'middle', 'alphabetic', 'ideographic', 'bottom']) }))
+		.add(new Method('beginPath'))
+		.add(new Method('closePath'))
+		.add(new Method('createPattern')
+			.add({ name: 'image', type: 'buffer', required: true})
+			.add({ name: 'repetition', type: 'custom', required: true, custom: multiOptions.bind(null, ['repeat', 'repeat-x', 'repeat-y', 'no-repeat']) }))
+		// .add(new Method('createLinearGradient')
+		// 	.add({ name: 'x0', type: 'number', required: true })
+		// 	.add({ name: 'y0', type: 'number', required: true })
+		// 	.add({ name: 'x1', type: 'number', required: true })
+		// 	.add({ name: 'y1', type: 'number', required: true })
+		// 	.add({ name: 'x0', type: 'number', required: false }));
+
 }
