@@ -1,7 +1,5 @@
 import { Command } from 'klasa';
-import CanvasConstructor from 'canvas-constructor';
-
-const { Canvas } = CanvasConstructor;
+import { Canvas } from 'canvas-constructor';
 
 export default class extends Command {
 

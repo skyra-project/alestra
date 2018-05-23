@@ -25,7 +25,7 @@
   "homepage": "https://github.com/kyranet/Smii#readme",
   "dependencies": {
     "canvas": "github:Automattic/node-canvas#92b192447e9b9ae98da0f801e4e34afdd1dc1ef8",
-    "canvas-constructor": "^1.0.1",
+    "canvas-constructor": "github:kyranet/canvasConstructor",
     "discord.js": "github:discordjs/discord.js",
     "klasa": "github:dirigeants/klasa#esm",
     "snekfetch": "^4.0.0"

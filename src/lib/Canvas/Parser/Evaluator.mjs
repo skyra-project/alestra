@@ -1,9 +1,7 @@
 import { CANVAS_HEADER, SPLIT_METHODS, METHOD_PARSE } from '../Util/Constants.mjs';
 import Method from './Method.mjs';
-import CanvasConstructor from 'canvas-constructor';
+import { Canvas } from 'canvas-constructor';
 import { Type } from 'klasa';
-
-const { Canvas } = CanvasConstructor;
 
 export default class Evaluator {
 
