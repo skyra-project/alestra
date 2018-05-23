@@ -5,6 +5,7 @@ import {
 	IncorrectArgumentError,
 	ArgumentParseError
 } from '../Util/ValidateError.mjs';
+import { QUOTES } from '../Util/Constants.mjs';
 import { get } from 'snekfetch';
 import { util } from 'klasa';
 
@@ -73,6 +74,7 @@ export default class Method {
 
 	static _validateArgString(arg, input) {
 		const firstChar = input.charAt(0);
+		if (!QUOTES.test(firstChar)) throw new ArgumentParseError(arg, 'Invalid string literal: Expected a pair of single quotes (\'), double quotes (") or backticks (`).');
 		const lastChar = input.charAt(input.length - 1);
 		if (firstChar !== lastChar) throw new ArgumentParseError(arg, 'Failed to parse string: Mismatching quotes.');
 
