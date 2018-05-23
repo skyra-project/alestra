@@ -27,7 +27,7 @@ export default class Method {
 	}
 
 	add({ name, required = false, custom, type = typeof custom === 'function' ? 'custom' : null, properties = null }) {
-		this.arguments.push({ parent: this, name, required, type, properties });
+		this.arguments.push({ parent: this, name, required, type, custom, properties });
 		if (required) this.required++;
 
 		return this;
