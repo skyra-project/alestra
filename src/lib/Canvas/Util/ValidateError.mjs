@@ -10,7 +10,7 @@ export class ValidateError extends Error {
 	}
 
 	toString() {
-		return `${this.constructor.name} on ${this.argument.parent.name}#${this.argument.name}: ${this.reason}`;
+		return `${this.constructor.name} on ${this.argument.parent.name} at argument ${this.argument.name}: ${this.reason}`;
 	}
 
 }
