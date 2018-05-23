@@ -63,7 +63,7 @@ export default class Method {
 				if (firstChar !== lastChar) throw new ArgumentParseError(arg, 'Failed to parse string: Mismatching quotes.');
 
 				let quotes = 0, point = 0;
-				while (point < input.length - 1) {
+				while (point < input.length) {
 					const char = input.charAt(point);
 					if (char === '\\') {
 						point += 2;
