@@ -1,5 +1,6 @@
 import { CANVAS_HEADER, SPLIT_METHODS, METHOD_PARSE } from '../Util/Constants.mjs';
 import Method from './Method.mjs';
+import { SIZES } from '../../../../config';
 import { Canvas } from 'canvas-constructor';
 import { Type } from 'klasa';
 
@@ -20,6 +21,10 @@ export default class Evaluator {
 		if (!CANVAS_HEADER.test(input)) throw new Error(`You must initialize Canvas with \`new Canvas(width, height)\`.`);
 		const result = CANVAS_HEADER.exec(input);
 		const methods = await this.parseInput(input.slice(result[0].length, input.length));
+
+		const width = Number(result[1]), height = Number(result[2]);
+		if (width > SIZES.WIDTH) throw new Error(`Canvas width must be a value lower than ${SIZES.WIDTH}. Got: ${width}`);
+		if (height > SIZES.HEIGHT) throw new Error(`Canvas height must be a value lower than ${SIZES.HEIGHT}. Got: ${height}`);
 
 		const canvas = new Canvas(Number(result[1]), Number(result[2]));
 		for (const [method, args] of methods) canvas[method](...args);

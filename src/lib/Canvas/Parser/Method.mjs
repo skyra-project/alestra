@@ -52,9 +52,14 @@ export default class Method {
 	 * Validate an argument
 	 * @param {Argument} arg The argument to parse
 	 * @param {string} input The input from the user
+	 * @param {boolean} [array=false] Whether this is checking an inner array or not
 	 * @returns {any}
 	 */
-	static async _validateArg(arg, input) {
+	static async _validateArg(arg, input, array = false) {
+		if (!array && arg.type.endsWith('[]')) {
+			if (!Array.isArray(input)) throw new IncorrectArgumentError(arg, input);
+			return input.map(value => Method._validateArg(arg, value, true));
+		}
 		switch (arg.type) {
 			case 'number': return Method._validateArgNumber(arg, input);
 			case 'string': return Method._validateArgString(arg, input);

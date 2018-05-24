@@ -1,0 +1,7 @@
+// Remove `.example` from the file extension to configure Smii
+
+export const TOKEN = '< BOT TOKEN GOES HERE >';
+export const SIZES = {
+	WIDTH: 1500,
+	HEIGTH: 1500
+};

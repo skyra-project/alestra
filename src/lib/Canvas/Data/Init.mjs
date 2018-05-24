@@ -180,8 +180,8 @@ export default function init(evaluator) {
 			.add({ name: 'y1', type: 'number', required: true })
 			.add({
 				name: 'steps', type: 'object[]', required: false, properties: new Map()
-					.set('position', { name: 'position', type: 'number', required: false })
-					.set('color', { name: 'color', type: 'string', required: false })
+					.set('position', { name: 'position', type: 'number', required: true })
+					.set('color', { name: 'color', type: 'string', required: true })
 			}))
 		.add(new Method('printLinearGradient')
 			.add({ name: 'x0', type: 'number', required: true })
@@ -190,8 +190,8 @@ export default function init(evaluator) {
 			.add({ name: 'y1', type: 'number', required: true })
 			.add({
 				name: 'steps', type: 'object[]', required: false, properties: new Map()
-					.set('position', { name: 'position', type: 'number', required: false })
-					.set('color', { name: 'color', type: 'string', required: false })
+					.set('position', { name: 'position', type: 'number', required: true })
+					.set('color', { name: 'color', type: 'string', required: true })
 			}))
 		.add(new Method('createRadialGradient')
 			.add({ name: 'x0', type: 'number', required: true })
@@ -202,8 +202,8 @@ export default function init(evaluator) {
 			.add({ name: 'r1', type: 'number', required: true })
 			.add({
 				name: 'steps', type: 'object[]', required: false, properties: new Map()
-					.set('position', { name: 'position', type: 'number', required: false })
-					.set('color', { name: 'color', type: 'string', required: false })
+					.set('position', { name: 'position', type: 'number', required: true })
+					.set('color', { name: 'color', type: 'string', required: true })
 			}))
 		.add(new Method('printRadialGradient')
 			.add({ name: 'x0', type: 'number', required: true })
@@ -214,8 +214,8 @@ export default function init(evaluator) {
 			.add({ name: 'r1', type: 'number', required: true })
 			.add({
 				name: 'steps', type: 'object[]', required: false, properties: new Map()
-					.set('position', { name: 'position', type: 'number', required: false })
-					.set('color', { name: 'color', type: 'string', required: false })
+					.set('position', { name: 'position', type: 'number', required: true })
+					.set('color', { name: 'color', type: 'string', required: true })
 			}))
 		.add(new Method('createEllipse')
 			.add({ name: 'x', type: 'number', required: true })
