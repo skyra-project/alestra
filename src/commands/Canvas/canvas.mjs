@@ -1,7 +1,8 @@
-import { Command } from 'klasa';
+import { Command as KlasaCommand, Stopwatch, util as KlasaUtil } from 'klasa';
 import { Canvas } from 'canvas-constructor';
+import { inspect } from 'util';
 
-export default class extends Command {
+export default class Command extends KlasaCommand {
 
 	constructor(...args) {
 		super(...args, {
@@ -16,12 +17,16 @@ export default class extends Command {
 	}
 
 	async run(message, [code]) {
+		const sw = new Stopwatch(5);
 		try {
 			let output = await this.client.evaluator.parse(code);
+			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
-			return message.channel.sendFile(output, 'output.png');
+			if (output instanceof Buffer) return message.channel.sendFile(output, 'output.png', `\`✔\` \`⏱ ${sw}\``);
+			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
-			return message.sendCode('', error.toString());
+			if (sw.running) sw.stop();
+			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', error)}`;
 		}
 	}
 

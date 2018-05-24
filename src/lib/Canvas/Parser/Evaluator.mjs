@@ -28,7 +28,15 @@ export default class Evaluator {
 		if (height > SIZES.HEIGHT) throw new Error(`Canvas height must be a value lower than ${SIZES.HEIGHT}. Got: ${height}`);
 
 		const canvas = new Canvas(Number(result[1]), Number(result[2]));
-		for (const [method, args] of methods) canvas[method](...args);
+		let breakChain = null;
+		for (const [method, args] of methods) {
+			if (breakChain) throw new MethodParseError(`The CanvasConstructor.prototype.${breakChain} call was not chainable.`);
+			if (typeof canvas[method] === 'function') {
+				if (canvas[method](...args) !== canvas) breakChain = method;
+			} else {
+				throw new MethodParseError(`CanvasConstructor.prototype.${method} is not a function.`);
+			}
+		}
 
 		return canvas;
 	}
