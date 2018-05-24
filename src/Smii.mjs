@@ -1,5 +1,5 @@
 import { TOKEN } from '../config.mjs';
-import Smii from './lib/Smii';
+import { Smii } from './index';
 
 new Smii({
 	commandEditing: true,

@@ -5,9 +5,9 @@ import {
 	IncorrectArgumentError,
 	ArgumentParseError
 } from '../Util/ValidateError.mjs';
+import ArgumentParser from './ArgumentParser.mjs';
+import Argument from './Argument.mjs';
 import { get } from 'snekfetch';
-import { ArgumentParser } from './ArgumentParser.mjs';
-import { Argument } from './Argument.mjs';
 
 export default class Method {
 

@@ -1,7 +1,7 @@
 import { CompilationParseError } from '../Util/ValidateError.mjs';
 import { QUOTES, NUMBER, SPACE, VARCHAR, CHAR } from '../Util/Constants';
 
-export class ArgumentParser {
+export default class ArgumentParser {
 
 	constructor(line) {
 		this.line = line;

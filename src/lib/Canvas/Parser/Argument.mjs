@@ -1,4 +1,6 @@
-export class Argument {
+import PropertyMap from './PropertyMap';
+
+export default class Argument {
 
 	constructor({ parent, name, required = false, custom, type = typeof custom === 'function' ? 'custom' : null, properties = new Map() }) {
 		this.parent = parent;
@@ -8,19 +10,6 @@ export class Argument {
 		this.custom = custom;
 		this.properties = new PropertyMap(this);
 		for (const value of properties.values()) this.properties.set(value);
-	}
-
-}
-
-export class PropertyMap extends Map {
-
-	constructor(parent) {
-		super();
-		this.parent = parent;
-	}
-
-	set(value) {
-		return super.set(value.name, new Argument({ parent: this.parent, ...value }));
 	}
 
 }
