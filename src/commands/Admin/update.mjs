@@ -15,7 +15,7 @@ export default class Command extends KlasaCommand {
 	async run(message, [branch = 'master']) {
 		const pullResponse = await util.exec(`git pull origin ${branch}`);
 		const response = await message.channel.sendCode('prolog', [pullResponse.stdout, pullResponse.stderr || '✔'].join('\n-=-=-=-\n'));
-		if ((await util.exec('git rev-parse --abbrev-ref HEAD')).stdout !== branch) {
+		if (await this.isCurrentBranch(branch)) {
 			const switchResponse = await message.channel.send(`Switching to ${branch}...`);
 			const checkoutResponse = await util.exec(`git checkout ${branch}`);
 			await switchResponse.edit([checkoutResponse.stdout, checkoutResponse.stderr || '✔'].join('\n-=-=-=-\n'), { code: 'prolog' });
@@ -24,6 +24,11 @@ export default class Command extends KlasaCommand {
 			return this.store.get('reboot').run(message);
 		}
 		return response;
+	}
+
+	async isCurrentBranch(branch) {
+		const { stdout } = await util.exec('git symbolic-ref --short HEAD');
+		return stdout === `refs/heads/${branch}\n` || stdout === `${branch}\n`;
 	}
 
 }
