@@ -1,5 +1,13 @@
 import { Type } from 'klasa';
 
+export class CompilationParseError extends Error {
+
+	toString() {
+		return `${this.constructor.name}: ${this.message}`;
+	}
+
+}
+
 export class ValidateError extends Error {
 
 	constructor(argument) {

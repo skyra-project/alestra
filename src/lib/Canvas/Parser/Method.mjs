@@ -5,9 +5,9 @@ import {
 	IncorrectArgumentError,
 	ArgumentParseError
 } from '../Util/ValidateError.mjs';
-import { QUOTES } from '../Util/Constants.mjs';
 import { get } from 'snekfetch';
 import { util } from 'klasa';
+import { ArgumentParser } from './ArgumentParser.mjs';
 
 export default class Method {
 
@@ -35,12 +35,15 @@ export default class Method {
 	}
 
 	async validate(params) {
-		const parsed = params.split(',').map(param => param.trim());
+		const parser = new ArgumentParser(params);
+		const parsed = parser.parse();
+		parser.dispose();
+
 		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
 
 		const output = [];
 		for (let i = 0; i < parsed.length; i++)
-			output[i] = await Method._validateArg(this.arguments[i], parsed[i]);
+			output[i] = await Method._validateArg(this.arguments[i], parsed[i].value);
 
 		return output;
 	}
@@ -67,31 +70,13 @@ export default class Method {
 	}
 
 	static _validateArgNumber(arg, input) {
-		const parsed = Number(input);
-		if (util.isNumber(parsed)) return parsed;
+		if (util.isNumber(input)) return input;
 		throw new IncorrectArgumentError(arg, input);
 	}
 
 	static _validateArgString(arg, input) {
-		const firstChar = input.charAt(0);
-		if (!QUOTES.test(firstChar)) throw new ArgumentParseError(arg, 'Invalid string literal: Expected a pair of single quotes (\'), double quotes (") or backticks (`).');
-		const lastChar = input.charAt(input.length - 1);
-		if (firstChar !== lastChar) throw new ArgumentParseError(arg, 'Failed to parse string: Mismatching quotes.');
-
-		let quotes = 0, point = 0;
-		while (point < input.length) {
-			const char = input.charAt(point);
-			if (char === '\\') {
-				point += 2;
-			} else {
-				if (char === firstChar) quotes++;
-				point++;
-			}
-		}
-
-		if (quotes % 2 !== 0) throw new ArgumentParseError(arg, 'Failed to parse string: Unescaped string literals.');
-
-		return input.substring(1, input.length - 1);
+		if (typeof input === 'string') return input;
+		throw new ArgumentParseError(arg, 'Invalid string literal: Expected a pair of single quotes (\'), double quotes (") or backticks (`).');
 	}
 
 	static async _validateArgBuffer(arg, input) {
@@ -110,14 +95,13 @@ export default class Method {
 
 	static async _validateArgObject(arg, input) {
 		try {
-			const parsed = JSON.parse(input);
-			if (!arg.properties) return parsed;
-			const keys = Object.keys(parsed);
+			if (!arg.properties) return input;
+			const keys = Object.keys(input);
 			for (const key of keys) {
 				if (!arg.properties.has(key)) throw new UnknownArgumentPropertyError(arg, key);
-				parsed[key] = await Method._validateArg(arg.properties.get(key), parsed[key]);
+				input[key] = await Method._validateArg(arg.properties.get(key), input[key]);
 			}
-			return parsed;
+			return input;
 		} catch (error) {
 			if (error instanceof ValidateError) throw error;
 			throw new ArgumentParseError(arg, `Failed to parse JSON object: ${error.message}`);
