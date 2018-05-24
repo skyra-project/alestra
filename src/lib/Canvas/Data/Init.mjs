@@ -7,13 +7,13 @@ export default function init(evaluator) {
 	if (!(evaluator instanceof Evaluator)) throw new TypeError(`Expected evaluator to be an Evaluator instance, got ${new Type(evaluator)} instead.`);
 
 	evaluator
-		.add(new Method('changeCanvasSize')
-			.add({ name: 'width', type: 'number', required: true })
-			.add({ name: 'height', type: 'number', required: true }))
-		.add(new Method('changeCanvasWidth')
-			.add({ name: 'width', type: 'number', required: true }))
-		.add(new Method('changeCanvasHeigth')
-			.add({ name: 'height', type: 'number', required: true }))
+		// .add(new Method('changeCanvasSize')
+		// 	.add({ name: 'width', type: 'number', required: true })
+		// 	.add({ name: 'height', type: 'number', required: true }))
+		// .add(new Method('changeCanvasWidth')
+		// 	.add({ name: 'width', type: 'number', required: true }))
+		// .add(new Method('changeCanvasHeigth')
+		// 	.add({ name: 'height', type: 'number', required: true }))
 		.add(new Method('save'))
 		.add(new Method('restore'))
 		.add(new Method('rotate')
@@ -305,13 +305,13 @@ export default function init(evaluator) {
 		// 	.add({ name: 'type', type: 'string', required: true })
 		// 	.add({ name: 'args', type: '', required: true }))
 		// .add(new Method('toDataURLAsync'));
-		.add(new Method('getCanvas'))
+		// .add(new Method('getCanvas'))
 		.add(new Method('addTextFont')
 			.add({ name: 'path', type: 'string', required: true })
-			.add({ name: 'family', type: 'string', required: true }))
-		.add(new Method('registerFont')
-			.add({ name: 'path', type: 'string', required: true })
 			.add({ name: 'family', type: 'string', required: true }));
+	// .add(new Method('registerFont')
+	// 	.add({ name: 'path', type: 'string', required: true })
+	// 	.add({ name: 'family', type: 'string', required: true }));
 	// .add(new Method('process')
 	// 	.add({ name: 'fn', type: 'function', required: true }))
 }
