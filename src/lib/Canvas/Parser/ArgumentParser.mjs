@@ -87,14 +87,14 @@ export default class ArgumentParser {
 		} else if (char === ',') {
 			this.parsed.push(undefined);
 		} else if (!SPACE.test(char)) {
-			throw new CompilationParseError(`Cannot parse ${char} at position ${this.i}`);
+			throw new CompilationParseError(`Cannot parse ${char} at position ${this.i}.`);
 		}
 	}
 
 	_parseVariable(char) {
 		if (VARCHAR.test(char)) this.chunk += char;
 		else if (char === ',') this._endArgument(parseLiteral(this.chunk), 1);
-		else throw new CompilationParseError('Failed to parse literal');
+		else throw new CompilationParseError(`Failed to parse literal \`${this.chunk}${char}\` at position ${this.i}.`);
 	}
 
 	_parseString(char) {
@@ -111,7 +111,7 @@ export default class ArgumentParser {
 	_parseNumber(char) {
 		if (char === ',') this._endArgument(Number(this.chunk), 1);
 		else if (NUMBER.test(char)) this.chunk += char;
-		else throw new CompilationParseError('Failed to parse number');
+		else throw new CompilationParseError(`Failed to parse number \`${this.chunk}${char}\` at position ${this.i}.`);
 	}
 
 	_parseArray(char) {
