@@ -58,7 +58,7 @@ export default class Method {
 	static async _validateArg(arg, input, array = false) {
 		if (!array && arg.type.endsWith('[]')) {
 			if (!Array.isArray(input)) throw new IncorrectArgumentError(arg, input);
-			return input.map(value => Method._validateArg(arg, value, true));
+			return input.map(value => Method._validateArg({ type: arg.type.slice(0, arg.type.length - 2), ...arg }, value, true));
 		}
 		switch (arg.type) {
 			case 'number': return Method._validateArgNumber(arg, input);
