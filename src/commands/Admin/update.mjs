@@ -15,7 +15,7 @@ export default class Command extends KlasaCommand {
 	async run(message, [branch = 'master']) {
 		const pullResponse = await util.exec(`git pull origin ${branch}`);
 		const response = await message.channel.sendCode('prolog', [pullResponse.stdout, pullResponse.stderr || '✔'].join('\n-=-=-=-\n'));
-		if (await this.isCurrentBranch(branch)) {
+		if (!await this.isCurrentBranch(branch)) {
 			const switchResponse = await message.channel.send(`Switching to ${branch}...`);
 			const checkoutResponse = await util.exec(`git checkout ${branch}`);
 			await switchResponse.edit([checkoutResponse.stdout, checkoutResponse.stderr || '✔'].join('\n-=-=-=-\n'), { code: 'prolog' });
