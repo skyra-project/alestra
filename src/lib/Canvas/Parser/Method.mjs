@@ -6,8 +6,8 @@ import {
 	ArgumentParseError
 } from '../Util/ValidateError.mjs';
 import { get } from 'snekfetch';
-import { util } from 'klasa';
 import { ArgumentParser } from './ArgumentParser.mjs';
+import { Argument } from './Argument.mjs';
 
 export default class Method {
 
@@ -27,9 +27,9 @@ export default class Method {
 		this.required = 0;
 	}
 
-	add({ name, required = false, custom, type = typeof custom === 'function' ? 'custom' : null, properties = null }) {
-		this.arguments.push({ parent: this, name, required, type, custom, properties });
-		if (required) this.required++;
+	add(options) {
+		this.arguments.push(new Argument({ parent: this, ...options }));
+		if (options.required) this.required++;
 
 		return this;
 	}
@@ -58,6 +58,7 @@ export default class Method {
 		switch (arg.type) {
 			case 'number': return Method._validateArgNumber(arg, input);
 			case 'string': return Method._validateArgString(arg, input);
+			case 'boolean': return Method._validateArgBoolean(arg, input);
 			case 'buffer': return Method._validateArgBuffer(arg, input);
 			case 'object': return Method._validateArgObject(arg, input);
 			case 'custom': {
@@ -65,18 +66,23 @@ export default class Method {
 				return arg.custom(arg, input);
 			}
 			default:
-				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type, please report this to this bot's owners.`);
+				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type (${arg.type}), please report this to this bot's owners.`);
 		}
 	}
 
 	static _validateArgNumber(arg, input) {
-		if (util.isNumber(input)) return input;
+		if (typeof input === 'number') return input;
 		throw new IncorrectArgumentError(arg, input);
 	}
 
 	static _validateArgString(arg, input) {
 		if (typeof input === 'string') return input;
-		throw new ArgumentParseError(arg, 'Invalid string literal: Expected a pair of single quotes (\'), double quotes (") or backticks (`).');
+		throw new IncorrectArgumentError(arg, input);
+	}
+
+	static _validateArgBoolean(arg, input) {
+		if (typeof input === 'boolean') return input;
+		throw new IncorrectArgumentError(arg, input);
 	}
 
 	static async _validateArgBuffer(arg, input) {

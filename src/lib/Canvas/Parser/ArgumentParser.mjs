@@ -87,7 +87,6 @@ export class ArgumentParser {
 		} else if (char === ',') {
 			this.parsed.push(undefined);
 		} else if (!SPACE.test(char)) {
-			console.log(char);
 			throw new CompilationParseError(`Cannot parse ${char} at position ${this.i}`);
 		}
 	}
@@ -125,7 +124,7 @@ export class ArgumentParser {
 		if (char === '{') {
 			this.nest++;
 		} else if (char === '}') {
-			if (this.nest === 0) this._endArgument(JSON.parse(this.chunk.replace(/([^"])(\w[\w\d]+):/g, '$1"$2":')));
+			if (this.nest === 0) this._endArgument(parse(this.chunk.replace(/([^"])(\w[\w\d]+):/g, '$1"$2":')));
 			else this.nest--;
 		}
 	}
@@ -135,11 +134,24 @@ export class ArgumentParser {
 export function parseLiteral(literal) {
 	switch (literal) {
 		case 'null': return null;
+		case 'false': return false;
+		case 'true': return true;
 		case 'undefined': return undefined;
 		case 'Infinity': return Infinity;
 		case 'NaN': return NaN;
 		default:
 			if (literal in global) throw new CompilationParseError(`The literal \`${literal}\` is not available.`);
 			return literal;
+	}
+}
+
+function parse(string) {
+	const fixed = string.replace(/([^"])(\w[\w\d]+):/g, '$1"$2":').replace(/:\s*'([^']*)'/g, ':"$1"');
+
+	try {
+		const parsed = JSON.parse(fixed);
+		return parsed;
+	} catch (_) {
+		throw new CompilationParseError(`Could not parse the JSON object \`${string}\`.`);
 	}
 }

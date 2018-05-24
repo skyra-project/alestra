@@ -101,6 +101,7 @@ export default function init(evaluator) {
 				name: 'options', type: 'object', required: false, properties: new Map()
 					.set('radius', { name: 'radius', type: 'number', required: false })
 					.set('type', { name: 'type', type: 'custom', required: false, custom: multiOptions.bind(null, ['round', 'bevel']) })
+					.set('restore', { name: 'restore', type: 'boolean', required: false })
 			}))
 		.add(new Method('addRoundImage')
 			.add({ name: 'link', type: 'buffer', required: true })
@@ -273,6 +274,7 @@ export default function init(evaluator) {
 		.add(new Method('setAntialiasing')
 			.add({ name: 'antialias', type: 'custom', required: true, custom: multiOptions.bind(null, ['default', 'none', 'gray', 'subpixel']) }))
 		.add(new Method('setGlobalCompositeOperation')
+			// eslint-disable-next-line max-len
 			.add({ name: 'type', type: 'custom', required: true, custom: multiOptions.bind(null, ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'copy', 'xor', 'darken', 'lighten', 'color-dodge', 'color-burn', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'multiply', 'screen', 'overlay', 'hard-light', 'soft-light', 'hsl-hue', 'hsl-saturation', 'hsl-color', 'hsl-luminosity']) }))
 		.add(new Method('setGlobalAlpha')
 			.add({ name: 'value', type: 'number', required: true }))
@@ -297,9 +299,8 @@ export default function init(evaluator) {
 		.add(new Method('isPointInStroke')
 			.add({ name: 'x', type: 'number', required: true })
 			.add({ name: 'y', type: 'number', required: true }))
-		// .add(new Method('toBuffer')
-		// 	.add({ name: 'args', type: '', required: true }))
-		// .add(new Method('toBufferAsync'))
+		.add(new Method('toBuffer'))
+		.add(new Method('toBufferAsync'))
 		// .add(new Method('toDataURL')
 		// 	.add({ name: 'type', type: 'string', required: true })
 		// 	.add({ name: 'args', type: '', required: true }))
@@ -311,6 +312,6 @@ export default function init(evaluator) {
 		.add(new Method('registerFont')
 			.add({ name: 'path', type: 'string', required: true })
 			.add({ name: 'family', type: 'string', required: true }));
-		// .add(new Method('process')
-		// 	.add({ name: 'fn', type: 'function', required: true }))
+	// .add(new Method('process')
+	// 	.add({ name: 'fn', type: 'function', required: true }))
 }
