@@ -1,5 +1,7 @@
 import { CANVAS_HEADER, SPLIT_METHODS, METHOD_PARSE } from '../Util/Constants.mjs';
+import { MethodParseError } from '../Util/ValidateError.mjs';
 import Method from './Method.mjs';
+import { SIZES } from '../../../../config';
 import { Canvas } from 'canvas-constructor';
 import { Type } from 'klasa';
 
@@ -21,8 +23,20 @@ export default class Evaluator {
 		const result = CANVAS_HEADER.exec(input);
 		const methods = await this.parseInput(input.slice(result[0].length, input.length));
 
+		const width = Number(result[1]), height = Number(result[2]);
+		if (width > SIZES.WIDTH) throw new Error(`Canvas width must be a value lower than ${SIZES.WIDTH}. Got: ${width}`);
+		if (height > SIZES.HEIGHT) throw new Error(`Canvas height must be a value lower than ${SIZES.HEIGHT}. Got: ${height}`);
+
 		const canvas = new Canvas(Number(result[1]), Number(result[2]));
-		for (const [method, args] of methods) canvas[method](...args);
+		let breakChain = null;
+		for (const [method, args] of methods) {
+			if (breakChain) throw new MethodParseError(`The CanvasConstructor.prototype.${breakChain} call was not chainable.`);
+			if (typeof canvas[method] === 'function') {
+				if (canvas[method](...args) !== canvas) breakChain = method;
+			} else {
+				throw new MethodParseError(`CanvasConstructor.prototype.${method} is not a function.`);
+			}
+		}
 
 		return canvas;
 	}
@@ -41,8 +55,9 @@ export default class Evaluator {
 	async parseMethod(input) {
 		if (!METHOD_PARSE.test(input)) throw new Error(`Expected line to be like \`.method()\`, got: ${input}`);
 		const [, method, params] = METHOD_PARSE.exec(input);
+		if (!(method in Canvas.prototype)) throw new MethodParseError(`The method ${method} does not exist.`);
 		if (this.methods.has(method)) return [method, await this.methods.get(method).validate(params)];
-		throw new Error(`The method ${method} is not available.`);
+		throw new MethodParseError(`The method ${method} is blocked.`);
 	}
 
 }

@@ -1,10 +1,19 @@
 {
   "name": "smii",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Canvas-Constructor helper bot",
   "main": "src/Smii.mjs",
   "scripts": {
-    "test": "eslint src"
+    "lint": "eslint --fix src",
+    "pm2:delete": "pm2 delete Smii",
+    "pm2:logs": "pm2 logs Smii --lines=200",
+    "pm2:restart": "pm2 restart Smii",
+    "pm2:start-harmony": "pm2 start src/Smii.mjs --node-args=\"--experimental-modules --harmony --harmony-bigint\" --name=\"Smii\"",
+    "pm2:start": "pm2 start src/Smii.mjs --node-args=\"--experimental-modules\" --name=\"Smii\"",
+    "pm2:stop": "pm2 stop Smii",
+    "start": "node --experimental-modules src/Smii.mjs",
+    "test": "eslint src",
+    "update": "npm i"
   },
   "repository": {
     "type": "git",
@@ -17,6 +26,11 @@
     "discord.js",
     "klasa"
   ],
+  "contributors": [
+    "kyranet",
+    "yorkaargh"
+  ],
+  "private": true,
   "author": "kyraNET",
   "license": "MIT",
   "bugs": {

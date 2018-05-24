@@ -5,8 +5,9 @@ import {
 	IncorrectArgumentError,
 	ArgumentParseError
 } from '../Util/ValidateError.mjs';
+import ArgumentParser from './ArgumentParser.mjs';
+import Argument from './Argument.mjs';
 import { get } from 'snekfetch';
-import { util } from 'klasa';
 
 export default class Method {
 
@@ -26,20 +27,23 @@ export default class Method {
 		this.required = 0;
 	}
 
-	add({ name, required = false, custom, type = typeof custom === 'function' ? 'custom' : null, properties = null }) {
-		this.arguments.push({ parent: this, name, required, type, properties });
-		if (required) this.required++;
+	add(options) {
+		this.arguments.push(new Argument({ parent: this, ...options }));
+		if (options.required) this.required++;
 
 		return this;
 	}
 
 	async validate(params) {
-		const parsed = params.split(',').map(param => param.trim());
+		const parser = new ArgumentParser(params);
+		const parsed = parser.parse();
+		parser.dispose();
+
 		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
 
 		const output = [];
 		for (let i = 0; i < parsed.length; i++)
-			output[i] = await Method._validateArg(this.arguments[i], parsed[i]);
+			output[i] = await Method._validateArg(this.arguments[i], parsed[i].value);
 
 		return output;
 	}
@@ -48,68 +52,70 @@ export default class Method {
 	 * Validate an argument
 	 * @param {Argument} arg The argument to parse
 	 * @param {string} input The input from the user
+	 * @param {boolean} [array=false] Whether this is checking an inner array or not
 	 * @returns {any}
 	 */
-	static async _validateArg(arg, input) {
+	static async _validateArg(arg, input, array = false) {
+		if (!array && arg.type.endsWith('[]')) {
+			if (!Array.isArray(input)) throw new IncorrectArgumentError(arg, input);
+			return input.map(value => Method._validateArg({ type: arg.type.slice(0, arg.type.length - 2), ...arg }, value, true));
+		}
 		switch (arg.type) {
-			case 'number': {
-				const parsed = Number(input);
-				if (util.isNumber(parsed)) return parsed;
-				throw new IncorrectArgumentError(arg, input);
-			}
-			case 'string': {
-				const firstChar = input.charAt(0);
-				const lastChar = input.charAt(input.length - 1);
-				if (firstChar !== lastChar) throw new ArgumentParseError(arg, 'Failed to parse string: Mismatching quotes.');
-
-				let quotes = 0, point = 0;
-				while (point < input.length) {
-					const char = input.charAt(point);
-					if (char === '\\') {
-						point += 2;
-					} else {
-						if (char === firstChar) quotes++;
-						point++;
-					}
-				}
-
-				if (quotes % 2 !== 0) throw new ArgumentParseError(arg, 'Failed to parse string: Unescaped string literals.');
-
-				return input.substring(1, input.length - 1);
-			}
-			case 'buffer': {
-				const link = await Method._validateArg({ ...arg, type: 'string' }, input);
-
-				try {
-					const url = new URL(link);
-					return get(url.href)
-						.then(result => result.body)
-						.catch(() => { throw { message: `Cannot get ${url.href}` }; });
-				} catch (error) {
-					throw new ArgumentParseError(arg, `Failed to parse link: ${error.message}`);
-				}
-			}
-			case 'object': {
-				try {
-					const parsed = JSON.parse(input);
-					if (!arg.properties) return parsed;
-					const keys = Object.keys(parsed);
-					for (const key of keys) {
-						if (!arg.properties.has(key)) throw new UnknownArgumentPropertyError(arg, key);
-						parsed[key] = await Method._validateArg(arg.properties.get(key), parsed[key]);
-					}
-					return parsed;
-				} catch (error) {
-					if (error instanceof ValidateError) throw error;
-					throw new ArgumentParseError(arg, `Failed to parse JSON object: ${error.message}`);
-				}
-			}
+			case 'number': return Method._validateArgNumber(arg, input);
+			case 'string': return Method._validateArgString(arg, input);
+			case 'boolean': return Method._validateArgBoolean(arg, input);
+			case 'buffer': return Method._validateArgBuffer(arg, input);
+			case 'object': return Method._validateArgObject(arg, input);
 			case 'custom': {
 				if (typeof arg.custom !== 'function') throw new Error(`${arg.parent.name}::${arg.name} does not have the resolver.`);
 				return arg.custom(arg, input);
 			}
 			default:
-				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type, please report this to this bot's owners.`);
+				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type (${arg.type}), please report this to this bot's owners.`);
+		}
+	}
+
+	static _validateArgNumber(arg, input) {
+		if (typeof input === 'number') return input;
+		throw new IncorrectArgumentError(arg, input);
+	}
+
+	static _validateArgString(arg, input) {
+		if (typeof input === 'string') return input;
+		throw new IncorrectArgumentError(arg, input);
+	}
+
+	static _validateArgBoolean(arg, input) {
+		if (typeof input === 'boolean') return input;
+		throw new IncorrectArgumentError(arg, input);
+	}
+
+	static async _validateArgBuffer(arg, input) {
+		const link = Method._validateArgString({ ...arg, type: 'string' }, input);
+
+		try {
+			const url = new URL(link);
+			if (url.protocol !== 'https:' && url.protocol !== 'http:') throw { message: `${url.href} is not a valid URL.` };
+			return get(url.href)
+				.then(result => result.body)
+				.catch(() => { throw { message: `Cannot get ${url.href}` }; });
+		} catch (error) {
+			throw new ArgumentParseError(arg, `Failed to parse link: ${error.message}`);
+		}
+	}
+
+	static async _validateArgObject(arg, input) {
+		try {
+			if (!arg.properties) return input;
+			const keys = Object.keys(input);
+			for (const key of keys) {
+				if (!arg.properties.has(key)) throw new UnknownArgumentPropertyError(arg, key);
+				input[key] = await Method._validateArg(arg.properties.get(key), input[key]);
+			}
+			return input;
+		} catch (error) {
+			if (error instanceof ValidateError) throw error;
+			throw new ArgumentParseError(arg, `Failed to parse JSON object: ${error.message}`);
 		}
 	}
 
