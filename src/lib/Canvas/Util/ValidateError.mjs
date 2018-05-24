@@ -8,6 +8,8 @@ export class CompilationParseError extends Error {
 
 }
 
+export class MethodParseError extends CompilationParseError { }
+
 export class ValidateError extends Error {
 
 	constructor(argument) {

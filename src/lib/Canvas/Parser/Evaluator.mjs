@@ -1,4 +1,5 @@
 import { CANVAS_HEADER, SPLIT_METHODS, METHOD_PARSE } from '../Util/Constants.mjs';
+import { MethodParseError } from '../Util/ValidateError.mjs';
 import Method from './Method.mjs';
 import { SIZES } from '../../../../config';
 import { Canvas } from 'canvas-constructor';
@@ -46,8 +47,9 @@ export default class Evaluator {
 	async parseMethod(input) {
 		if (!METHOD_PARSE.test(input)) throw new Error(`Expected line to be like \`.method()\`, got: ${input}`);
 		const [, method, params] = METHOD_PARSE.exec(input);
+		if (!(method in Canvas.prototype)) throw new MethodParseError(`The method ${method} does not exist.`);
 		if (this.methods.has(method)) return [method, await this.methods.get(method).validate(params)];
-		throw new Error(`The method ${method} is not available.`);
+		throw new MethodParseError(`The method ${method} is blocked.`);
 	}
 
 }
