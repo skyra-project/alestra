@@ -99,7 +99,7 @@ export default class Method {
 
 		try {
 			const url = new URL(link);
-			if (url.protocol !== 'https:' || url.protocol !== 'http:') throw { message: `${url.href} is not a valid URL.` };
+			if (url.protocol !== 'https:' && url.protocol !== 'http:') throw { message: `${url.href} is not a valid URL.` };
 			return get(url.href)
 				.then(result => result.body)
 				.catch(() => { throw { message: `Cannot get ${url.href}` }; });
