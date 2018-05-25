@@ -21,11 +21,12 @@ export default class Evaluator {
 	async parse(input) {
 		if (!CANVAS_HEADER.test(input)) throw new Error(`You must initialize Canvas with \`new Canvas(width, height)\`.`);
 		const result = CANVAS_HEADER.exec(input);
-		const methods = await this.parseInput(input.slice(result[0].length, input.length));
 
 		const width = Number(result[1]), height = Number(result[2]);
 		if (width > SIZES.WIDTH) throw new Error(`Canvas width must be a value lower than ${SIZES.WIDTH}. Got: ${width}`);
 		if (height > SIZES.HEIGHT) throw new Error(`Canvas height must be a value lower than ${SIZES.HEIGHT}. Got: ${height}`);
+
+		const methods = await this.parseInput(input.slice(result[0].length, input.length));
 
 		const canvas = new Canvas(Number(result[1]), Number(result[2]));
 		let breakChain = null;
@@ -44,7 +45,9 @@ export default class Evaluator {
 	async parseInput(input) {
 		const semicolon = input.indexOf(';');
 		if (semicolon !== -1) input = input.slice(0, semicolon);
+		input = input.trim();
 
+		if (!input.length) return [];
 		const methods = input.split(SPLIT_METHODS).map(mt => mt.trim());
 
 		const parsed = [];
