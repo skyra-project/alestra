@@ -6,3 +6,5 @@ export const NUMBER = /\d/;
 export const CHAR = /[a-zA-Z_]/;
 export const VARCHAR = /[a-zA-Z0-9_]/;
 export const SPACE = /\s/;
+export const HEXLITERALS = /\\u([0-9a-fA-F]{4})/;
+export const HEXLITERALS_GLOBAL = /\\u([0-9a-fA-F]{4})/g;

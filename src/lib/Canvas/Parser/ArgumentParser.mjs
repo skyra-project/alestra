@@ -1,5 +1,12 @@
 import { CompilationParseError } from '../Util/ValidateError.mjs';
-import { QUOTES, NUMBER, SPACE, VARCHAR, CHAR } from '../Util/Constants';
+import {
+	QUOTES,
+	NUMBER,
+	SPACE,
+	VARCHAR,
+	CHAR,
+	HEXLITERALS_GLOBAL
+} from '../Util/Constants';
 
 export default class ArgumentParser {
 
@@ -62,6 +69,7 @@ export default class ArgumentParser {
 	}
 
 	_endArgument(parsed, offset = 0) {
+		if (this.type === 'string') parsed = parsed.replace(HEXLITERALS_GLOBAL, (_, hex) => String.fromCharCode(hex));
 		this.parsed.push({ type: this.type, value: parsed });
 		this.quote = null;
 		this.type = null;
