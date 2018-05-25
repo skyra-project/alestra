@@ -1,6 +1,6 @@
 {
   "name": "smii",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Canvas-Constructor helper bot",
   "main": "src/Smii.mjs",
   "scripts": {
