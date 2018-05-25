@@ -100,7 +100,7 @@ export default class ArgumentParser {
 	_parseString(char) {
 		if (char === '\\' && this.line.charAt(this.i + 1) === this.quote) {
 			this.chunk += this.quote;
-			this.i += 2;
+			this.i++;
 		} else if (char === this.quote) {
 			this._endArgument(this.chunk);
 		} else {
