@@ -1,26 +1,12 @@
-import Smii from './lib/Smii';
+export Smii from './lib/Smii';
 
-import Init from './lib/Canvas/Data/Init';
-import Argument from './lib/Canvas/Parser/Argument';
-import ArgumentParser from './lib/Canvas/Parser/ArgumentParser';
-import Evaluator from './lib/Canvas/Parser/Evaluator';
-import Method from './lib/Canvas/Parser/Method';
-import PropertyMap from './lib/Canvas/Parser/PropertyMap';
+export Init from './lib/Canvas/Data/Init';
+export Argument from './lib/Canvas/Parser/Argument';
+export ArgumentParser from './lib/Canvas/Parser/ArgumentParser';
+export Evaluator from './lib/Canvas/Parser/Evaluator';
+export Method from './lib/Canvas/Parser/Method';
+export PropertyMap from './lib/Canvas/Parser/PropertyMap';
 
-import * as Constants from './lib/Canvas/Util/Constants';
-import * as Util from './lib/Canvas/Util/Util';
-import * as ValidateError from './lib/Canvas/Util/ValidateError';
-
-export {
-	Smii,
-
-	Init,
-	Argument,
-	ArgumentParser,
-	Evaluator,
-	Method,
-	PropertyMap,
-	Constants,
-	Util,
-	ValidateError
-};
+export * as Constants from './lib/Canvas/Util/Constants';
+export * as Util from './lib/Canvas/Util/Util';
+export * as ValidateError from './lib/Canvas/Util/ValidateError';
