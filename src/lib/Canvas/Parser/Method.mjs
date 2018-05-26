@@ -3,7 +3,8 @@ import {
 	RequiredArgumentError,
 	UnknownArgumentPropertyError,
 	IncorrectArgumentError,
-	ArgumentParseError
+	ArgumentParseError,
+	TooManyArgumentsMethodError
 } from '../Util/ValidateError.mjs';
 import ArgumentParser from './ArgumentParser.mjs';
 import Argument from './Argument.mjs';
@@ -40,6 +41,7 @@ export default class Method {
 		parser.dispose();
 
 		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
+		if (parsed.length > this.arguments.length) throw new TooManyArgumentsMethodError(this, parsed.length);
 
 		const output = [];
 		for (let i = 0; i < parsed.length; i++)
