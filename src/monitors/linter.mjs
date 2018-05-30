@@ -23,7 +23,7 @@ export default class Monitor extends KlasaMonitor {
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)
-			await oldHandler.stop();
+			await oldHandler.handler.stop();
 
 		const code = CODEBLOCK_REGEXP.exec(message.content)[1].trim();
 		const errors = checkErrors(code);
@@ -32,12 +32,14 @@ export default class Monitor extends KlasaMonitor {
 			return;
 		}
 
-		await message.react('redCross:451517251464593411');
-		await message.react('🔍');
-		const reactions = await message.awaitReactions((reaction, user) => user.id === message.author.id && reaction.emoji.name === '🔍', { time: 15000, max: 1 });
-		if (!reactions.size) {
-			await message.reactions.removeAll();
-			return;
+		if (!oldHandler || oldHandler.message !== message) {
+			await message.react('redCross:451517251464593411');
+			await message.react('🔍');
+			const reactions = await message.awaitReactions((reaction, user) => user.id === message.author.id && reaction.emoji.name === '🔍', { time: 15000, max: 1 });
+			if (!reactions.size) {
+				await message.reactions.removeAll();
+				return;
+			}
 		}
 
 		const richDisplay = new RichDisplay(new MessageEmbed()
@@ -56,10 +58,10 @@ export default class Monitor extends KlasaMonitor {
 			await message.channel.send('<:canvasconstructor:451438332375728128> | Please wait...'),
 			{ filter: (_, user) => user.id === message.author.id });
 
-		this.handlers.set(message.author.id, handler);
+		this.handlers.set(message.author.id, { handler, message });
 		handler.once('end', () => {
 			this.handlers.delete(message.author.id);
-			if (!handler.message.deleted) handler.message.delete();
+			if (!handler.message.deleted) handler.message.delete().catch(() => null);
 		});
 	}
 
