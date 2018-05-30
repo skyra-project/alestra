@@ -6,7 +6,6 @@ import {
 	ArgumentParseError,
 	TooManyArgumentsMethodError
 } from '../Util/ValidateError.mjs';
-import ArgumentParser from './ArgumentParser.mjs';
 import Argument from './Argument.mjs';
 import { get } from 'snekfetch';
 
@@ -35,17 +34,13 @@ export default class Method {
 		return this;
 	}
 
-	async validate(params) {
-		const parser = new ArgumentParser(params);
-		const parsed = parser.parse();
-		parser.dispose();
-
-		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
-		if (parsed.length > this.arguments.length) throw new TooManyArgumentsMethodError(this, parsed.length);
+	async validate(args) {
+		if (args.length < this.required) throw new RequiredArgumentError(this.arguments[args.length]);
+		if (args.length > this.arguments.length) throw new TooManyArgumentsMethodError(this, args.length);
 
 		const output = [];
-		for (let i = 0; i < parsed.length; i++)
-			output[i] = await Method._validateArg(this.arguments[i], parsed[i].value);
+		for (let i = 0; i < args.length; i++)
+			output[i] = await Method._validateArg(this.arguments[i], args[i]);
 
 		return output;
 	}

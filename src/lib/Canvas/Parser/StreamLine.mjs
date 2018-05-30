@@ -1,6 +1,5 @@
 import { CompilationParseError } from '../Util/ValidateError.mjs';
 
-export const CHAR = /[a-zA-Z_]/;
 export const VARCHAR = /[a-zA-Z0-9_]/;
 export const QUOTES = /'|"|`/;
 export const NUMBER = /\d/;
@@ -289,23 +288,3 @@ export default class StreamLine {
 	}
 
 }
-
-for (const [method, args] of new StreamLine(`
-	.setColor(\`#2C2F33)
-	.addRect(0, 0, 84, 180)
-	.addRect(169, 26, 231, 46)
-	.addRect(224, 108, 176, 46)
-	.setShadowColor("rgba(22, 22, 22, 1)")
-	.setShadowOffsetY(5)
-	.setShadowBlur(10)
-	.addCircle(84, 90, 62)
-	.setColor("#23272A")
-	.addBeveledRect(20, 138, 128, 32, 5)
-	.setTextAlign("center")
-	.setColor("#FFFFFF")
-	.addText("Level Up!", 285, 54)
-	.addText("IPv6#0088", 84, 159)
-	.setTextAlign("left")
-	.addRoundImage("https://cdn.discordapp.com/avatars/425938842348945408/47b5f737756848f66cc8329f6cbd108d.png?size=2048", 20, 128, 128, 128)
-	.addText("Level 105", 241, 136)
-`).run()) console.log(method, args);
