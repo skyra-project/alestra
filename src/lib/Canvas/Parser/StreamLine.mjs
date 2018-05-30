@@ -34,15 +34,20 @@ export default class StreamLine {
 		this.string = str.trim();
 	}
 
-	*run() {
+	*run() { // eslint-disable-line complexity
+		const semicolonIndex = this.string.indexOf(';');
+		if (semicolonIndex !== -1) {
+			if (semicolonIndex !== this.string.length - 1) throw new CompilationParseError(`Unreachable code detected: ${this.string.slice(semicolonIndex + 1).trim()}`);
+			this.string = this.string.slice(0, semicolonIndex);
+		}
+
 		const max = this.string.length;
-		if (this.i === max) throw new Error('Already parsed');
 
 		let char, method = '', inMethodName = false;
 		while (this.i < max) {
 			char = this.string.charAt(this.i);
 			if (SPACE.test(char)) {
-				if (inMethodName) throw new CompilationParseError(`Unexpected identifier '${method} ' is not a valid method name.`);
+				if (inMethodName) throw new CompilationParseError(`Unexpected identifier '${method}' is not a valid method name.`);
 				this.i++;
 				continue;
 			}
