@@ -23,7 +23,7 @@ export default class Monitor extends KlasaMonitor {
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)
-			await oldHandler.stop('edit');
+			await oldHandler.stop();
 
 		const code = CODEBLOCK_REGEXP.exec(message.content)[1].trim();
 		const errors = checkErrors(code);
@@ -57,10 +57,9 @@ export default class Monitor extends KlasaMonitor {
 			{ filter: (_, user) => user.id === message.author.id });
 
 		this.handlers.set(message.author.id, handler);
-		handler.once('end', (_, reason) => {
+		handler.once('end', () => {
 			this.handlers.delete(message.author.id);
 			if (!handler.message.deleted) handler.message.delete();
-			if (reason !== 'edit' && message.reactions.size) message.reactions.removeAll();
 		});
 	}
 
