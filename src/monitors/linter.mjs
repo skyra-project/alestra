@@ -12,7 +12,7 @@ export default class Monitor extends KlasaMonitor {
 	constructor(...args) {
 		super(...args, { ignoreOthers: false, ignoreEdits: false });
 
-		this.displays = new Map();
+		this.handlers = new Map();
 	}
 
 	async run(message) {
@@ -21,11 +21,9 @@ export default class Monitor extends KlasaMonitor {
 			|| !message.guild.configs.supportChannels.includes(message.channel.id)
 			|| !CODEBLOCK_REGEXP.test(message.content)) return;
 
-		const oldHandler = this.displays.get(message.author.id);
-		if (oldHandler) {
-			if (!oldHandler.message.deleted) oldHandler.message.delete();
-			await oldHandler.stop();
-		}
+		const oldHandler = this.handlers.get(message.author.id);
+		if (oldHandler)
+			await oldHandler.stop('edit');
 
 		const code = CODEBLOCK_REGEXP.exec(message.content)[1].trim();
 		const errors = checkErrors(code);
@@ -58,8 +56,12 @@ export default class Monitor extends KlasaMonitor {
 			await message.channel.send('<:canvasconstructor:451438332375728128> | Please wait...'),
 			{ filter: (_, user) => user.id === message.author.id });
 
-		this.displays.set(message.author.id, handler);
-		handler.once('end', () => { this.displays.delete(message.author.id); });
+		this.handlers.set(message.author.id, handler);
+		handler.once('end', (_, reason) => {
+			this.handlers.delete(message.author.id);
+			if (!handler.message.deleted) handler.message.delete();
+			if (reason !== 'edit' && message.reactions.size) message.reactions.removeAll();
+		});
 	}
 
 	_displayRanges(start, end) {
