@@ -1,10 +1,12 @@
-import { CANVAS_HEADER } from '../Util/Constants.mjs';
 import { MethodParseError } from '../Util/ValidateError.mjs';
-import Method from './Method.mjs';
-import { SIZES } from '../../../../config';
 import { Canvas } from 'canvas-constructor';
 import { Type } from 'klasa';
+
 import StreamLine from './StreamLine.mjs';
+import Method from './Method.mjs';
+
+import { CANVAS_HEADER } from '../Util/Constants.mjs';
+import { SIZES } from '../../../../config';
 
 export default class Evaluator {
 
@@ -19,7 +21,7 @@ export default class Evaluator {
 		return this;
 	}
 
-	async parse(input) {
+	async parse(input, vars) {
 		if (!CANVAS_HEADER.test(input)) throw new Error(`You must initialize Canvas with \`new Canvas(width, height)\`.`);
 		const result = CANVAS_HEADER.exec(input);
 
@@ -37,7 +39,7 @@ export default class Evaluator {
 				throw new MethodParseError(`The method ${method} does not exist.`);
 
 			if (this.methods.has(method)) {
-				if (canvas[method](...await this.methods.get(method).validate(args)) !== canvas) breakChain = method;
+				if (canvas[method](...await this.methods.get(method).validate(args, vars)) !== canvas) breakChain = method;
 			} else {
 				throw new MethodParseError(`The method ${method} is blocked.`);
 			}

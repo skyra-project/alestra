@@ -1,5 +1,6 @@
 import { CompilationParseError } from '../Util/ValidateError.mjs';
 
+export const CHAR = /[a-zA-Z_]/;
 export const VARCHAR = /[a-zA-Z0-9_]/;
 export const QUOTES = /'|"|`/;
 export const NUMBER = /\d/;
@@ -101,7 +102,7 @@ export default class StreamLine {
 				temp = StreamLine.parseString(string, i, lastChar);
 			} else if (NUMBER.test(char)) {
 				temp = StreamLine.parseNumber(string, i, lastChar);
-			} else if (VARCHAR.test(char)) {
+			} else if (CHAR.test(char)) {
 				temp = StreamLine.parseVariable(string, i, lastChar);
 			} else if (char === '{') {
 				temp = StreamLine.parseObject(string, i, lastChar);
@@ -135,7 +136,31 @@ export default class StreamLine {
 			}
 		}
 
-		return { output, position: i };
+		if (array) return { output: { value: output, type: 'array' }, position: i };
+		else return { output, position: i };
+	}
+
+	/**
+	 * @param {string} string The string to parse
+	 * @param {number} i The current position
+	 * @param {string} lastChar The last character this must encounter if it does not find a comma before
+	 * @returns {any}
+	 */
+	static parseVariable(string, i, lastChar) {
+		let char, output = string.charAt(i);
+		while (i < string.length) {
+			char = string.charAt(++i);
+			if (VARCHAR.test(char)) {
+				output += char;
+				continue;
+			}
+			if (char === ',' || char === lastChar)
+				break;
+
+			throw new CompilationParseError(`Failed to parse literal \`${output}${char}\`.`);
+		}
+
+		return { output: { value: StreamLine._parseLiteral(output), type: 'literal' }, position: i };
 	}
 
 	/**
@@ -192,7 +217,7 @@ export default class StreamLine {
 				: `Detected unterminated string after '${output}'. Expected the string to be closed with ${quote === '"' ? "'\"'" : '"\'"'}.`);
 		}
 
-		return { output, position: i };
+		return { output: { value: output, type: 'string' }, position: i };
 	}
 
 	/**
@@ -201,14 +226,14 @@ export default class StreamLine {
 	 * @param {string} lastChar The last character this must encounter if it does not find a comma before
 	 * @returns {any}
 	 */
-	static parseNumber(string, i, lastChar) { // eslint-disable-line complexity
+	static parseNumber(string, i, lastChar) {
 		let raw = '', char, inDecimals = false;
 
 		const first = string.charAt(i++);
 		const second = string.charAt(i++);
 
 		if (second === '' || second === ',' || second === lastChar)
-			return { output: Number(first), position: i - 1 };
+			return { output: { value: Number(first), type: 'number' }, position: i - 1 };
 
 		if (second === 'x')
 			return StreamLine._parseNumber(string, i, lastChar, HEXADECIMAL, 16);
@@ -239,7 +264,7 @@ export default class StreamLine {
 			}
 		}
 
-		return { output: Number(raw), position: i };
+		return { output: { value: Number(raw), type: 'number' }, position: i };
 	}
 
 	static parseObject(string, i) {
@@ -257,7 +282,7 @@ export default class StreamLine {
 			}
 		}
 
-		return { output: StreamLine._parseObject(raw), position: i };
+		return { output: { value: StreamLine._parseObject(raw), type: 'object' }, position: i };
 	}
 
 	static _parseNumber(string, i, lastChar, reg, base) {
@@ -273,7 +298,7 @@ export default class StreamLine {
 
 		if (raw === '') throw new CompilationParseError('Invalid or unexpected token');
 
-		return { output: parseInt(raw, base), position: i };
+		return { output: { value: parseInt(raw, base), type: 'number' }, position: i };
 	}
 
 	static _parseObject(string) {
@@ -284,6 +309,26 @@ export default class StreamLine {
 			return parsed;
 		} catch (_) {
 			throw new CompilationParseError(`Could not parse the JSON object \`${string}\`.`);
+		}
+	}
+
+	static _parseLiteral(literal) {
+		switch (literal) {
+			case 'null':
+				return null;
+			case 'false':
+				return false;
+			case 'true':
+				return true;
+			case 'undefined':
+				return undefined;
+			case 'Infinity':
+				return Infinity;
+			case 'NaN':
+				return NaN;
+			default:
+				if (literal in global) throw new CompilationParseError(`The literal \`${literal}\` is not available.`);
+				return literal;
 		}
 	}
 

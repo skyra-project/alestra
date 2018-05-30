@@ -1,6 +1,9 @@
 import { Command as KlasaCommand, Stopwatch, util as KlasaUtil } from 'klasa';
-import { Canvas } from 'canvas-constructor';
+import * as CanvasConstructor from 'canvas-constructor';
 import { inspect } from 'util';
+
+const { Canvas, ..._methods } = CanvasConstructor;
+const methods = Object.entries(_methods);
 
 export default class Command extends KlasaCommand {
 
@@ -19,7 +22,7 @@ export default class Command extends KlasaCommand {
 	async run(message, [code]) {
 		const sw = new Stopwatch(5);
 		try {
-			let output = await this.client.evaluator.parse(code);
+			let output = await this.client.evaluator.parse(code, this.parseFlags(message.flags.vars));
 			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			if (output instanceof Buffer) return message.channel.sendFile(output, 'output.png', `\`✔\` \`⏱ ${sw}\``);
@@ -28,6 +31,17 @@ export default class Command extends KlasaCommand {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && message.author.id === this.client.owner.id ? error.stack : error)}`;
 		}
+	}
+
+	parseFlags(flags) {
+		if (typeof flags !== 'string') return methods;
+		const vars = flags.split(',');
+		const parsed = vars.map(flag => {
+			const index = flag.indexOf('=');
+			if (index === -1) throw `Could not parse '${flag}': There is no assignment.`;
+			return [flag.slice(0, index), flag.slice(index + 1)];
+		});
+		return methods.concat(parsed);
 	}
 
 }
