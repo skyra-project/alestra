@@ -29,7 +29,7 @@ export default class Evaluator {
 
 		let breakChain = null;
 		const canvas = new Canvas(Number(result[1]), Number(result[2]));
-		for (const [method, args] of new StreamLine(input.slice(result[0].length, input.length))) {
+		for (const [method, args] of new StreamLine(input.slice(result[0].length, input.length)).run()) {
 			if (breakChain)
 				throw new MethodParseError(`The CanvasConstructor.prototype.${breakChain} call was not chainable.`);
 

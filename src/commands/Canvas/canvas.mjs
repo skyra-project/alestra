@@ -26,7 +26,7 @@ export default class Command extends KlasaCommand {
 			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
-			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', error)}`;
+			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && message.author.id === this.client.owner.id ? error.stack : error)}`;
 		}
 	}
 
