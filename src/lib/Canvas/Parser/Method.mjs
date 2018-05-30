@@ -3,9 +3,9 @@ import {
 	RequiredArgumentError,
 	UnknownArgumentPropertyError,
 	IncorrectArgumentError,
-	ArgumentParseError
+	ArgumentParseError,
+	TooManyArgumentsMethodError
 } from '../Util/ValidateError.mjs';
-import ArgumentParser from './ArgumentParser.mjs';
 import Argument from './Argument.mjs';
 import { get } from 'snekfetch';
 
@@ -34,16 +34,21 @@ export default class Method {
 		return this;
 	}
 
-	async validate(params) {
-		const parser = new ArgumentParser(params);
-		const parsed = parser.parse();
-		parser.dispose();
-
-		if (parsed.length < this.required) throw new RequiredArgumentError(this.arguments[parsed.length]);
+	async validate(args, vars) {
+		if (args.length < this.required) throw new RequiredArgumentError(this.arguments[args.length]);
+		if (args.length > this.arguments.length) throw new TooManyArgumentsMethodError(this, args.length);
 
 		const output = [];
-		for (let i = 0; i < parsed.length; i++)
-			output[i] = await Method._validateArg(this.arguments[i], parsed[i].value);
+		for (let i = 0; i < args.length; i++) {
+			const arg = args[i];
+			if (arg.type === 'literal' && typeof arg.value === 'string') {
+				const variable = vars.find(vr => vr[0] === arg.value);
+				if (variable) [, arg.value] = variable;
+				else throw new ArgumentParseError(this.arguments[i], `The variable '${arg.value}' is not defined.`);
+			}
+
+			output[i] = await Method._validateArg(this.arguments[i], arg.value);
+		}
 
 		return output;
 	}
@@ -66,6 +71,7 @@ export default class Method {
 			case 'boolean': return Method._validateArgBoolean(arg, input);
 			case 'buffer': return Method._validateArgBuffer(arg, input);
 			case 'object': return Method._validateArgObject(arg, input);
+			case 'function': return Method._validateArgFunction(arg, input);
 			case 'custom': {
 				if (typeof arg.custom !== 'function') throw new Error(`${arg.parent.name}::${arg.name} does not have the resolver.`);
 				return arg.custom(arg, input);
@@ -73,6 +79,11 @@ export default class Method {
 			default:
 				throw new Error(`${arg.parent.name}::${arg.name} has an unknown type (${arg.type}), please report this to this bot's owners.`);
 		}
+	}
+
+	static _validateArgFunction(arg, input) {
+		if (typeof input === 'function') return input;
+		throw new IncorrectArgumentError(arg, input);
 	}
 
 	static _validateArgNumber(arg, input) {
@@ -96,7 +107,7 @@ export default class Method {
 		try {
 			const url = new URL(link);
 			if (url.protocol !== 'https:' && url.protocol !== 'http:') throw { message: `${url.href} is not a valid URL.` };
-			return get(url.href)
+			return await get(url.href)
 				.then(result => result.body)
 				.catch(() => { throw { message: `Cannot get ${url.href}` }; });
 		} catch (error) {

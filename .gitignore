@@ -4,3 +4,4 @@ config.mjs
 *.heapsnapshot
 *.log
 bwd/
+package-lock.json

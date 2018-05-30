@@ -109,14 +109,16 @@ export default function init(evaluator) {
 			.add({ name: 'y', type: 'number', required: true })
 			.add({ name: 'width', type: 'number', required: true })
 			.add({ name: 'height', type: 'number', required: true })
-			.add({ name: 'radius', type: 'number', required: false }))
+			.add({ name: 'radius', type: 'number', required: false })
+			.add({ name: 'restore', type: 'boolean', required: false }))
 		.add(new Method('addBevelImage')
 			.add({ name: 'link', type: 'buffer', required: true })
 			.add({ name: 'x', type: 'number', required: true })
 			.add({ name: 'y', type: 'number', required: true })
 			.add({ name: 'width', type: 'number', required: true })
 			.add({ name: 'height', type: 'number', required: true })
-			.add({ name: 'radius', type: 'number', required: false }))
+			.add({ name: 'radius', type: 'number', required: false })
+			.add({ name: 'restore', type: 'boolean', required: false }))
 		.add(new Method('addCircle')
 			.add({ name: 'x', type: 'number', required: true })
 			.add({ name: 'y', type: 'number', required: true })
@@ -314,10 +316,10 @@ export default function init(evaluator) {
 		// .add(new Method('getCanvas'))
 		.add(new Method('addTextFont')
 			.add({ name: 'path', type: 'string', required: true })
-			.add({ name: 'family', type: 'string', required: true }));
-	// .add(new Method('registerFont')
-	// 	.add({ name: 'path', type: 'string', required: true })
-	// 	.add({ name: 'family', type: 'string', required: true }));
-	// .add(new Method('process')
-	// 	.add({ name: 'fn', type: 'function', required: true }))
+			.add({ name: 'family', type: 'string', required: true }))
+		// .add(new Method('registerFont')
+		// 	.add({ name: 'path', type: 'string', required: true })
+		// 	.add({ name: 'family', type: 'string', required: true }));
+		.add(new Method('process')
+			.add({ name: 'fn', type: 'function', required: true }));
 }

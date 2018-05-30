@@ -10,6 +10,29 @@ export class CompilationParseError extends Error {
 
 export class MethodParseError extends CompilationParseError { }
 
+export class MethodError extends Error {
+
+	constructor(method) {
+		super();
+		this.method = method;
+		this.reason = null;
+	}
+
+	toString() {
+		return `${this.constructor.name} on method ${this.method.name}: ${this.reason}`;
+	}
+
+}
+
+export class TooManyArgumentsMethodError extends MethodError {
+
+	constructor(method, argLength) {
+		super(method);
+		this.reason = `Expected ${method.arguments.length} arguments${method.arguments.length > method.required ? ' or less' : ''}. Received: ${argLength}`;
+	}
+
+}
+
 export class ValidateError extends Error {
 
 	constructor(argument) {
