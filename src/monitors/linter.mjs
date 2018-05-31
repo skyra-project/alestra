@@ -38,7 +38,7 @@ export default class Monitor extends KlasaMonitor {
 			const reactions = await message.awaitReactions((reaction, user) => user.id === message.author.id && reaction.emoji.name === '🔍', { time: 15000, max: 1 });
 			if (!reactions.size) {
 				const reaction = message.reactions.get('🔍');
-				if (reaction && reaction.users.has(message.author)) await reaction.users.remove(message.author).catch(() => null);
+				if (reaction && reaction.users.has(message.author.id)) await reaction.users.remove(message.author).catch(() => null);
 				return;
 			}
 		}
@@ -65,7 +65,7 @@ export default class Monitor extends KlasaMonitor {
 			if (!handler.message.deleted) handler.message.delete().catch(() => null);
 			if (!message.deleted) {
 				const reaction = message.reactions.get('🔍');
-				if (reaction && reaction.users.has(message.author)) reaction.users.remove(message.author).catch(() => null);
+				if (reaction && reaction.users.has(message.author.id)) reaction.users.remove(message.author).catch(() => null);
 			}
 		});
 	}
