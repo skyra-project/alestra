@@ -28,14 +28,18 @@ export default class Monitor extends KlasaMonitor {
 		const code = CODEBLOCK_REGEXP.exec(message.content)[1].trim();
 		const errors = checkErrors(code);
 		if (!errors.length) {
+			if (message.reactions.has('451517251464593411')) await message.reactions.removeAll();
 			await message.react('greenTick:451517251317923851');
 			return;
 		}
+
+		if (message.reactions.has('451517251317923851')) await message.reactions.removeAll();
 
 		if (!oldHandler || oldHandler.message !== message) {
 			await message.react('redCross:451517251464593411');
 			await message.react('🔍');
 			const reactions = await message.awaitReactions((reaction, user) => user.id === message.author.id && reaction.emoji.name === '🔍', { time: 15000, max: 1 });
+			if (message.deleted) return;
 			if (!reactions.size) {
 				const reaction = message.reactions.get('🔍');
 				if (reaction && reaction.users.has(this.client.user.id)) await reaction.users.remove(this.client.user).catch(() => null);
