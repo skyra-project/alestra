@@ -13,13 +13,15 @@ export default class Monitor extends KlasaMonitor {
 		super(...args, { ignoreOthers: false, ignoreEdits: false });
 
 		this.handlers = new Map();
+		this.dev = this.client.options.dev;
 	}
 
 	async run(message) {
-		if (!message.guild
-			|| !message.channel.permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
-			|| !message.guild.configs.supportChannels.includes(message.channel.id)
-			|| !CODEBLOCK_REGEXP.test(message.content)) return;
+		if (message.guild
+			&& this.dev ? message.author.id === this.client.options.ownerID : true
+			&& message.channel.permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
+			&& message.guild.configs.supportChannels.includes(message.channel.id)
+			&& CODEBLOCK_REGEXP.test(message.content)) return;
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)

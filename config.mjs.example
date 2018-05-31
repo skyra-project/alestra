@@ -6,6 +6,7 @@ export const CLIENT_OPTIONS = {
 	commandMessageLifetime: 200,
 	consoleEvents: { verbose: true },
 	customPromptDefaults: { limit: 5 },
+	dev: false,
 	messageCacheLifetime: 200,
 	messageCacheMaxSize: 25,
 	messageSweepInterval: 100,
