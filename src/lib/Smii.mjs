@@ -5,7 +5,7 @@ import init from './Canvas/Data/Init.mjs';
 export default class Smii extends KlasaClient {
 
 	constructor(options) {
-		super(util.mergeDefault({ dev: true }, options));
+		super(util.mergeDefault({ dev: false }, options));
 
 		this.evaluator = new Evaluator();
 		init(this.evaluator);
