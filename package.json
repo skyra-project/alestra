@@ -41,7 +41,6 @@
     "canvas": "github:Automattic/node-canvas#92b192447e9b9ae98da0f801e4e34afdd1dc1ef8",
     "canvas-constructor": "github:kyranet/canvasConstructor",
     "discord.js": "github:discordjs/discord.js",
-    "file-type": "^8.0.0",
     "klasa": "github:dirigeants/klasa#esm",
     "node-fetch": "^2.1.2"
   },
