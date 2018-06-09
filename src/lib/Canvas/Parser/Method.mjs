@@ -7,7 +7,8 @@ import {
 	TooManyArgumentsMethodError
 } from '../Util/ValidateError.mjs';
 import Argument from './Argument.mjs';
-import { get } from 'snekfetch';
+import fetch from 'node-fetch';
+import fileType from 'file-type';
 
 export default class Method {
 
@@ -107,8 +108,9 @@ export default class Method {
 		try {
 			const url = new URL(link);
 			if (url.protocol !== 'https:' && url.protocol !== 'http:') throw { message: `${url.href} is not a valid URL.` };
-			return await get(url.href)
-				.then(result => result.body)
+			return await fetch(url.href)
+				.then(result => result.buffer())
+				.then(buffer => fileType(buffer))
 				.catch(() => { throw { message: `Cannot get ${url.href}` }; });
 		} catch (error) {
 			throw new ArgumentParseError(arg, `Failed to parse link: ${error.message}`);
