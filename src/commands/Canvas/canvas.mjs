@@ -36,8 +36,7 @@ export default class Command extends KlasaCommand {
 	}
 
 	parseCodeblock(code) {
-		if (!CODEBLOCK.test(code)) return code;
-		return CODEBLOCK.exec(code)[1];
+		return CODEBLOCK.test(code) ? CODEBLOCK.exec(code)[1].trim() : code;
 	}
 
 	parseFlags(flags) {
