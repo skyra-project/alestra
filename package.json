@@ -42,7 +42,7 @@
     "canvas-constructor": "github:kyranet/canvasConstructor",
     "discord.js": "github:discordjs/discord.js",
     "klasa": "github:dirigeants/klasa#esm",
-    "snekfetch": "^4.0.0"
+    "node-fetch": "^2.1.2"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
