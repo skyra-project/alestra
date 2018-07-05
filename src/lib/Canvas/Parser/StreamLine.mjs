@@ -93,7 +93,7 @@ export default class StreamLine {
 				}
 			}
 
-			throw new CompilationParseError(`Invalid or unexpected token '${char}'..`);
+			throw new CompilationParseError(`Invalid or unexpected token '${char}'.`);
 		}
 	}
 
@@ -120,6 +120,8 @@ export default class StreamLine {
 			} else if (char === lastChar) {
 				i++;
 				break;
+			} else {
+				throw new CompilationParseError(`Invalid or unexpected token '${char}'.`);
 			}
 
 			if (temp) {
