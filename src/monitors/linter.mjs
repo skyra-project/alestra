@@ -94,9 +94,4 @@ export default class Monitor extends KlasaMonitor {
 		return '';
 	}
 
-	async init() {
-		if (!this.client.gateways.guilds.schema.has('supportChannels'))
-			await this.client.gateways.guilds.schema.add('supportChannels', { array: true, type: 'textchannel' });
-	}
-
 }
