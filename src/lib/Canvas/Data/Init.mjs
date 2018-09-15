@@ -322,10 +322,6 @@ export default function init(evaluator) {
 		.add(new Method('toBufferAsync'))
 		.add(new Method('toDataURL'))
 		.add(new Method('toDataURLAsync'))
-		// .add(new Method('toDataURL')
-		// 	.add({ name: 'type', type: 'string', required: true })
-		// 	.add({ name: 'args', type: '', required: true }))
-		// .add(new Method('toDataURLAsync'));
 		// .add(new Method('getCanvas'))
 		.add(new Method('addTextFont')
 			.add({ name: 'path', type: 'string', required: true })
