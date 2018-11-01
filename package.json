@@ -39,7 +39,7 @@
   "homepage": "https://github.com/kyranet/Smii#readme",
   "dependencies": {
     "canvas-constructor": "github:kyranet/canvasConstructor",
-    "canvas": "github:Automattic/node-canvas#92b192447e9b9ae98da0f801e4e34afdd1dc1ef8",
+    "canvas": "^2.0.1",
     "discord.js": "github:discordjs/discord.js",
     "eslint": "^5.6.0",
     "klasa": "github:dirigeants/klasa#esm",
