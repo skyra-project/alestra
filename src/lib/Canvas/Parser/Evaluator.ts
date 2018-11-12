@@ -173,19 +173,19 @@ function parseExpressionStatement(ctx: EvaluatorContext, node: NodeExpressionSta
 
 async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpression, scope: Scope): Promise<string> {
 	const object = await parseNode(ctx, node.object, scope);
-	const propertyValue = await parseNode(ctx, node.property, scope);
+	const propertyValue = node.property.type === 'Identifier' ? (<NodeIdentifier> node.property).name : await parseNode(ctx, node.property, scope);
 	let property: any = kUnset;
 
 	if (node.computed && node.property.type !== 'Literal') {
 		// If `[variable]()`
 		if (ctx.identifiers.has(propertyValue)) property = ctx.identifiers.get(propertyValue);
 		else if (scope && scope.has(propertyValue)) property = scope.get(propertyValue);
+		if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyValue);
 	} else {
 		// If .variable
 		property = propertyValue;
 	}
 
-	if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyValue);
 	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'constructor');
 
 	const value = object[property];
