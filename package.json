@@ -1,23 +1,23 @@
 {
-  "name": "smii",
-  "version": "2.1.0",
-  "description": "Canvas-Constructor helper bot",
-  "main": "src/Smii.mjs",
+  "name": "alestra",
+  "version": "3.0.0",
+  "description": "Canvas-Constructor helper bot and Soft-Sandbox Evaluator",
+  "main": "dist/Alestra.js",
   "scripts": {
-    "lint": "eslint --fix src",
-    "pm2:delete": "pm2 delete Smii",
-    "pm2:logs": "pm2 logs Smii --lines=200",
-    "pm2:restart": "pm2 restart Smii",
-    "pm2:start-harmony": "pm2 start start.js --node-args=\"--experimental-modules --harmony\" --name=\"Smii\"",
-    "pm2:start": "pm2 start start.js --node-args=\"--experimental-modules\" --name=\"Smii\"",
-    "pm2:stop": "pm2 stop Smii",
-    "start": "node --experimental-modules src/Smii.mjs",
-    "test": "eslint src",
-    "update": "npm i"
+    "lint": "tslint --fix src",
+    "pm2:delete": "pm2 delete Alestra",
+    "pm2:logs": "pm2 logs Alestra --lines=200",
+    "pm2:restart": "pm2 restart Alestra",
+    "pm2:start-harmony": "pm2 start dist/Alestra.js --node-args=\"--harmony\" --name=\"Alestra\"",
+    "pm2:start": "pm2 start dist/Alestra.js --name=\"Alestra\"",
+    "pm2:stop": "pm2 stop Alestra",
+    "start": "node dist/Alestra.js",
+    "test": "tslint src",
+    "update": "yarn"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/kyranet/Smii.git"
+    "url": "git+ssh://git@github.com/kyranet/Alestra.git"
   },
   "keywords": [
     "Canvas-Constructor",
@@ -32,20 +32,23 @@
   ],
   "private": true,
   "author": "kyraNET",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/kyranet/Smii/issues"
+    "url": "https://github.com/kyranet/Alestra/issues"
   },
-  "homepage": "https://github.com/kyranet/Smii#readme",
+  "homepage": "https://github.com/kyranet/Alestra#readme",
   "dependencies": {
-    "canvas-constructor": "github:kyranet/canvasConstructor",
-    "canvas": "^2.0.1",
+    "acorn": "^6.0.4",
+    "canvas-constructor": "2.0.0",
+    "canvas": "^2.1.0",
     "discord.js": "github:discordjs/discord.js",
-    "eslint": "^5.6.0",
+    "eslint": "^5.9.0",
     "klasa": "github:dirigeants/klasa#esm",
-    "node-fetch": "^2.2.0"
+    "node-fetch": "^2.2.1"
   },
   "devDependencies": {
+    "@types/node": "^10.12.5",
+    "@types/eslint": "^4.16.4",
     "eslint-config-klasa": "github:dirigeants/klasa-lint"
   }
 }

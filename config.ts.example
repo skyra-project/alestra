@@ -1,6 +1,8 @@
+import { AlestraClientOptions } from './src/lib/Alestra';
+
 // Remove `.example` from the file extension to configure Smii
 
-export const CLIENT_OPTIONS = {
+export const CLIENT_OPTIONS: AlestraClientOptions = {
 	commandEditing: true,
 	commandLogging: false,
 	commandMessageLifetime: 200,

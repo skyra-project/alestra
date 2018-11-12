@@ -20,8 +20,9 @@ export default class Monitor extends KlasaMonitor {
 		if (!(message.guild
 			&& this.dev ? message.author.id === this.client.options.ownerID : true
 			&& message.channel.permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
-			&& message.guild.settings.supportChannels.includes(message.channel.id)
-			&& CODEBLOCK_REGEXP.test(message.content))) return;
+			&& message.guild.settings.supportChannels.includes(message.channel.id))) return;
+
+		if (!CODEBLOCK_REGEXP.test(message.content)) return;
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)
