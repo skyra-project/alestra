@@ -1,20 +1,24 @@
 {
+	"compileOnSave": true,
 	"compilerOptions": {
-		"module": "commonjs",
-        "target": "esnext",
-        "lib": ["esnext"],
-        "sourceMap": true,
         "declaration": true,
-        "removeComments": true,
-        "experimentalDecorators": true,
-        "noImplicitAny": true,
+		"lib": ["esnext"],
+		"module": "commonjs",
+		"outDir": "./dist",
+		"types": ["node", "node-fetch", "eslint"],
         "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "target": "esnext"
 	},
 	"exclude": [
 		"node_modules",
 		"bin",
 		"examples",
 		"scripts"
+	],
+	"include": [
+		"./src/**/*"
 	]
 }
