@@ -186,7 +186,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	}
 
 	if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyName);
-	if (property === 'constructor') throw new SandboxError(ctx.code, node.property.start, propertyName);
+	if (property === 'constructor') throw new SandboxError(ctx.code, node.property.start, 'Constructor access is not allowed');
 
 	const value = object[property];
 	return typeof value === 'function' ? value.bind(object) : value;
@@ -242,7 +242,8 @@ async function parseIfStatement(ctx: EvaluatorContext, node: NodeIfStatement, sc
 	return undefined;
 }
 
-function parseLiteral(_: EvaluatorContext, node: NodeLiteral): Promise<any> {
+function parseLiteral(ctx: EvaluatorContext, node: NodeLiteral): Promise<any> {
+	if (node.value instanceof RegExp) throw new SandboxError(ctx.code, node.start, 'RegExp features are not allowed');
 	return node.value;
 }
 
