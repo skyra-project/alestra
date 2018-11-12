@@ -1,9 +1,28 @@
-import { Node, parse } from 'acorn';
+import { parse } from 'acorn';
 import * as CanvasConstructor from 'canvas-constructor';
+import { default as _fetch } from 'node-fetch';
+import { extname } from 'path';
+import { URL } from 'url';
 import { AlreadyDeclaredIdentifier, CompilationParseError, SandboxError, UnknownIdentifier } from '../Util/ValidateError';
 
 const kUnset = Symbol('unset');
-const defaultIdentifiers = Object.entries(CanvasConstructor);
+const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
+
+async function fetch(...args: [string]): Promise<Buffer> {
+	if (args.length !== 1) throw new TypeError('Expected only 1 argument (at fetch).');
+	if (typeof args[0] !== 'string') throw new TypeError('Expected url to be a string (at fetch).');
+	const url = new URL(args[0]);
+	const ext = extname(url.pathname);
+	if (/^\.(jpe?g|png)$/.test(ext)) {
+		const response = await _fetch(url.href);
+		if (response.ok) return response.buffer();
+		throw new Error(`${response.status}: ${response.statusText} | ${url.href}`);
+	}
+	throw new Error(`The url ${url.href} must have any of the following extensions: .png, .jpg, .jpeg`);
+}
+
+// Function#bind allows the code to be censored
+defaultIdentifiers.push(['fetch', fetch.bind(null)]);
 
 export function evaluate(input: string): Promise<any> {
 	return parseNode({
@@ -17,28 +36,29 @@ export function evaluate(input: string): Promise<any> {
 	}), null);
 }
 
-function parseNode(ctx: EvaluatorContext, node: Node, scope: Scope): Promise<any> {
+function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promise<any> {
 	const unknownNode: any = node;
 	ctx.allowSpread = false;
 	switch (node.type) {
-		case 'AwaitExpression': return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
-		case 'AssignmentExpression': return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
-		case 'TemplateLiteral': return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
-		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement, scope);
 		// case 'ArrowFunctionExpression': return parseArrowFunctionExpression(ctx, unknownNode as NodeArrowFunctionExpression);
 		case 'ArrayExpression': return parseArrayExpression(ctx, unknownNode as NodeArrayExpression, scope);
+		case 'AssignmentExpression': return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
+		case 'AwaitExpression': return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
 		case 'BinaryExpression': return parseBinaryExpression(ctx, unknownNode as NodeBinaryExpression, scope);
-		case 'SpreadElement': return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
 		case 'CallExpression': return parseCallExpression(ctx, unknownNode as NodeCallExpression, scope);
 		case 'ExpressionStatement': return parseExpressionStatement(ctx, unknownNode as NodeExpressionStatement, scope);
 		case 'Identifier': return parseIdentifier(ctx, unknownNode as NodeIdentifier, scope);
 		case 'Literal': return parseLiteral(ctx, unknownNode as NodeLiteral);
 		case 'MemberExpression': return parseMemberExpression(ctx, unknownNode as NodeMemberExpression, scope);
 		case 'NewExpression': return parseNewExpression(ctx, unknownNode as NodeNewExpression, scope);
+		case 'ObjectExpression': return parseObjectExpression(ctx, unknownNode as NodeObjectExpression, scope);
 		case 'Program': return parseProgram(ctx, unknownNode as NodeProgram, scope);
+		case 'SpreadElement': return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
+		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement, scope);
+		case 'TemplateLiteral': return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
+		case 'UnaryExpression': return parseUnaryExpression(ctx, unknownNode as NodeUnaryExpression, scope);
 		case 'VariableDeclaration': return parseVariableDeclaration(ctx, unknownNode as NodeVariableDeclaration, scope);
 		case 'VariableDeclarator': return parseVariableDeclarator(ctx, unknownNode as NodeVariableDeclarator, scope);
-		case 'ObjectExpression': return parseObjectExpression(ctx, unknownNode as NodeObjectExpression, scope);
 		default: throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
 	}
 }
@@ -122,7 +142,7 @@ async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpressio
 async function parseNewExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const ctor: new (...args: any[]) => any = await parseNode(ctx, node.callee, scope);
 	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.start, 'Constructor is not a function');
-	const args = await Promise.all(node.arguments.map((arg: Node) => parseNode(ctx, arg, scope)));
+	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return new ctor(...args);
 }
 
@@ -169,6 +189,13 @@ async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariable
 // function parseArrowFunctionExpression(ctx: EvaluatorContext, node: NodeArrowFunctionExpression, scope: Scope): Function {
 // 	return (): null => null;
 // }
+
+async function parseUnaryExpression(ctx: EvaluatorContext, node: NodeUnaryExpression, scope: Scope): Promise<any> {
+	const argument = await parseNode(ctx, node.argument, scope);
+	const operator = unaryOperators.get(node.operator);
+	if (operator) return operator(argument);
+	throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
+}
 
 async function parseBinaryExpression(ctx: EvaluatorContext, node: NodeBinaryExpression, scope: Scope): Promise<any> {
 	const left = await parseNode(ctx, node.left, scope);
@@ -323,14 +350,20 @@ type NodeTemplateElement = acorn.Node & {
 	tail: boolean;
 };
 
+type NodeUnaryExpression = acorn.Node & {
+	operator: string;
+	prefix: boolean;
+	argument: acorn.Node;
+};
+
 type NodeAwaitExpression = acorn.Node & {
 	argument: acorn.Node;
 };
 
 type NodeAssignmentExpression = acorn.Node & {
 	operator: string;
-	left: Node;
-	right: Node;
+	left: acorn.Node;
+	right: acorn.Node;
 };
 
 // TODO: Add this later
@@ -340,5 +373,5 @@ type NodeAssignmentExpression = acorn.Node & {
 // 	generator: boolean;
 // 	async: boolean;
 // 	params: NodeIdentifier[];
-// 	body: Node;
+// 	body: acorn.Node;
 // };
