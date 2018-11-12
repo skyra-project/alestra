@@ -45,9 +45,13 @@ function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promi
 		case 'AssignmentExpression': return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
 		case 'AwaitExpression': return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
 		case 'BinaryExpression': return parseBinaryExpression(ctx, unknownNode as NodeBinaryExpression, scope);
+		case 'BlockStatement': return parseBlockStatement(ctx, unknownNode as NodeBlockStatement, scope);
 		case 'CallExpression': return parseCallExpression(ctx, unknownNode as NodeCallExpression, scope);
+		case 'ConditionalExpression': return parseConditionalExpression(ctx, unknownNode as NodeConditionalExpression, scope);
+		case 'EmptyStatement': return parseEmptyStatement(ctx, unknownNode as NodeEmptyStatement, scope);
 		case 'ExpressionStatement': return parseExpressionStatement(ctx, unknownNode as NodeExpressionStatement, scope);
 		case 'Identifier': return parseIdentifier(ctx, unknownNode as NodeIdentifier, scope);
+		case 'IfStatement': return parseIfStatement(ctx, unknownNode as NodeIfStatement, scope);
 		case 'Literal': return parseLiteral(ctx, unknownNode as NodeLiteral);
 		case 'MemberExpression': return parseMemberExpression(ctx, unknownNode as NodeMemberExpression, scope);
 		case 'NewExpression': return parseNewExpression(ctx, unknownNode as NodeNewExpression, scope);
@@ -132,6 +136,10 @@ async function parseProgram(ctx: EvaluatorContext, node: NodeProgram, scope: Sco
 	return (await Promise.all(node.body.map((nd) => parseNode(ctx, nd, scope)))).pop();
 }
 
+async function parseBlockStatement(ctx: EvaluatorContext, node: NodeBlockStatement, scope: Scope): Promise<any> {
+	return (await Promise.all(node.body.map((nd) => parseNode(ctx, nd, scope)))).pop();
+}
+
 async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const member = await parseNode(ctx, node.callee, scope);
 	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.start, `${node.callee}`);
@@ -139,11 +147,20 @@ async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpressio
 	return member(args);
 }
 
+async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeConditionalExpression, scope: Scope): Promise<any> {
+	const test = await parseNode(ctx, node.test, scope);
+	return parseNode(ctx, test ? node.consequent : node.alternate, scope);
+}
+
 async function parseNewExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const ctor: new (...args: any[]) => any = await parseNode(ctx, node.callee, scope);
 	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.start, 'Constructor is not a function');
 	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return new ctor(...args);
+}
+
+async function parseEmptyStatement(_: EvaluatorContext, __: NodeEmptyStatement, ___: Scope): Promise<any> {
+	return undefined;
 }
 
 function parseExpressionStatement(ctx: EvaluatorContext, node: NodeExpressionStatement, scope: Scope): Promise<any> {
@@ -205,10 +222,17 @@ async function parseBinaryExpression(ctx: EvaluatorContext, node: NodeBinaryExpr
 	throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
 }
 
-function parseIdentifier(ctx: EvaluatorContext, node: NodeIdentifier, scope: Scope): Promise<any> {
+async function parseIdentifier(ctx: EvaluatorContext, node: NodeIdentifier, scope: Scope): Promise<any> {
 	if (ctx.identifiers.has(node.name)) return ctx.identifiers.get(node.name);
 	if (scope && scope.has(node.name)) return scope.get(node.name);
 	throw new UnknownIdentifier(ctx.code, node.start, node.name);
+}
+
+async function parseIfStatement(ctx: EvaluatorContext, node: NodeIfStatement, scope: Scope): Promise<any> {
+	const test = await parseNode(ctx, node.test, scope);
+	if (test) return parseNode(ctx, node.consequent, scope);
+	if (node.alternate) return parseNode(ctx, node.alternate, scope);
+	return undefined;
 }
 
 function parseLiteral(_: EvaluatorContext, node: NodeLiteral): Promise<any> {
@@ -300,6 +324,10 @@ type NodeVariableDeclarator = acorn.Node & {
 	init: acorn.Node | null;
 };
 
+type NodeBlockStatement = acorn.Node & {
+	body: acorn.Node[];
+};
+
 type NodeCallExpression = acorn.Node & {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
@@ -314,12 +342,24 @@ type NodeIdentifier = acorn.Node & {
 	name: string;
 };
 
+type NodeIfStatement = acorn.Node & {
+	test: acorn.Node;
+	consequent: acorn.Node;
+	alternate: acorn.Node | null;
+};
+
 type NodeArrayExpression = acorn.Node & {
 	elements: acorn.Node[];
 };
 
 type NodeSpreadElement = acorn.Node & {
 	argument: acorn.Node;
+};
+
+type NodeConditionalExpression = acorn.Node & {
+	test: acorn.Node;
+	consequent: acorn.Node;
+	alternate: acorn.Node;
 };
 
 type NodeBinaryExpression = acorn.Node & {
@@ -332,6 +372,8 @@ type NodeNewExpression = acorn.Node & {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
 };
+
+type NodeEmptyStatement = acorn.Node;
 
 type NodeExpressionStatement = acorn.Node & {
 	expression: acorn.Node;
