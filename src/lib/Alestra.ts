@@ -1,9 +1,7 @@
 import { KlasaClient, KlasaClientOptions, util } from 'klasa';
-import Evaluator from './Canvas/Parser/Evaluator';
 
 export default class Alestra extends KlasaClient {
 
-	public evaluator = new Evaluator();
 	public options: Required<AlestraClientOptions>;
 
 	public constructor(options: AlestraClientOptions) {
