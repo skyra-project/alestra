@@ -3,7 +3,7 @@ import * as CanvasConstructor from 'canvas-constructor';
 import { default as _fetch } from 'node-fetch';
 import { extname } from 'path';
 import { URL } from 'url';
-import { AlreadyDeclaredIdentifier, CompilationParseError, SandboxError, UnknownIdentifier } from '../Util/ValidateError';
+import { AlreadyDeclaredIdentifier, CompilationParseError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
 
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
@@ -186,7 +186,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	}
 
 	if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyName);
-	if (property === 'constructor') throw new SandboxError(ctx.code, node.property.start, 'Constructor access is not allowed');
+	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'Constructor access is not allowed');
 
 	const value = object[property];
 	return typeof value === 'function' ? value.bind(object) : value;
@@ -243,7 +243,7 @@ async function parseIfStatement(ctx: EvaluatorContext, node: NodeIfStatement, sc
 }
 
 function parseLiteral(ctx: EvaluatorContext, node: NodeLiteral): Promise<any> {
-	if (node.value instanceof RegExp) throw new SandboxError(ctx.code, node.start, 'RegExp features are not allowed');
+	if (node.value instanceof RegExp) throw new SandboxError(ctx.code, node.start, 'RegExp is not available');
 	return node.value;
 }
 

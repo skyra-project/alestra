@@ -29,6 +29,14 @@ export class AlreadyDeclaredIdentifier extends CompilationParseError {
 
 export class SandboxError extends CompilationParseError {
 
+	public constructor(code: string, start: number, reason: string) {
+		super(code, start, reason);
+	}
+
+}
+
+export class SandboxPropertyError extends CompilationParseError {
+
 	public constructor(code: string, start: number, name: string) {
 		super(code, start, `The property access to \`${name}\` is forbidden`);
 	}
