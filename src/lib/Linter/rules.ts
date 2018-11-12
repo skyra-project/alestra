@@ -1,4 +1,6 @@
-export default {
+import { Linter } from 'eslint';
+
+export const rules: Linter.Config = {
 	parserOptions: {
 		ecmaVersion: 2018,
 		sourceType: 'module'
@@ -24,8 +26,8 @@ export default {
 		'no-dupe-keys': 'error',
 		'no-duplicate-case': 'error',
 		'no-duplicate-imports': 'error',
-		'no-empty-character-class': 'error',
 		'no-empty': 'error',
+		'no-empty-character-class': 'error',
 		'no-eval': 'error',
 		'no-ex-assign': 'error',
 		'no-extra-label': 'error',

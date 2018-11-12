@@ -1,33 +1,33 @@
-import { Command as KlasaCommand, Stopwatch, util as KlasaUtil } from 'klasa';
-import * as CanvasConstructor from 'canvas-constructor';
+import { Canvas } from 'canvas-constructor';
+import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
 import { inspect } from 'util';
-
-const { Canvas, ..._methods } = CanvasConstructor;
-const methods = Object.entries(_methods);
+import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
 export default class Command extends KlasaCommand {
 
-	constructor(...args) {
-		super(...args, {
-			runIn: ['text'],
-			requiredPermissions: ['ATTACH_FILES'],
+	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
+		super(client, store, file, directory, {
 			bucket: 1,
 			cooldown: 10,
 			description: 'Render a Canvas-Constructor',
 			extendedHelp: 'No extended help available.',
+			requiredPermissions: ['ATTACH_FILES'],
+			runIn: ['text'],
 			usage: '<code:string>'
 		});
 	}
 
-	async run(message, [code]) {
+	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
 		const sw = new Stopwatch(5);
 		try {
-			let output = await this.client.evaluator.parse(this.parseCodeblock(code), this.parseFlags(message.flags.vars));
+			let output = await evaluate(this.parseCodeblock(code));
 			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
+			// @ts-ignore
 			if (output instanceof Buffer) return message.channel.sendFile(output, 'output.png', `\`✔\` \`⏱ ${sw}\``);
+			// @ts-ignore
 			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
@@ -35,19 +35,8 @@ export default class Command extends KlasaCommand {
 		}
 	}
 
-	parseCodeblock(code) {
+	public parseCodeblock(code: string): string {
 		return CODEBLOCK.test(code) ? CODEBLOCK.exec(code)[1].trim() : code;
-	}
-
-	parseFlags(flags) {
-		if (typeof flags !== 'string') return methods;
-		const vars = flags.split(',');
-		const parsed = vars.map(flag => {
-			const index = flag.indexOf('=');
-			if (index === -1) throw `Could not parse '${flag}': There is no assignment.`;
-			return [flag.slice(0, index), flag.slice(index + 1)];
-		});
-		return methods.concat(parsed);
 	}
 
 }

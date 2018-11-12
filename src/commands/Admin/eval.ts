@@ -1,22 +1,20 @@
-import { Command as KlasaCommand, Stopwatch, Type, util } from 'klasa';
-import nodeUtil from 'util';
-
-const { inspect } = nodeUtil;
+import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, Stopwatch, Type, util } from 'klasa';
+import { inspect } from 'util';
 
 export default class Command extends KlasaCommand {
 
-	constructor(...args) {
-		super(...args, {
+	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
+		super(client, store, file, directory, {
 			aliases: ['ev'],
-			permissionLevel: 10,
+			description: (language) => language.get('COMMAND_EVAL_DESCRIPTION'),
+			extendedHelp: (language) => language.get('COMMAND_EVAL_EXTENDEDHELP'),
 			guarded: true,
-			description: (message) => message.language.get('COMMAND_EVAL_DESCRIPTION'),
-			extendedHelp: (message) => message.language.get('COMMAND_EVAL_EXTENDEDHELP'),
+			permissionLevel: 10,
 			usage: '<expression:str>'
 		});
 	}
 
-	async run(message, [code]) {
+	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
 		const { success, result, time, type } = await this.eval(message, code);
 		const footer = util.codeBlock('ts', type);
 		const output = message.language.get(success ? 'COMMAND_EVAL_OUTPUT' : 'COMMAND_EVAL_ERROR',
@@ -26,7 +24,9 @@ export default class Command extends KlasaCommand {
 
 		// Handle too-long-messages
 		if (output.length > 2000) {
+			// @ts-ignore
 			if (message.guild && message.channel.attachable)
+				// @ts-ignore
 				return message.channel.sendFile(Buffer.from(result), 'output.txt', message.language.get('COMMAND_EVAL_SENDFILE', time, footer));
 
 			this.client.emit('log', result);
@@ -38,8 +38,8 @@ export default class Command extends KlasaCommand {
 	}
 
 	// Eval the input
-	async eval(message, code) {
-		// eslint-disable-next-line no-unused-vars
+	public async eval(message: KlasaMessage, code: string): Promise<any> {
+		// @ts-ignore
 		const msg = message;
 		const { flags } = message;
 		const stopwatch = new Stopwatch();
@@ -77,7 +77,7 @@ export default class Command extends KlasaCommand {
 		return { success, type, time: this.formatTime(syncTime, asyncTime), result: util.clean(result) };
 	}
 
-	formatTime(syncTime, asyncTime) {
+	public formatTime(syncTime: string, asyncTime: string): string {
 		return asyncTime ? `⏱ ${asyncTime}<${syncTime}>` : `⏱ ${syncTime}`;
 	}
 

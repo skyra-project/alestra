@@ -1,3 +1,3 @@
-# Smii
+# Alestra
 
 Canvas-Constructor helper bot

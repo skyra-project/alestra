@@ -1,27 +1,30 @@
-import { Monitor as KlasaMonitor, RichDisplay, util } from 'klasa';
-import { default as Discord } from 'discord.js';
+import * as Discord from 'discord.js';
+import { KlasaClient, KlasaMessage, Monitor as KlasaMonitor, MonitorStore, RichDisplay, util } from 'klasa';
+import { AlestraClientOptions } from '../lib/Alestra';
 import {
-	CODEBLOCK_REGEXP,
-	checkErrors
+	checkErrors,
+	CODEBLOCK_REGEXP
 } from '../lib/Linter/Linter';
 
 const { MessageEmbed, Permissions: { FLAGS } } = Discord;
 
 export default class Monitor extends KlasaMonitor {
 
-	constructor(...args) {
-		super(...args, { ignoreOthers: false, ignoreEdits: false });
+	public handlers = new Map();
+	public dev: boolean = (<AlestraClientOptions> this.client.options).dev;
 
-		this.handlers = new Map();
-		this.dev = this.client.options.dev;
+	public constructor(client: KlasaClient, store: MonitorStore, file: string, directory: string) {
+		super(client, store, file, directory, { ignoreOthers: false, ignoreEdits: false });
 	}
 
-	async run(message) {
+	public async run(message: KlasaMessage): Promise<void> {
 		if (!(message.guild
 			&& this.dev ? message.author.id === this.client.options.ownerID : true
-			&& message.channel.permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
-			&& message.guild.settings.supportChannels.includes(message.channel.id)
-			&& CODEBLOCK_REGEXP.test(message.content))) return;
+			&& (<Discord.TextChannel> message.channel).permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
+			// @ts-ignore
+			&& message.guild.settings.supportChannels.includes(message.channel.id))) return;
+
+		if (!CODEBLOCK_REGEXP.test(message.content)) return;
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)
@@ -54,10 +57,11 @@ export default class Monitor extends KlasaMonitor {
 
 		const richDisplay = new RichDisplay(new MessageEmbed()
 			.setColor(0xFF7327)
+			// @ts-ignore
 			.setAuthor(this.client.user.username, this.client.user.avatarURL({ size: 64 }))
 			.setTitle('ESLint Errors'));
 		for (const error of errors) {
-			richDisplay.addPage(template => template.setDescription([
+			richDisplay.addPage((template) => template.setDescription([
 				`[\`${error.ruleId || 'Parsing Error'}\`] (Severity ${error.severity}) at ${
 					this._displayRanges(error.line, error.endLine)}:${
 					this._displayRanges(error.column, error.endColumn)
@@ -65,6 +69,7 @@ export default class Monitor extends KlasaMonitor {
 			].join('\n')));
 		}
 		const handler = await richDisplay.run(
+			// @ts-ignore
 			await message.channel.send('<:canvasconstructor:451438332375728128> | Please wait...'),
 			{ filter: (_, user) => user.id === message.author.id });
 
@@ -79,13 +84,13 @@ export default class Monitor extends KlasaMonitor {
 		});
 	}
 
-	_displayRanges(start, end) {
-		if (typeof end !== 'number') return start;
-		if (start === end) return start;
+	public _displayRanges(start: number, end: number): string {
+		if (typeof end !== 'number') return String(start);
+		if (start === end) return String(start);
 		return `${start}-${end}`;
 	}
 
-	_displayText(code, line, endLine = line, column, endColumn = column) {
+	public _displayText(code: string, line: number, endLine: number = line, column: number, endColumn: number = column): string {
 		const singleLine = typeof endLine !== 'number' || line === endLine;
 		if (singleLine) {
 			const extractedLine = code.split('\n')[line - 1];
