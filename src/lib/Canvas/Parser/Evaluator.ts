@@ -72,10 +72,10 @@ async function parseAwaitExpression(ctx: EvaluatorContext, node: NodeSpreadEleme
 }
 
 async function parseSpreadElement(ctx: EvaluatorContext, node: NodeSpreadElement, scope: Scope): Promise<Iterable<any>> {
-	if (!ctx.allowSpread) throw new CompilationParseError(ctx.code, node.start, 'Spread was not expected yet');
+	if (!ctx.allowSpread) throw new CompilationParseError(ctx.code, node.argument.start, 'Spread was not expected yet');
 	const arg = await parseNode(ctx, node.argument, scope);
 	if (Symbol.iterator in arg) return arg;
-	throw new CompilationParseError(ctx.code, node.start, 'A iterable was not given');
+	throw new CompilationParseError(ctx.code, node.argument.start, 'A iterable was not given');
 }
 
 async function parseTemplateElement(_: EvaluatorContext, node: NodeTemplateElement, __: Scope): Promise<string> {
@@ -129,7 +129,7 @@ async function parseAssignmentExpression(ctx: EvaluatorContext, node: NodeAssign
 		else ctx.identifiers.set(name, value);
 		return value;
 	}
-	throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
+	throw new CompilationParseError(ctx.code, node.left.end, 'Unsupported feature');
 }
 
 async function parseProgram(ctx: EvaluatorContext, node: NodeProgram, scope: Scope): Promise<any> {
@@ -146,7 +146,7 @@ async function parseBlockStatement(ctx: EvaluatorContext, node: NodeBlockStateme
 
 async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const member = await parseNode(ctx, node.callee, scope);
-	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.start, `${node.callee}`);
+	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Tried to call a non-function');
 	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return member(...args);
 }
@@ -158,7 +158,7 @@ async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeCondi
 
 async function parseNewExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const ctor: new (...args: any[]) => any = await parseNode(ctx, node.callee, scope);
-	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.start, 'Constructor is not a function');
+	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Constructor is not a function');
 	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return new ctor(...args);
 }
@@ -199,8 +199,7 @@ async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariabl
 }
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope): Promise<any> {
-	if (!node.id || !node.id.name) throw new CompilationParseError(ctx.code, node.start, 'Failed to parse declarator identifier');
-	if (ctx.identifiers.has(node.id.name) || scope && scope.has(node.id.name)) throw new AlreadyDeclaredIdentifier(ctx.code, node.start, node.id.name);
+	if (ctx.identifiers.has(node.id.name) || scope && scope.has(node.id.name)) throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
 	if (node.init) {
 		const value = await parseNode(ctx, node.init, scope);
 		if (scope) scope.set(node.id.name, value);
@@ -219,7 +218,7 @@ async function parseUnaryExpression(ctx: EvaluatorContext, node: NodeUnaryExpres
 	const argument = await parseNode(ctx, node.argument, scope);
 	const operator = unaryOperators.get(node.operator);
 	if (operator) return operator(argument);
-	throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
+	throw new CompilationParseError(ctx.code, node.argument.end, 'Unsupported feature');
 }
 
 async function parseBinaryExpression(ctx: EvaluatorContext, node: NodeBinaryExpression, scope: Scope): Promise<any> {
@@ -227,7 +226,7 @@ async function parseBinaryExpression(ctx: EvaluatorContext, node: NodeBinaryExpr
 	const right = await parseNode(ctx, node.right, scope);
 	const operator = binaryOperators.get(node.operator);
 	if (operator) return operator(left, right);
-	throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
+	throw new CompilationParseError(ctx.code, node.left.end, 'Unsupported feature');
 }
 
 async function parseIdentifier(ctx: EvaluatorContext, node: NodeIdentifier, scope: Scope): Promise<any> {
