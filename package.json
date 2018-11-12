@@ -40,7 +40,7 @@
   "homepage": "https://github.com/kyranet/Alestra#readme",
   "dependencies": {
     "acorn": "^6.0.4",
-    "canvas-constructor": "2.0.0",
+    "canvas-constructor": "2.0.1",
     "canvas": "^2.1.0",
     "discord.js": "github:discordjs/discord.js",
     "eslint": "^5.9.0",
