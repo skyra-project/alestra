@@ -133,18 +133,22 @@ async function parseAssignmentExpression(ctx: EvaluatorContext, node: NodeAssign
 }
 
 async function parseProgram(ctx: EvaluatorContext, node: NodeProgram, scope: Scope): Promise<any> {
-	return (await Promise.all(node.body.map((nd) => parseNode(ctx, nd, scope)))).pop();
+	let last;
+	for (const element of node.body) last = await parseNode(ctx, element, scope);
+	return last;
 }
 
 async function parseBlockStatement(ctx: EvaluatorContext, node: NodeBlockStatement, scope: Scope): Promise<any> {
-	return (await Promise.all(node.body.map((nd) => parseNode(ctx, nd, scope)))).pop();
+	let last;
+	for (const element of node.body) last = await parseNode(ctx, element, scope);
+	return last;
 }
 
 async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const member = await parseNode(ctx, node.callee, scope);
 	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.start, `${node.callee}`);
 	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
-	return member(args);
+	return member(...args);
 }
 
 async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeConditionalExpression, scope: Scope): Promise<any> {
@@ -183,11 +187,15 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 
 	if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyName);
 	if (property === 'constructor') throw new SandboxError(ctx.code, node.property.start, propertyName);
-	return object[property];
+
+	const value = object[property];
+	return typeof value === 'function' ? value.bind(object) : value;
 }
 
 async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariableDeclaration, scope: Scope): Promise<any> {
-	return (await Promise.all(node.declarations.map((declarator) => parseVariableDeclarator(ctx, declarator, scope)))).pop();
+	let last;
+	for (const declarator of node.declarations) last = await parseVariableDeclarator(ctx, declarator, scope);
+	return last;
 }
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope): Promise<any> {
