@@ -176,7 +176,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	const propertyValue = await parseNode(ctx, node.property, scope);
 	let property: any = kUnset;
 
-	if (node.computed) {
+	if (node.computed && node.property.type !== 'Literal') {
 		// If `[variable]()`
 		if (ctx.identifiers.has(propertyValue)) property = ctx.identifiers.get(propertyValue);
 		else if (scope && scope.has(propertyValue)) property = scope.get(propertyValue);
