@@ -1,6 +1,6 @@
 import { AlestraClientOptions } from './src/lib/Alestra';
 
-// Remove `.example` from the file extension to configure Smii
+// Remove `.example` from the file extension to configure Alestra
 
 export const CLIENT_OPTIONS: AlestraClientOptions = {
 	commandEditing: true,
@@ -13,8 +13,8 @@ export const CLIENT_OPTIONS: AlestraClientOptions = {
 	messageCacheMaxSize: 25,
 	messageSweepInterval: 100,
 	prefix: 's.',
-	presence: { status: 'online', activity: { type: 'LISTENING', name: 'Smii, help' } },
-	regexPrefix: /smii(,|!)/i,
+	presence: { status: 'online', activity: { type: 'LISTENING', name: 'Alestra, help' } },
+	regexPrefix: /alestra[,!]/i,
 	typing: true,
 	pieceDefaults: {
 		commands: { deletable: true },
