@@ -186,7 +186,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	}
 
 	if (property === kUnset) throw new UnknownIdentifier(ctx.code, node.property.start, propertyName);
-	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'Constructor access is not allowed');
+	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'constructor');
 
 	const value = object[property];
 	return typeof value === 'function' ? value.bind(object) : value;
