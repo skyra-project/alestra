@@ -32,7 +32,7 @@
     "yorkaargh"
   ],
   "private": true,
-  "author": "kyraNET",
+  "author": "kyranet <kyradiscord@gmail.com>",
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/kyranet/Alestra/issues"
@@ -49,9 +49,10 @@
     "typescript": "^3.1.6"
   },
   "devDependencies": {
-    "@types/node": "^10.12.5",
-    "@types/node-fetch": "^2.1.2",
     "@types/eslint": "^4.16.4",
-    "eslint-config-klasa": "github:dirigeants/klasa-lint"
+    "@types/node-fetch": "^2.1.2",
+    "@types/node": "^10.12.5",
+    "eslint-config-klasa": "github:dirigeants/klasa-lint",
+    "tslint": "^5.11.0"
   }
 }

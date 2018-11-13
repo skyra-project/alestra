@@ -1,7 +1,10 @@
 import { Canvas } from 'canvas-constructor';
 import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
+import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
+
+const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true, checkJs: true, target: ScriptTarget.ESNext } };
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
@@ -11,8 +14,7 @@ export default class Command extends KlasaCommand {
 		super(client, store, file, directory, {
 			bucket: 1,
 			cooldown: 10,
-			description: 'Render a Canvas-Constructor',
-			extendedHelp: 'No extended help available.',
+			description: 'Execute a sandboxed subset of JavaScript',
 			requiredPermissions: ['ATTACH_FILES'],
 			runIn: ['text'],
 			usage: '<code:string>'
@@ -20,9 +22,10 @@ export default class Command extends KlasaCommand {
 	}
 
 	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
+		code = this.parseCodeblock(code);
 		const sw = new Stopwatch(5);
 		try {
-			let output = await evaluate(this.parseCodeblock(code));
+			let output = await evaluate(message.flags.ts ? transpileModule(code, tsTranspileOptions).outputText : code);
 			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			// @ts-ignore
