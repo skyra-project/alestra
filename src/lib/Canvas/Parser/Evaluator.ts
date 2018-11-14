@@ -27,6 +27,12 @@ async function fetch(...args: [string]): Promise<Buffer> {
 
 // Function#bind allows the code to be censored
 defaultIdentifiers.push(['fetch', fetch.bind(null)]);
+defaultIdentifiers.push(['Error', Error]);
+defaultIdentifiers.push(['EvalError', EvalError]);
+defaultIdentifiers.push(['RangeError', RangeError]);
+defaultIdentifiers.push(['ReferenceError', ReferenceError]);
+defaultIdentifiers.push(['SyntaxError', SyntaxError]);
+defaultIdentifiers.push(['TypeScript', TypeError]);
 
 export async function evaluate(input: string): Promise<any> {
 	try {
