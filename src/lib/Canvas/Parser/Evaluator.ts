@@ -164,9 +164,9 @@ async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpressio
 }
 
 async function parseCatchClause(ctx: EvaluatorContext, node: NodeCatchClause, scope: Scope, error: Error): Promise<any> {
-	const internalScope = (scope ? new Map([...scope]) : new Map()).set(node.param.name, error);
+	const internalScope = node.param ? (scope ? new Map([...scope]) : new Map()).set(node.param.name, error) : scope;
 	const internalBlock = await parseBlockStatement(ctx, node.body, internalScope);
-	if (scope) scope.delete(node.param.name);
+	if (node.param && scope) scope.delete(node.param.name);
 	return internalBlock;
 }
 
