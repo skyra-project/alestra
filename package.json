@@ -40,8 +40,10 @@
   "homepage": "https://github.com/kyranet/Alestra#readme",
   "dependencies": {
     "acorn": "^6.0.4",
-    "canvas-constructor": "2.0.1",
+    "acorn-bigint": "^0.3.1",
+    "acorn-numeric-separator": "^0.2.0",
     "canvas": "^2.1.0",
+    "canvas-constructor": "2.0.1",
     "discord.js": "github:discordjs/discord.js",
     "eslint": "^5.9.0",
     "klasa": "github:dirigeants/klasa#esm",
@@ -50,8 +52,8 @@
   },
   "devDependencies": {
     "@types/eslint": "^4.16.4",
-    "@types/node-fetch": "^2.1.2",
     "@types/node": "^10.12.5",
+    "@types/node-fetch": "^2.1.2",
     "eslint-config-klasa": "github:dirigeants/klasa-lint",
     "tslint": "^5.11.0"
   }

@@ -1,9 +1,13 @@
-import { parse } from 'acorn';
+import { Parser } from 'acorn';
 import * as CanvasConstructor from 'canvas-constructor';
 import { default as _fetch } from 'node-fetch';
 import { extname } from 'path';
 import { URL } from 'url';
 import { AlreadyDeclaredIdentifier, CompilationParseError, MissingPropertyError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
+
+import bigInt from 'acorn-bigint';
+import numericSeparator from 'acorn-numeric-separator';
+const parser = Parser.extend(numericSeparator).extend(bigInt);
 
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
@@ -27,6 +31,10 @@ async function fetch(...args: [string]): Promise<Buffer> {
 
 // Function#bind allows the code to be censored
 defaultIdentifiers.push(['fetch', fetch.bind(null)]);
+
+// @ts-ignore
+defaultIdentifiers.push(['BigInt', BigInt]);
+defaultIdentifiers.push(['Number', Number]);
 defaultIdentifiers.push(['Error', Error]);
 defaultIdentifiers.push(['EvalError', EvalError]);
 defaultIdentifiers.push(['RangeError', RangeError]);
@@ -40,7 +48,7 @@ export async function evaluate(input: string): Promise<any> {
 			allowSpread: false,
 			code: input,
 			identifiers: new Map(defaultIdentifiers)
-		}, parse(input, {
+		}, parser.parse(input, {
 			// @ts-ignore
 			allowAwaitOutsideFunction: true,
 			ecmaVersion: 2019
