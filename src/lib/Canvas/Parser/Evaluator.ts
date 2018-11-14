@@ -3,7 +3,7 @@ import * as CanvasConstructor from 'canvas-constructor';
 import { default as _fetch } from 'node-fetch';
 import { extname } from 'path';
 import { URL } from 'url';
-import { AlreadyDeclaredIdentifier, CompilationParseError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
+import { AlreadyDeclaredIdentifier, CompilationParseError, MissingPropertyError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
 
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
@@ -212,6 +212,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	}
 
 	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'constructor');
+	if (!(property in object)) throw new InternalError(new MissingPropertyError(ctx.code, node.property.start, property));
 
 	const value = object[property];
 	return typeof value === 'function' ? value.bind(object) : value;

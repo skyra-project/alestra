@@ -42,3 +42,11 @@ export class SandboxPropertyError extends CompilationParseError {
 	}
 
 }
+
+export class MissingPropertyError extends CompilationParseError {
+
+	public constructor(code: string, start: number, name: string) {
+		super(code, start, `The property \`${name}\` does not exist`);
+	}
+
+}
