@@ -1,16 +1,16 @@
-import * as Discord from 'discord.js';
-import { KlasaClient, KlasaMessage, Monitor as KlasaMonitor, MonitorStore, RichDisplay, util } from 'klasa';
+import { GuildChannel, MessageEmbed, Permissions, Snowflake } from 'discord.js';
+import { KlasaClient, KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay, util } from 'klasa';
 import { AlestraClientOptions } from '../lib/Alestra';
 import {
 	checkErrors,
 	CODEBLOCK_REGEXP
 } from '../lib/Linter/Linter';
 
-const { MessageEmbed, Permissions: { FLAGS } } = Discord;
+const { FLAGS } = Permissions;
 
 export default class Monitor extends KlasaMonitor {
 
-	public handlers = new Map();
+	public handlers: Map<string, { handler: ReactionHandler; message: KlasaMessage }> = new Map();
 	public dev: boolean = (<AlestraClientOptions> this.client.options).dev;
 
 	public constructor(client: KlasaClient, store: MonitorStore, file: string, directory: string) {
@@ -18,12 +18,15 @@ export default class Monitor extends KlasaMonitor {
 	}
 
 	public async run(message: KlasaMessage): Promise<void> {
-		if (!(message.guild
-			&& this.dev ? message.author.id === this.client.options.ownerID : true
-			&& (<Discord.TextChannel> message.channel).permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)
-			// @ts-ignore
-			&& message.guild.settings.supportChannels.includes(message.channel.id))) return;
-
+		// If it's in development mode, ignore anyone else that is not the owner
+		if (this.dev && message.author.id !== this.client.options.ownerID) return;
+		// If it's not in a guild, return
+		if (!message.guild) return;
+		// If this is not a support channel, return
+		if (!message.guild.settings.get<Snowflake[]>('supportChannels').includes(message.channel.id)) return;
+		// If I don't have permissions, return
+		if (!(message.channel as GuildChannel).permissionsFor(message.guild.me).has(FLAGS.MANAGE_MESSAGES)) return;
+		// If there is no codeblock, return
 		if (!CODEBLOCK_REGEXP.test(message.content)) return;
 
 		const oldHandler = this.handlers.get(message.author.id);
