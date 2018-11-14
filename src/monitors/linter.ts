@@ -74,7 +74,7 @@ export default class Monitor extends KlasaMonitor {
 		const handler = await richDisplay.run(
 			// @ts-ignore
 			await message.channel.send('<:canvasconstructor:451438332375728128> | Please wait...'),
-			{ filter: (_, user) => user.id === message.author.id });
+			{ filter: (_, user) => user.id === message.author.id, time: 120000 });
 
 		this.handlers.set(message.author.id, { handler, message });
 		handler.once('end', () => {
