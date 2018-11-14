@@ -13,7 +13,7 @@ export default class Command extends KlasaCommand {
 	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
 		super(client, store, file, directory, {
 			bucket: 1,
-			cooldown: 10,
+			cooldown: 5,
 			description: 'Execute a sandboxed subset of JavaScript',
 			requiredPermissions: ['ATTACH_FILES'],
 			runIn: ['text'],
@@ -31,7 +31,7 @@ export default class Command extends KlasaCommand {
 			// @ts-ignore
 			if (output instanceof Buffer) return message.channel.sendFile(output, 'output.png', `\`✔\` \`⏱ ${sw}\``);
 			// @ts-ignore
-			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
+			return message.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && message.author.id === this.client.owner.id ? error.stack : error)}`;
