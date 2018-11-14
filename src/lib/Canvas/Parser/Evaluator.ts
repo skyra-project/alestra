@@ -8,6 +8,10 @@ import { AlreadyDeclaredIdentifier, CompilationParseError, SandboxError, Sandbox
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
 
+export class InternalError {
+	public constructor(public error: Error) {}
+}
+
 async function fetch(...args: [string]): Promise<Buffer> {
 	if (args.length !== 1) throw new TypeError('Expected only 1 argument (at fetch).');
 	if (typeof args[0] !== 'string') throw new TypeError('Expected url to be a string (at fetch).');
@@ -16,24 +20,29 @@ async function fetch(...args: [string]): Promise<Buffer> {
 	if (/^\.(jpe?g|png)$/.test(ext)) {
 		const response = await _fetch(url.href);
 		if (response.ok) return response.buffer();
-		throw new Error(`${response.status}: ${response.statusText} | ${url.href}`);
+		throw new InternalError(new Error(`${response.status}: ${response.statusText} | ${url.href}`));
 	}
-	throw new Error(`The url ${url.href} must have any of the following extensions: .png, .jpg, .jpeg`);
+	throw new InternalError(new Error(`The url ${url.href} must have any of the following extensions: .png, .jpg, .jpeg`));
 }
 
 // Function#bind allows the code to be censored
 defaultIdentifiers.push(['fetch', fetch.bind(null)]);
 
-export function evaluate(input: string): Promise<any> {
-	return parseNode({
-		allowSpread: false,
-		code: input,
-		identifiers: new Map(defaultIdentifiers)
-	}, parse(input, {
-		// @ts-ignore
-		allowAwaitOutsideFunction: true,
-		ecmaVersion: 2019
-	}), null);
+export async function evaluate(input: string): Promise<any> {
+	try {
+		return await parseNode({
+			allowSpread: false,
+			code: input,
+			identifiers: new Map(defaultIdentifiers)
+		}, parse(input, {
+			// @ts-ignore
+			allowAwaitOutsideFunction: true,
+			ecmaVersion: 2019
+		}), null);
+	} catch (error) {
+		if (error instanceof InternalError) throw error.error;
+		throw error;
+	}
 }
 
 function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promise<any> {
@@ -41,6 +50,7 @@ function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promi
 	ctx.allowSpread = false;
 	switch (node.type) {
 		// case 'ArrowFunctionExpression': return parseArrowFunctionExpression(ctx, unknownNode as NodeArrowFunctionExpression);
+		// case 'CatchClause': return parseCatchClause(ctx, unknownNode as NodeCatchClause, scope);
 		case 'ArrayExpression': return parseArrayExpression(ctx, unknownNode as NodeArrayExpression, scope);
 		case 'AssignmentExpression': return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
 		case 'AwaitExpression': return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
@@ -60,6 +70,8 @@ function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promi
 		case 'SpreadElement': return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
 		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement, scope);
 		case 'TemplateLiteral': return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
+		case 'ThrowStatement': return parseThrowStatement(ctx, unknownNode as NodeThrowStatement, scope);
+		case 'TryStatement': return parseTryStatement(ctx, unknownNode as NodeTryStatement, scope);
 		case 'UnaryExpression': return parseUnaryExpression(ctx, unknownNode as NodeUnaryExpression, scope);
 		case 'VariableDeclaration': return parseVariableDeclaration(ctx, unknownNode as NodeVariableDeclaration, scope);
 		case 'VariableDeclarator': return parseVariableDeclarator(ctx, unknownNode as NodeVariableDeclarator, scope);
@@ -151,6 +163,13 @@ async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpressio
 	return member(...args);
 }
 
+async function parseCatchClause(ctx: EvaluatorContext, node: NodeCatchClause, scope: Scope, error: Error): Promise<any> {
+	const internalScope = (scope ? new Map([...scope]) : new Map()).set(node.param.name, error);
+	const internalBlock = await parseBlockStatement(ctx, node.body, internalScope);
+	if (scope) scope.delete(node.param.name);
+	return internalBlock;
+}
+
 async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeConditionalExpression, scope: Scope): Promise<any> {
 	const test = await parseNode(ctx, node.test, scope);
 	return parseNode(ctx, test ? node.consequent : node.alternate, scope);
@@ -213,6 +232,25 @@ async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariable
 // function parseArrowFunctionExpression(ctx: EvaluatorContext, node: NodeArrowFunctionExpression, scope: Scope): Function {
 // 	return (): null => null;
 // }
+
+async function parseThrowStatement(ctx: EvaluatorContext, node: NodeThrowStatement, scope: Scope): Promise<any> {
+	throw new InternalError(await parseNode(ctx, node, scope));
+}
+
+async function parseTryStatement(ctx: EvaluatorContext, node: NodeTryStatement, scope: Scope): Promise<any> {
+	try {
+		const internalBlock = await parseBlockStatement(ctx, node.block, scope);
+		return internalBlock;
+	} catch (error) {
+		if (error instanceof InternalError && node.handler) {
+			const internalCatch = await parseCatchClause(ctx, node.handler, scope, error.error);
+			return internalCatch;
+		}
+		throw error;
+	} finally {
+		if (node.finalizer) await parseBlockStatement(ctx, node.finalizer, scope);
+	}
+}
 
 async function parseUnaryExpression(ctx: EvaluatorContext, node: NodeUnaryExpression, scope: Scope): Promise<any> {
 	const argument = await parseNode(ctx, node.argument, scope);
@@ -469,6 +507,30 @@ type NodeExpressionStatement = acorn.Node & {
 type NodeTemplateLiteral = acorn.Node & {
 	expressions: acorn.Node[];
 	quasis: NodeTemplateElement[];
+};
+
+/**
+ * ThrowStatement type
+ */
+type NodeThrowStatement = acorn.Node & {
+	argument: acorn.Node;
+};
+
+/**
+ * TryStatement type
+ */
+type NodeTryStatement = acorn.Node & {
+	block: NodeBlockStatement;
+	handler: NodeCatchClause;
+	finalizer: NodeBlockStatement;
+};
+
+/**
+ * CatchClause type
+ */
+type NodeCatchClause = acorn.Node & {
+	param: NodeIdentifier;
+	body: NodeBlockStatement;
 };
 
 /**
