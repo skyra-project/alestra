@@ -28,7 +28,7 @@ export default class Command extends KlasaCommand {
 	private async fetch(message: KlasaMessage, branch: string): Promise<string> {
 		await util.exec('git fetch');
 		const { stdout, stderr } = await util.exec(`git pull origin ${branch}`);
-		if (stdout.includes('Already up to date.')) throw '✔ Up to date.';
+		if (stdout.includes('Already up-to-date.')) throw '✔ Up to date.';
 		if (!this.isSuccessfulPull(stdout)) {
 			if (this.needsStash(stdout + stderr)) return this.stash(message);
 		} else if (await !this.isCurrentBranch(branch)) {
