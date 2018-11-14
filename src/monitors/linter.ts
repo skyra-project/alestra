@@ -31,7 +31,7 @@ export default class Monitor extends KlasaMonitor {
 
 		const oldHandler = this.handlers.get(message.author.id);
 		if (oldHandler)
-			await oldHandler.handler.stop();
+			oldHandler.handler.stop();
 
 		const code = CODEBLOCK_REGEXP.exec(message.content)[1].trim();
 		const errors = checkErrors(code);
