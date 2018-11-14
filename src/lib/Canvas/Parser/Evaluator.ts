@@ -234,7 +234,7 @@ async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariable
 // }
 
 async function parseThrowStatement(ctx: EvaluatorContext, node: NodeThrowStatement, scope: Scope): Promise<any> {
-	throw new InternalError(await parseNode(ctx, node, scope));
+	throw new InternalError(await parseNode(ctx, node.argument, scope));
 }
 
 async function parseTryStatement(ctx: EvaluatorContext, node: NodeTryStatement, scope: Scope): Promise<any> {
