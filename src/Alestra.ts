@@ -3,4 +3,5 @@ import Alestra from './lib/Alestra';
 
 Alestra.defaultGuildSchema.add('supportChannels', 'TextChannel', { array: true });
 
-new Alestra(CLIENT_OPTIONS).login(TOKEN);
+const client = new Alestra(CLIENT_OPTIONS);
+client.login(TOKEN).catch((error) => { client.console.error(error); });

@@ -14,4 +14,7 @@ export default class Alestra extends KlasaClient {
 
 }
 
+/**
+ * The client options for Alestra
+ */
 export type AlestraClientOptions = KlasaClientOptions & { dev?: boolean };

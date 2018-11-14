@@ -288,36 +288,73 @@ const unaryOperators: Map<string, (value: any) => any> = new Map()
 	// Boolean operators
 	.set('!', (value: any) => !value);
 
-enum ScopeType { Global, Local, None }
+/**
+ * The scope type for a variable
+ */
+enum ScopeType {
+	/**
+	 * The global scope, used if the value is in the global scope
+	 */
+	Global,
+	/**
+	 * The local scope, used if the value is in the local scope
+	 */
+	Local,
+	/**
+	 * No scope, the variable does not exist
+	 */
+	None
+}
 
+/**
+ * Scope
+ */
 type Scope = Map<string, any> | null;
 
+/**
+ * Evaluator context
+ */
 type EvaluatorContext = {
 	allowSpread: boolean;
 	code: string;
 	identifiers: Map<string, any>;
 };
 
+/**
+ * Program type
+ */
 type NodeProgram = acorn.Node & {
 	body: acorn.Node[];
 };
 
+/**
+ * MemberExpression type
+ */
 type NodeMemberExpression = acorn.Node & {
 	object: acorn.Node;
 	property: acorn.Node;
 	computed: boolean;
 };
 
+/**
+ * VariableDeclaration type
+ */
 type NodeVariableDeclaration = acorn.Node & {
 	property: NodeIdentifier;
 	kind: 'var' | 'let' | 'const';
 	declarations: NodeVariableDeclarator[];
 };
 
+/**
+ * ObjectExpression type
+ */
 type NodeObjectExpression = acorn.Node & {
 	properties: NodeProperty[];
 };
 
+/**
+ * Property type
+ */
 type NodeProperty = acorn.Node & {
 	method: boolean;
 	shorthand: boolean;
@@ -327,71 +364,116 @@ type NodeProperty = acorn.Node & {
 	kind: string;
 };
 
+/**
+ * VariableDeclarator type
+ */
 type NodeVariableDeclarator = acorn.Node & {
 	id: NodeIdentifier;
 	init: acorn.Node | null;
 };
 
+/**
+ * BlockStatement type
+ */
 type NodeBlockStatement = acorn.Node & {
 	body: acorn.Node[];
 };
 
+/**
+ * CallExpression type
+ */
 type NodeCallExpression = acorn.Node & {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
 };
 
+/**
+ * Literal type
+ */
 type NodeLiteral = acorn.Node & {
 	value: any;
 	raw: string;
 };
 
+/**
+ * Identifier type
+ */
 type NodeIdentifier = acorn.Node & {
 	name: string;
 };
 
+/**
+ * IfStatement type
+ */
 type NodeIfStatement = acorn.Node & {
 	test: acorn.Node;
 	consequent: acorn.Node;
 	alternate: acorn.Node | null;
 };
 
+/**
+ * ArrayExpression type
+ */
 type NodeArrayExpression = acorn.Node & {
 	elements: acorn.Node[];
 };
 
+/**
+ * SpreadElement type
+ */
 type NodeSpreadElement = acorn.Node & {
 	argument: acorn.Node;
 };
 
+/**
+ * ConditionalExpression type
+ */
 type NodeConditionalExpression = acorn.Node & {
 	test: acorn.Node;
 	consequent: acorn.Node;
 	alternate: acorn.Node;
 };
 
+/**
+ * BinaryExpression type
+ */
 type NodeBinaryExpression = acorn.Node & {
 	left: acorn.Node;
 	right: acorn.Node;
 	operator: string;
 };
 
+/**
+ * NewExpression type
+ */
 type NodeNewExpression = acorn.Node & {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
 };
 
+/**
+ * EmptyStatement type
+ */
 type NodeEmptyStatement = acorn.Node;
 
+/**
+ * ExpressionStatement type
+ */
 type NodeExpressionStatement = acorn.Node & {
 	expression: acorn.Node;
 };
 
+/**
+ * TemplateLiteral type
+ */
 type NodeTemplateLiteral = acorn.Node & {
 	expressions: acorn.Node[];
 	quasis: NodeTemplateElement[];
 };
 
+/**
+ * TemplateElement type
+ */
 type NodeTemplateElement = acorn.Node & {
 	value: {
 		raw: string;
@@ -400,16 +482,25 @@ type NodeTemplateElement = acorn.Node & {
 	tail: boolean;
 };
 
+/**
+ * UnaryExpression type
+ */
 type NodeUnaryExpression = acorn.Node & {
 	operator: string;
 	prefix: boolean;
 	argument: acorn.Node;
 };
 
+/**
+ * AwaitExpression type
+ */
 type NodeAwaitExpression = acorn.Node & {
 	argument: acorn.Node;
 };
 
+/**
+ * AssignmentExpression type
+ */
 type NodeAssignmentExpression = acorn.Node & {
 	operator: string;
 	left: acorn.Node;
