@@ -219,9 +219,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 }
 
 async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariableDeclaration, scope: Scope): Promise<any> {
-	let last;
-	for (const declarator of node.declarations) last = await parseVariableDeclarator(ctx, declarator, scope);
-	return last;
+	for (const declarator of node.declarations) await parseVariableDeclarator(ctx, declarator, scope);
 }
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope): Promise<any> {
