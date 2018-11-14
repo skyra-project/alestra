@@ -4,7 +4,7 @@
   "description": "Canvas-Constructor helper bot and Soft-Sandbox Evaluator",
   "main": "dist/src/Alestra.js",
   "scripts": {
-    "lint": "tslint --fix src",
+    "lint": "tslint -p tsconfig.json src/**/*.ts --fix",
     "pm2:delete": "pm2 delete Alestra",
     "pm2:logs": "pm2 logs Alestra --lines=200",
     "pm2:restart": "pm2 restart Alestra",
@@ -12,7 +12,7 @@
     "pm2:start": "pm2 start dist/src/Alestra.js --name=\"Alestra\"",
     "pm2:stop": "pm2 stop Alestra",
     "start": "node dist/src/Alestra.js",
-    "test": "tslint src",
+    "test": "tslint -p tsconfig.json src/**/*.ts",
     "update": "yarn",
     "compile": "tsc -p ."
   },
