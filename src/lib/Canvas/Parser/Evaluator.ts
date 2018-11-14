@@ -224,14 +224,9 @@ async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariabl
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope): Promise<any> {
 	if (ctx.identifiers.has(node.id.name) || scope && scope.has(node.id.name)) throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
-	if (node.init) {
-		const value = await parseNode(ctx, node.init, scope);
-		if (scope) scope.set(node.id.name, value);
-		else ctx.identifiers.set(node.id.name, value);
-		return value;
-	}
-
-	return undefined;
+	const value = node.init ? await parseNode(ctx, node.init, scope) : undefined;
+	if (scope) scope.set(node.id.name, value);
+	else ctx.identifiers.set(node.id.name, value);
 }
 
 // function parseArrowFunctionExpression(ctx: EvaluatorContext, node: NodeArrowFunctionExpression, scope: Scope): Function {
