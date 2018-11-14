@@ -50,11 +50,10 @@ export default class Monitor extends KlasaMonitor {
 			if (message.deleted) return;
 			if (!reactions.size) {
 				const reaction = message.reactions.get('🔍');
-				if (reaction && reaction.users.has(this.client.user.id)) await reaction.users.remove(this.client.user).catch(() => null);
-				return;
+				if (reaction) await reaction.users.remove(this.client.user).catch(() => null);
 			} else {
 				const reaction = message.reactions.get('🔍');
-				if (reaction && reaction.users.has(message.author.id)) await reaction.users.remove(message.author).catch(() => null);
+				if (reaction) await reaction.users.remove(message.author).catch(() => null);
 			}
 		}
 
@@ -63,6 +62,7 @@ export default class Monitor extends KlasaMonitor {
 			// @ts-ignore
 			.setAuthor(this.client.user.username, this.client.user.avatarURL({ size: 64 }))
 			.setTitle('ESLint Errors'));
+
 		for (const error of errors) {
 			richDisplay.addPage((template) => template.setDescription([
 				`[\`${error.ruleId || 'Parsing Error'}\`] (Severity ${error.severity}) at ${
