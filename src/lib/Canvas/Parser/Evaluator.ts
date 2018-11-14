@@ -5,9 +5,8 @@ import { extname } from 'path';
 import { URL } from 'url';
 import { AlreadyDeclaredIdentifier, CompilationParseError, MissingPropertyError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
 
-import * as bigInt from 'acorn-bigint';
 import * as numericSeparator from 'acorn-numeric-separator';
-const parser = Parser.extend(numericSeparator).extend(bigInt);
+const parser = Parser.extend(numericSeparator);
 
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
