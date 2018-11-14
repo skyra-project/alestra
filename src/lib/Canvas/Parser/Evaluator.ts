@@ -30,10 +30,9 @@ async function fetch(...args: [string]): Promise<Buffer> {
 
 // Function#bind allows the code to be censored
 defaultIdentifiers.push(['fetch', fetch.bind(null)]);
-
-// @ts-ignore
-defaultIdentifiers.push(['BigInt', BigInt]);
 defaultIdentifiers.push(['Number', Number]);
+defaultIdentifiers.push(['Object', Object]);
+defaultIdentifiers.push(['Array', Array]);
 defaultIdentifiers.push(['Error', Error]);
 defaultIdentifiers.push(['EvalError', EvalError]);
 defaultIdentifiers.push(['RangeError', RangeError]);
