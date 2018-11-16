@@ -47,7 +47,8 @@
     "eslint": "^5.9.0",
     "klasa": "github:dirigeants/klasa#esm",
     "node-fetch": "^2.2.1",
-    "typescript": "^3.1.6"
+    "typescript": "^3.1.6",
+    "veza": "^0.3.2"
   },
   "devDependencies": {
     "@types/eslint": "^4.16.4",

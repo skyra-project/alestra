@@ -1,6 +1,6 @@
 import { GuildChannel, MessageEmbed, Permissions, Snowflake } from 'discord.js';
 import { KlasaClient, KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay, util } from 'klasa';
-import { AlestraClientOptions } from '../lib/Alestra';
+import { AlestraClientOptions } from '../lib/AlestraClient';
 import {
 	checkErrors,
 	CODEBLOCK_REGEXP
