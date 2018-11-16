@@ -10,6 +10,7 @@ export const CLIENT_OPTIONS: AlestraClientOptions = {
 	commandMessageLifetime: 200,
 	console: { useColor: true, utc: true },
 	consoleEvents: { verbose: true },
+	createPiecesFolders: false,
 	customPromptDefaults: { limit: 5 },
 	dev: DEV,
 	disabledEvents: [
