@@ -18,7 +18,7 @@ export class AlestraClient extends KlasaClient {
 		.on('error', (error, client) => { this.console.error(`${r} Error from ${client.name}`, error); })
 		.on('message', this.ipcMonitors.run.bind(this.ipcMonitors));
 
-	public constructor(options: AlestraClientOptions) {
+	public constructor(options?: AlestraClientOptions) {
 		super(util.mergeDefault({ dev: false }, options));
 
 		this.registerStore(this.ipcMonitors);
