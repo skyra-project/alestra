@@ -42,7 +42,7 @@
     "acorn": "^6.0.4",
     "acorn-numeric-separator": "^0.2.0",
     "canvas": "^2.1.0",
-    "canvas-constructor": "2.0.1",
+    "canvas-constructor": "2.1.1",
     "discord.js": "github:discordjs/discord.js",
     "eslint": "^5.9.0",
     "klasa": "github:dirigeants/klasa#esm",
