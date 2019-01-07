@@ -13,7 +13,7 @@ export default class Monitor extends KlasaMonitor {
 	public handlers: Map<string, { handler: ReactionHandler; message: KlasaMessage }> = new Map();
 	public dev: boolean = (<AlestraClientOptions> this.client.options).dev;
 
-	public constructor(client: KlasaClient, store: MonitorStore, file: string, directory: string) {
+	public constructor(client: KlasaClient, store: MonitorStore, file: string[], directory: string) {
 		super(client, store, file, directory, { ignoreOthers: false, ignoreEdits: false });
 	}
 

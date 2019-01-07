@@ -23,7 +23,7 @@ export class AlestraClient extends KlasaClient {
 
 		this.registerStore(this.ipcMonitors);
 		this.once('klasaReady', () => {
-			if (this.options.dev) this.permissionLevels.add(0, (client, message) => message.author.id === client.options.ownerID, { break: true });
+			if (this.options.dev) this.permissionLevels.add(0, ({ author, client }) => author.id === client.options.ownerID, { break: true });
 		});
 	}
 
