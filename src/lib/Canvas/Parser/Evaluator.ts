@@ -98,7 +98,7 @@ async function parseAwaitExpression(ctx: EvaluatorContext, node: NodeSpreadEleme
 async function parseSpreadElement(ctx: EvaluatorContext, node: NodeSpreadElement, scope: Scope): Promise<Iterable<any>> {
 	if (!ctx.allowSpread) throw new CompilationParseError(ctx.code, node.argument.start, 'Spread was not expected yet');
 	const arg = await parseNode(ctx, node.argument, scope);
-	if (Symbol.iterator in arg) return arg;
+	if (Symbol.iterator in Object(arg)) return arg;
 	throw new CompilationParseError(ctx.code, node.argument.start, 'A iterable was not given');
 }
 
@@ -218,7 +218,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	}
 
 	if (property === 'constructor') throw new SandboxPropertyError(ctx.code, node.property.start, 'constructor');
-	if (!(property in object)) throw new InternalError(new MissingPropertyError(ctx.code, node.property.start, property));
+	if (!(property in Object(object))) throw new InternalError(new MissingPropertyError(ctx.code, node.property.start, property));
 
 	const value = object[property];
 	return typeof value === 'function' ? value.bind(object) : value;
@@ -291,46 +291,49 @@ function parseLiteral(ctx: EvaluatorContext, node: NodeLiteral): Promise<any> {
 	return node.value;
 }
 
-const binaryOperators: Map<string, (left: any, right: any) => any> = new Map()
+const binaryOperators: Map<string, (left: unknown, right: unknown) => unknown> = new Map()
 	// Math operators
-	.set('+', (left: any, right: any) => left + right)
-	.set('-', (left: any, right: any) => left - right)
-	.set('/', (left: any, right: any) => left / right)
-	.set('*', (left: any, right: any) => left * right)
-	.set('%', (left: any, right: any) => left % right)
+	.set('+', (left, right) => left + right)
+	.set('-', (left, right) => left - right)
+	.set('/', (left, right) => left / right)
+	.set('*', (left, right) => left * right)
+	.set('%', (left, right) => left % right)
 
 	// Boolean operators
-	.set('**', (left: any, right: any) => left ** right)
-	.set('&&', (left: any, right: any) => left && right)
-	.set('||', (left: any, right: any) => left || right)
+	.set('**', (left, right) => left ** right)
+	.set('&&', (left, right) => left && right)
+	.set('||', (left, right) => left || right)
 
 	// Equality operators
-	.set('==', (left: any, right: any) => left == right) // tslint:disable-line
-	.set('===', (left: any, right: any) => left === right)
-	.set('!=', (left: any, right: any) => left != right) // tslint:disable-line
-	.set('!==', (left: any, right: any) => left !== right)
-	.set('>', (left: any, right: any) => left > right)
-	.set('<', (left: any, right: any) => left < right)
-	.set('>=', (left: any, right: any) => left >= right)
-	.set('<=', (left: any, right: any) => left <= right)
+	.set('==', (left, right) => left == right) // tslint:disable-line
+	.set('===', (left, right) => left === right)
+	.set('!=', (left, right) => left != right) // tslint:disable-line
+	.set('!==', (left, right) => left !== right)
+	.set('>', (left, right) => left > right)
+	.set('<', (left, right) => left < right)
+	.set('>=', (left, right) => left >= right)
+	.set('<=', (left, right) => left <= right)
 
 	// Bitwise operators
-	.set('^', (left: any, right: any) => left ^ right)
-	.set('&', (left: any, right: any) => left & right)
-	.set('|', (left: any, right: any) => left | right)
-	.set('>>', (left: any, right: any) => left >> right)
-	.set('<<', (left: any, right: any) => left << right)
-	.set('>>>', (left: any, right: any) => left >>> right)
+	.set('^', (left, right) => left ^ right)
+	.set('&', (left, right) => left & right)
+	.set('|', (left, right) => left | right)
+	.set('>>', (left, right) => left >> right)
+	.set('<<', (left, right) => left << right)
+	.set('>>>', (left, right) => left >>> right)
 
 	// Object operators
-	.set('in', (left: any, right: any) => left in right);
+	.set('in', (left, right) => left in right);
 
-const unaryOperators: Map<string, (value: any) => any> = new Map()
+const unaryOperators: Map<string, (value: unknown) => unknown> = new Map()
+	// Math operators
+	.set('+', (value) => +value)
+	.set('-', (value) => -value)
 	// Bitwise operators
-	.set('~', (value: any) => ~value)
+	.set('~', (value) => ~value)
 
 	// Boolean operators
-	.set('!', (value: any) => !value);
+	.set('!', (value) => !value);
 
 /**
  * The scope type for a variable
