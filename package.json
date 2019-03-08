@@ -12,7 +12,7 @@
     "pm2:start": "pm2 start dist/src/Alestra.js --name=\"Alestra\"",
     "pm2:stop": "pm2 stop Alestra",
     "start": "node dist/src/Alestra.js",
-    "test": "tslint -p tsconfig.json src/**/*.ts",
+    "test:lint": "tslint -p tsconfig.json src/**/*.ts",
     "update": "yarn",
     "compile": "tsc -p ."
   },
