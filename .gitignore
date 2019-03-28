@@ -16,5 +16,4 @@ dist/
 *.log
 
 # Ignore package locks
-yarn.lock
 package-lock.json

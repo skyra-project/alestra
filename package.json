@@ -39,22 +39,22 @@
   },
   "homepage": "https://github.com/kyranet/Alestra#readme",
   "dependencies": {
-    "acorn": "^6.0.4",
+    "acorn": "^6.1.1",
     "acorn-numeric-separator": "^0.2.0",
-    "canvas": "^2.1.0",
+    "canvas": "^2.4.1",
     "canvas-constructor": "3.0.1",
     "discord.js": "github:discordjs/discord.js",
-    "eslint": "^5.9.0",
+    "eslint": "^5.15.3",
     "klasa": "github:dirigeants/klasa#esm",
-    "node-fetch": "^2.2.1",
-    "typescript": "^3.1.6",
+    "node-fetch": "^2.3.0",
+    "typescript": "^3.3.4000",
     "veza": "^0.4.0"
   },
   "devDependencies": {
-    "@types/eslint": "^4.16.4",
-    "@types/node": "^11.9.0",
-    "@types/node-fetch": "^2.1.2",
+    "@types/eslint": "^4.16.6",
+    "@types/node": "^11.12.0",
+    "@types/node-fetch": "^2.1.7",
     "eslint-config-klasa": "github:dirigeants/klasa-lint",
-    "tslint": "^5.11.0"
+    "tslint": "^5.14.0"
   }
 }
