@@ -530,10 +530,10 @@ fs-minipass@^1.2.5:
   dependencies:
     minipass "^2.2.1"
 
-fs-nextra@^0.3.2:
-  version "0.3.8"
-  resolved "https://registry.yarnpkg.com/fs-nextra/-/fs-nextra-0.3.8.tgz#2a0c860a7a3c5d4b398548059d481d6155aac3c8"
-  integrity sha512-zHTMl89RbxuUUoGhG+Jx1Y2UkuOGnK4Q0Ibq6o/QHexhA91e0rtZf1Vo7G4iP2xdnUAnsDXvnfIa+r2Ffr29Lg==
+fs-nextra@^0.4.3:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/fs-nextra/-/fs-nextra-0.4.5.tgz#0f44a00dd6c0547adaf59ce875e59941d0c70664"
+  integrity sha512-oY2o6j0izYzJWp2sow21SekkR3qeMZqHV5ZfNFvfKimFU7piw1/AWwiwbcWjuSfwrfCmHyHymWZOyNbKOzew5g==
 
 fs.realpath@^1.0.0:
   version "1.0.0"
@@ -717,11 +717,12 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
   integrity sha1-nbe1lJatPzz+8wp1FC0tkwrXJlE=
 
-"klasa@github:dirigeants/klasa#esm":
+"klasa@github:dirigeants/klasa":
   version "0.5.0-dev"
-  resolved "https://codeload.github.com/dirigeants/klasa/tar.gz/8ac8c95fdfb9c4a8b58db8aed80452a678a28fe7"
+  uid "597eea3802a6a9eb890c0dfe139d176802e3f8b3"
+  resolved "https://codeload.github.com/dirigeants/klasa/tar.gz/597eea3802a6a9eb890c0dfe139d176802e3f8b3"
   dependencies:
-    fs-nextra "^0.3.2"
+    fs-nextra "^0.4.3"
 
 levn@^0.3.0, levn@~0.3.0:
   version "0.3.0"
