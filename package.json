@@ -40,7 +40,7 @@
   "homepage": "https://github.com/kyranet/Alestra#readme",
   "dependencies": {
     "acorn": "^6.1.1",
-    "acorn-numeric-separator": "^0.2.0",
+    "acorn-numeric-separator": "^0.3.0",
     "canvas": "^2.4.1",
     "canvas-constructor": "3.0.1",
     "discord.js": "github:discordjs/discord.js",

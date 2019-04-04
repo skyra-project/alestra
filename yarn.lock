@@ -58,10 +58,10 @@ acorn-jsx@^5.0.0:
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.0.1.tgz#32a064fd925429216a09b141102bfdd185fae40e"
   integrity sha512-HJ7CfNHrfJLlNTzIEUTj43LNWGkqpRLxm3YjAlcD0ACydk9XynzYsCBHxut+iqt+1aBXkx9UP/w/ZqMr13XIzg==
 
-acorn-numeric-separator@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/acorn-numeric-separator/-/acorn-numeric-separator-0.2.0.tgz#399642bc76ffacffeb587f97c560574636e0332c"
-  integrity sha512-0W+DJfa9eT0+nt9UYVpinELmJAtEqpgK5xZclSu5KG+ZIN7vO5QdUbKX6EDRDKEPlYsxumc4FY+8ou9Qf1c1dA==
+acorn-numeric-separator@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/acorn-numeric-separator/-/acorn-numeric-separator-0.3.0.tgz#15e2f9a698bbec83a339a70a7026ab1d9d257de2"
+  integrity sha512-g9FikQZHwG/P1Xs+dDzecqagmGBbU4b8OF4UbDQK8Wr8apwuFGG1c7KiaFxC4ClYU8D7zNl60vzqOCUuhKM3kA==
 
 acorn@^6.0.7, acorn@^6.1.1:
   version "6.1.1"
