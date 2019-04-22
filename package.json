@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@types/eslint": "^4.16.6",
-    "@types/node": "^11.13.5",
+    "@types/node": "^11.13.6",
     "@types/node-fetch": "^2.3.2",
     "eslint-config-klasa": "github:dirigeants/klasa-lint",
     "tslint": "^5.16.0"
