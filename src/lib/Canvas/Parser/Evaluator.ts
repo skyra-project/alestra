@@ -9,7 +9,22 @@ import * as numericSeparator from 'acorn-numeric-separator';
 const parser = Parser.extend(numericSeparator);
 
 const kUnset = Symbol('unset');
-const defaultIdentifiers: [string, any][] = Object.entries(CanvasConstructor);
+const defaultIdentifiers: [string, any][] = [
+	// Function#bind allows the code to be censored
+	['fetch', fetch.bind(null)],
+	...Object.entries({
+		Boolean,
+		Number,
+		Symbol,
+		Object,
+		Array,
+		Map, WeakMap,
+		Set, WeakSet,
+		Proxy,
+		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
+	}),
+	...Object.entries(CanvasConstructor)
+];
 
 export class InternalError {
 	public constructor(public error: Error) {}
@@ -27,18 +42,6 @@ async function fetch(...args: [string]): Promise<Buffer> {
 	}
 	throw new InternalError(new Error(`The url ${url.href} must have any of the following extensions: .png, .jpg, .jpeg`));
 }
-
-// Function#bind allows the code to be censored
-defaultIdentifiers.push(['fetch', fetch.bind(null)]);
-defaultIdentifiers.push(['Number', Number]);
-defaultIdentifiers.push(['Object', Object]);
-defaultIdentifiers.push(['Array', Array]);
-defaultIdentifiers.push(['Error', Error]);
-defaultIdentifiers.push(['EvalError', EvalError]);
-defaultIdentifiers.push(['RangeError', RangeError]);
-defaultIdentifiers.push(['ReferenceError', ReferenceError]);
-defaultIdentifiers.push(['SyntaxError', SyntaxError]);
-defaultIdentifiers.push(['TypeScript', TypeError]);
 
 export async function evaluate(input: string): Promise<any> {
 	try {
