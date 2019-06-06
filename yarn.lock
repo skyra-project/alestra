@@ -163,10 +163,10 @@ callsites@^3.0.0:
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.0.0.tgz#fb7eb569b72ad7a45812f93fd9430a3e410b3dd3"
   integrity sha512-tWnkwu9YEq2uzlBDI4RcLn8jrFvF9AOi8PxDNU3hZZjJcjkcRAq3vCI+vZcg1SuxISDYe86k9VZFwAxDiJGoAw==
 
-canvas-constructor@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/canvas-constructor/-/canvas-constructor-3.0.2.tgz#76d047e29321372d830f9a74e4a51822f2ddaf18"
-  integrity sha512-xS8P4DJ6zQcmRYPyGKxJLEGaqJ4zqgDDWNhWKFjdR2x1kVNFz0ZSIKu7hpZccRWM3/+ZkPLHENhcUUAForsPkw==
+canvas-constructor@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/canvas-constructor/-/canvas-constructor-3.0.3.tgz#7943f2cec0403daaa9dc1c805fd3bcf30e032da7"
+  integrity sha512-AbtpTT7YVJf5UxlgoUQVUCf5ZdfcnTyTp4zYJj2h3KnL9SMmZuBo3du0fyAhpetXuHW9qI13zMcn1+Ltam+a4g==
 
 canvas@^2.5.0:
   version "2.5.0"
