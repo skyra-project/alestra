@@ -20,6 +20,7 @@ const defaultIdentifiers: [string, any][] = [
 		Array,
 		Map, WeakMap,
 		Set, WeakSet,
+		Promise,
 		Proxy,
 		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
 	}),
