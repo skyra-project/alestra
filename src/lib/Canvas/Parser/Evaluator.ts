@@ -13,7 +13,7 @@ const defaultIdentifiers: [string, any][] = [
 	// Function#bind allows the code to be censored
 	['fetch', fetch.bind(null)],
 	...Object.entries({
-		undefined, null,
+		undefined,
 		Boolean,
 		Number,
 		Symbol,
