@@ -44,7 +44,7 @@
     "canvas": "^2.5.0",
     "canvas-constructor": "3.0.3",
     "discord.js": "github:discordjs/discord.js",
-    "eslint": "^5.16.0",
+    "eslint": "^6.0.0",
     "klasa": "github:dirigeants/klasa",
     "node-fetch": "^2.6.0",
     "typescript": "^3.5.2",
