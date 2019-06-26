@@ -303,9 +303,9 @@ const binaryOperators: Map<string, (left: unknown, right: unknown) => unknown> =
 	.set('/', (left, right) => left / right)
 	.set('*', (left, right) => left * right)
 	.set('%', (left, right) => left % right)
+	.set('**', (left, right) => left ** right)
 
 	// Boolean operators
-	.set('**', (left, right) => left ** right)
 	.set('&&', (left, right) => left && right)
 	.set('||', (left, right) => left || right)
 
@@ -338,7 +338,10 @@ const unaryOperators: Map<string, (value: unknown) => unknown> = new Map()
 	.set('~', (value) => ~value)
 
 	// Boolean operators
-	.set('!', (value) => !value);
+	.set('!', (value) => !value)
+
+	// Object operators
+	.set('typeof', (value) => typeof value);
 
 /**
  * The scope type for a variable
