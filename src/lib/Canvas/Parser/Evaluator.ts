@@ -303,9 +303,9 @@ const binaryOperators: Map<string, (left: unknown, right: unknown) => unknown> =
 	.set('/', (left, right) => left / right)
 	.set('*', (left, right) => left * right)
 	.set('%', (left, right) => left % right)
+	.set('**', (left, right) => left ** right)
 
 	// Boolean operators
-	.set('**', (left, right) => left ** right)
 	.set('&&', (left, right) => left && right)
 	.set('||', (left, right) => left || right)
 
