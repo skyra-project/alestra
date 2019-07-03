@@ -1,9 +1,9 @@
-import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, util } from 'klasa';
+import { Command as KlasaCommand, CommandStore, KlasaMessage, util } from 'klasa';
 
 export default class Command extends KlasaCommand {
 
-	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
-		super(client, store, file, directory, {
+	public constructor(store: CommandStore, file: string[], directory: string) {
+		super(store, file, directory, {
 			aliases: ['pull'],
 			description: 'Update the bot',
 			guarded: true,

@@ -8,7 +8,6 @@ const r = new Colors({ text: 'red' }).format('[IPC   ]');
 
 export class AlestraClient extends KlasaClient {
 
-	public options: Required<AlestraClientOptions>;
 	public ipcMonitors = new IPCMonitorStore(this);
 	public ipc = new Node('alestra-master')
 		.on('client.identify', client => { this.console.log(`${g} Client Connected: ${client.name}`); })
@@ -18,18 +17,27 @@ export class AlestraClient extends KlasaClient {
 		.on('error', (error, client) => { this.console.error(`${r} Error from ${client.name}`, error); })
 		.on('message', this.ipcMonitors.run.bind(this.ipcMonitors));
 
-	public constructor(options?: AlestraClientOptions) {
+	public constructor(options?: KlasaClientOptions) {
 		super(util.mergeDefault({ dev: false }, options));
 
 		this.registerStore(this.ipcMonitors);
 		this.once('klasaReady', () => {
-			if (this.options.dev) this.permissionLevels.add(0, ({ author, client }) => author.id === client.options.ownerID, { 'break': true });
+			if (this.options.dev) this.permissionLevels.add(0, ({ author, client }) => client.options.owners.includes(author!.id), { 'break': true });
 		});
 	}
 
 }
 
-/**
- * The client options for Alestra
- */
-export type AlestraClientOptions = KlasaClientOptions & { dev?: boolean };
+declare module 'discord.js' {
+	interface ClientOptions {
+		dev?: boolean;
+	}
+}
+
+declare module 'klasa' {
+
+	interface PieceDefaults {
+		ipcMonitors?: PieceOptions;
+	}
+
+}

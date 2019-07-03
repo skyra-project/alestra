@@ -1,5 +1,5 @@
 import { Canvas } from 'canvas-constructor';
-import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
+import { Command as KlasaCommand, CommandStore, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
@@ -10,8 +10,8 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
 export default class Command extends KlasaCommand {
 
-	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
-		super(client, store, file, directory, {
+	public constructor(store: CommandStore, file: string[], directory: string) {
+		super(store, file, directory, {
 			bucket: 1,
 			cooldown: 5,
 			description: 'Execute a sandboxed subset of JavaScript',
@@ -34,12 +34,12 @@ export default class Command extends KlasaCommand {
 			return message.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
-			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && message.author.id === this.client.owner.id ? error.stack : error)}`;
+			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? error.stack : error)}`;
 		}
 	}
 
 	public parseCodeblock(code: string): string {
-		return CODEBLOCK.test(code) ? CODEBLOCK.exec(code)[1].trim() : code;
+		return CODEBLOCK.test(code) ? CODEBLOCK.exec(code)![1].trim() : code;
 	}
 
 }

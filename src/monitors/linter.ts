@@ -1,6 +1,5 @@
 import { GuildChannel, MessageEmbed, Permissions, Snowflake } from 'discord.js';
-import { KlasaClient, KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay, util } from 'klasa';
-import { AlestraClientOptions } from '../lib/AlestraClient';
+import { KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay, util } from 'klasa';
 import {
 	checkErrors,
 	CODEBLOCK_REGEXP
@@ -11,19 +10,22 @@ const { FLAGS } = Permissions;
 export default class Monitor extends KlasaMonitor {
 
 	public handlers: Map<string, { handler: ReactionHandler; message: KlasaMessage }> = new Map();
-	public dev: boolean = (this.client.options as AlestraClientOptions).dev!;
+	public dev: boolean = this.client.options.dev;
 
-	public constructor(client: KlasaClient, store: MonitorStore, file: string[], directory: string) {
-		super(client, store, file, directory, { ignoreOthers: false, ignoreEdits: false });
+	public constructor(store: MonitorStore, file: string[], directory: string) {
+		super(store, file, directory, {
+			ignoreOthers: false,
+			ignoreEdits: false
+		});
 	}
 
 	public async run(message: KlasaMessage): Promise<void> {
 		// If it's in development mode, ignore anyone else that is not the owner
-		if (this.dev && message.author!.id !== this.client.options.ownerID) return;
+		if (this.dev && this.client.options.owners.includes(message.author!.id)) return;
 		// If it's not in a guild, return
 		if (!message.guild) return;
 		// If this is not a support channel, return
-		if (!message.guild.settings.get<Snowflake[]>('supportChannels').includes(message.channel.id)) return;
+		if (!(message.guild.settings.get('supportChannels') as Snowflake[]).includes(message.channel.id)) return;
 		// If I don't have permissions, return
 		if (!(message.channel as GuildChannel).permissionsFor(message.guild!.me!)!.has(FLAGS.MANAGE_MESSAGES)) return;
 		// If there is no codeblock, return

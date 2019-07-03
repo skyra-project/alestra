@@ -1,9 +1,6 @@
-import { AlestraClient } from '../lib/AlestraClient';
 import { IPCMonitor } from '../lib/structures/IPCMonitor';
 
 export default class extends IPCMonitor {
-
-	public client: AlestraClient;
 
 	public async run(): Promise<StatisticsResults> {
 		const memoryUsage = process.memoryUsage();

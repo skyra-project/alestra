@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"noImplicitAny": false,
 		"outDir": "./dist",
-		"types": ["node", "node-fetch"]
+		"types": ["node", "node-fetch", "discord.js", "klasa"]
 	},
 	"include": [
 		"./src/**/*"

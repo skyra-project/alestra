@@ -1,10 +1,10 @@
-import { Command as KlasaCommand, CommandStore, KlasaClient, KlasaMessage, Stopwatch, Type, util } from 'klasa';
+import { Command as KlasaCommand, CommandStore, KlasaMessage, Stopwatch, Type, util } from 'klasa';
 import { inspect } from 'util';
 
 export default class Command extends KlasaCommand {
 
-	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
-		super(client, store, file, directory, {
+	public constructor(store: CommandStore, file: string[], directory: string) {
+		super(store, file, directory, {
 			aliases: ['ev'],
 			description: language => language.get('COMMAND_EVAL_DESCRIPTION'),
 			extendedHelp: language => language.get('COMMAND_EVAL_EXTENDEDHELP'),

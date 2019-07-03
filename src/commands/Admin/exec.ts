@@ -1,11 +1,11 @@
 import { MessageAttachment } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, util } from 'klasa';
+import { Command, CommandStore, KlasaMessage, util } from 'klasa';
 import fetch from 'node-fetch';
 
 module.exports = class extends Command {
 
-	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
-		super(client, store, file, directory, {
+	public constructor(store: CommandStore, file: string[], directory: string) {
+		super(store, file, directory, {
 			aliases: ['execute'],
 			description: 'Executes bash commands',
 			guarded: true,
