@@ -23,13 +23,83 @@ const defaultIdentifiers: [string, any][] = [
 		Set, WeakSet,
 		Promise,
 		Proxy,
-		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
+		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError
 	}),
 	...Object.entries(CanvasConstructor)
 ];
 
+const binaryOperators: Map<string, (left: unknown, right: unknown) => unknown> = new Map()
+	// Math operators
+	.set('+', (left: number, right: number) => left + right) // eslint-disable-line @typescript-eslint/restrict-plus-operands
+	.set('-', (left: number, right: number) => left - right)
+	.set('/', (left: number, right: number) => left / right)
+	.set('*', (left: number, right: number) => left * right)
+	.set('%', (left: number, right: number) => left % right)
+	.set('**', (left: number, right: number) => left ** right)
+
+	// Boolean operators
+	.set('&&', (left: number, right: number) => left && right)
+	.set('||', (left: number, right: number) => left || right)
+
+	// Equality operators
+	.set('==', (left: number, right: number) => left == right) // eslint-disable-line eqeqeq
+	.set('===', (left: number, right: number) => left === right)
+	.set('!=', (left: number, right: number) => left != right) // eslint-disable-line eqeqeq
+	.set('!==', (left: number, right: number) => left !== right)
+	.set('>', (left: number, right: number) => left > right)
+	.set('<', (left: number, right: number) => left < right)
+	.set('>=', (left: number, right: number) => left >= right)
+	.set('<=', (left: number, right: number) => left <= right)
+
+	// Bitwise operators
+	.set('^', (left: number, right: number) => left ^ right)
+	.set('&', (left: number, right: number) => left & right)
+	.set('|', (left: number, right: number) => left | right)
+	.set('>>', (left: number, right: number) => left >> right)
+	.set('<<', (left: number, right: number) => left << right)
+	.set('>>>', (left: number, right: number) => left >>> right)
+
+	// Object operators
+	.set('in', (left: string | number | symbol, right: object) => left in right);
+
+const unaryOperators: Map<string, (value: unknown) => unknown> = new Map()
+	// Math operators
+	.set('+', (value: number) => +value) // eslint-disable-line no-implicit-coercion
+	.set('-', (value: number) => -value)
+	// Bitwise operators
+	.set('~', (value: number) => ~value)
+
+	// Boolean operators
+	.set('!', (value: unknown) => !value)
+
+	// Object operators
+	.set('typeof', (value: unknown) => typeof value);
+
+/**
+ * The scope type for a variable
+ */
+enum ScopeType {
+	/**
+	 * The global scope, used if the value is in the global scope
+	 */
+	Global,
+	/**
+	 * The local scope, used if the value is in the local scope
+	 */
+	Local,
+	/**
+	 * No scope, the variable does not exist
+	 */
+	None
+}
+
 export class InternalError {
-	public constructor(public error: Error) {}
+
+	public error: Error;
+	public constructor(error: Error) {
+		this.error = error;
+	}
+
 }
 
 async function fetch(...args: [string]): Promise<Buffer> {
@@ -75,7 +145,7 @@ function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promi
 		case 'BlockStatement': return parseBlockStatement(ctx, unknownNode as NodeBlockStatement, scope);
 		case 'CallExpression': return parseCallExpression(ctx, unknownNode as NodeCallExpression, scope);
 		case 'ConditionalExpression': return parseConditionalExpression(ctx, unknownNode as NodeConditionalExpression, scope);
-		case 'EmptyStatement': return parseEmptyStatement(ctx, unknownNode as NodeEmptyStatement, scope);
+		case 'EmptyStatement': return parseEmptyStatement();
 		case 'ExpressionStatement': return parseExpressionStatement(ctx, unknownNode as NodeExpressionStatement, scope);
 		case 'Identifier': return parseIdentifier(ctx, unknownNode as NodeIdentifier, scope);
 		case 'IfStatement': return parseIfStatement(ctx, unknownNode as NodeIfStatement, scope);
@@ -85,7 +155,7 @@ function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope): Promi
 		case 'ObjectExpression': return parseObjectExpression(ctx, unknownNode as NodeObjectExpression, scope);
 		case 'Program': return parseProgram(ctx, unknownNode as NodeProgram, scope);
 		case 'SpreadElement': return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
-		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement, scope);
+		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement);
 		case 'TemplateLiteral': return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
 		case 'ThrowStatement': return parseThrowStatement(ctx, unknownNode as NodeThrowStatement, scope);
 		case 'TryStatement': return parseTryStatement(ctx, unknownNode as NodeTryStatement, scope);
@@ -107,22 +177,22 @@ async function parseSpreadElement(ctx: EvaluatorContext, node: NodeSpreadElement
 	throw new CompilationParseError(ctx.code, node.argument.start, 'A iterable was not given');
 }
 
-async function parseTemplateElement(_: EvaluatorContext, node: NodeTemplateElement, __: Scope): Promise<string> {
+async function parseTemplateElement(_: EvaluatorContext, node: NodeTemplateElement): Promise<string> {
 	return node.value.cooked;
 }
 
 async function parseTemplateLiteral(ctx: EvaluatorContext, node: NodeTemplateLiteral, scope: Scope): Promise<string> {
 	return (await Promise.all(node.expressions.concat(node.quasis)
 		.sort((a, b) => a.start - b.start)
-		.map((element) => parseNode(ctx, element, scope))))
+		.map(element => parseNode(ctx, element, scope))))
 		.join('');
 }
 
 async function parseArrayExpression(ctx: EvaluatorContext, node: NodeArrayExpression, scope: Scope): Promise<Array<any>> {
-	const array = [];
+	const array: unknown[] = [];
 	for (const element of node.elements) {
 		ctx.allowSpread = true;
-		if (element.type === 'SpreadElement') array.push(...await parseSpreadElement(ctx, <unknown> element as NodeSpreadElement, scope));
+		if (element.type === 'SpreadElement') array.push(...await parseSpreadElement(ctx, element as NodeSpreadElement, scope));
 		else array.push(await parseNode(ctx, element, scope));
 	}
 	ctx.allowSpread = false;
@@ -130,7 +200,7 @@ async function parseArrayExpression(ctx: EvaluatorContext, node: NodeArrayExpres
 }
 
 async function parseObjectExpression(ctx: EvaluatorContext, node: NodeObjectExpression, scope: Scope): Promise<any> {
-	const entries = [];
+	const entries: Record<string, unknown>[] = [];
 	for (const property of node.properties) {
 		const key = await parseNode(ctx, property.key, scope);
 		const value = await parseNode(ctx, property.value, scope);
@@ -140,7 +210,7 @@ async function parseObjectExpression(ctx: EvaluatorContext, node: NodeObjectExpr
 }
 
 async function parseAssignmentExpression(ctx: EvaluatorContext, node: NodeAssignmentExpression, scope: Scope): Promise<any> {
-	const name = (<unknown> node.left as NodeIdentifier).name;
+	const { name } = node.left as NodeIdentifier;
 	const type = scope && scope.has(name)
 		? ScopeType.Local
 		: ctx.identifiers.has(name)
@@ -154,7 +224,7 @@ async function parseAssignmentExpression(ctx: EvaluatorContext, node: NodeAssign
 	const operator = binaryOperators.get(node.operator.slice(0, node.operator.length - 1));
 	if (operator) {
 		const value = operator(left, right);
-		if (type === ScopeType.Local) scope.set(name, value);
+		if (type === ScopeType.Local) scope!.set(name, value);
 		else ctx.identifiers.set(name, value);
 		return value;
 	}
@@ -176,7 +246,7 @@ async function parseBlockStatement(ctx: EvaluatorContext, node: NodeBlockStateme
 async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const member = await parseNode(ctx, node.callee, scope);
 	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Tried to call a non-function');
-	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
+	const args = await Promise.all(node.arguments.map(arg => parseNode(ctx, arg, scope)));
 	return member(...args);
 }
 
@@ -195,11 +265,11 @@ async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeCondi
 async function parseNewExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<any> {
 	const ctor: new (...args: any[]) => any = await parseNode(ctx, node.callee, scope);
 	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Constructor is not a function');
-	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
+	const args = await Promise.all(node.arguments.map(arg => parseNode(ctx, arg, scope)));
 	return new ctor(...args);
 }
 
-async function parseEmptyStatement(_: EvaluatorContext, __: NodeEmptyStatement, ___: Scope): Promise<any> {
+async function parseEmptyStatement(): Promise<any> {
 	return undefined;
 }
 
@@ -209,7 +279,7 @@ function parseExpressionStatement(ctx: EvaluatorContext, node: NodeExpressionSta
 
 async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpression, scope: Scope): Promise<string> {
 	const object = await parseNode(ctx, node.object, scope);
-	const propertyValue = node.property.type === 'Identifier' ? (<NodeIdentifier> node.property).name : await parseNode(ctx, node.property, scope);
+	const propertyValue = node.property.type === 'Identifier' ? (node.property as NodeIdentifier).name : await parseNode(ctx, node.property, scope);
 	let property: any = kUnset;
 
 	if (node.computed && node.property.type !== 'Literal') {
@@ -234,7 +304,7 @@ async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariabl
 }
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope): Promise<any> {
-	if (ctx.identifiers.has(node.id.name) || scope && scope.has(node.id.name)) throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
+	if (ctx.identifiers.has(node.id.name) || (scope && scope.has(node.id.name))) throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
 	const value = node.init ? await parseNode(ctx, node.init, scope) : undefined;
 	if (scope) scope.set(node.id.name, value);
 	else ctx.identifiers.set(node.id.name, value);
@@ -296,71 +366,6 @@ function parseLiteral(ctx: EvaluatorContext, node: NodeLiteral): Promise<any> {
 	return node.value;
 }
 
-const binaryOperators: Map<string, (left: unknown, right: unknown) => unknown> = new Map()
-	// Math operators
-	.set('+', (left, right) => left + right)
-	.set('-', (left, right) => left - right)
-	.set('/', (left, right) => left / right)
-	.set('*', (left, right) => left * right)
-	.set('%', (left, right) => left % right)
-	.set('**', (left, right) => left ** right)
-
-	// Boolean operators
-	.set('&&', (left, right) => left && right)
-	.set('||', (left, right) => left || right)
-
-	// Equality operators
-	.set('==', (left, right) => left == right) // tslint:disable-line
-	.set('===', (left, right) => left === right)
-	.set('!=', (left, right) => left != right) // tslint:disable-line
-	.set('!==', (left, right) => left !== right)
-	.set('>', (left, right) => left > right)
-	.set('<', (left, right) => left < right)
-	.set('>=', (left, right) => left >= right)
-	.set('<=', (left, right) => left <= right)
-
-	// Bitwise operators
-	.set('^', (left, right) => left ^ right)
-	.set('&', (left, right) => left & right)
-	.set('|', (left, right) => left | right)
-	.set('>>', (left, right) => left >> right)
-	.set('<<', (left, right) => left << right)
-	.set('>>>', (left, right) => left >>> right)
-
-	// Object operators
-	.set('in', (left, right) => left in right);
-
-const unaryOperators: Map<string, (value: unknown) => unknown> = new Map()
-	// Math operators
-	.set('+', (value) => +value)
-	.set('-', (value) => -value)
-	// Bitwise operators
-	.set('~', (value) => ~value)
-
-	// Boolean operators
-	.set('!', (value) => !value)
-
-	// Object operators
-	.set('typeof', (value) => typeof value);
-
-/**
- * The scope type for a variable
- */
-enum ScopeType {
-	/**
-	 * The global scope, used if the value is in the global scope
-	 */
-	Global,
-	/**
-	 * The local scope, used if the value is in the local scope
-	 */
-	Local,
-	/**
-	 * No scope, the variable does not exist
-	 */
-	None
-}
-
 /**
  * Scope
  */
@@ -369,222 +374,217 @@ type Scope = Map<string, any> | null;
 /**
  * Evaluator context
  */
-type EvaluatorContext = {
+interface EvaluatorContext {
 	allowSpread: boolean;
 	code: string;
 	identifiers: Map<string, any>;
-};
+}
 
 /**
  * Program type
  */
-type NodeProgram = acorn.Node & {
+interface NodeProgram extends acorn.Node {
 	body: acorn.Node[];
-};
+}
 
 /**
  * MemberExpression type
  */
-type NodeMemberExpression = acorn.Node & {
+interface NodeMemberExpression extends acorn.Node {
 	object: acorn.Node;
 	property: acorn.Node;
 	computed: boolean;
-};
+}
 
 /**
  * VariableDeclaration type
  */
-type NodeVariableDeclaration = acorn.Node & {
+interface NodeVariableDeclaration extends acorn.Node {
 	property: NodeIdentifier;
 	kind: 'var' | 'let' | 'const';
 	declarations: NodeVariableDeclarator[];
-};
+}
 
 /**
  * ObjectExpression type
  */
-type NodeObjectExpression = acorn.Node & {
+interface NodeObjectExpression extends acorn.Node {
 	properties: NodeProperty[];
-};
+}
 
 /**
  * Property type
  */
-type NodeProperty = acorn.Node & {
+interface NodeProperty extends acorn.Node {
 	method: boolean;
 	shorthand: boolean;
 	computed: boolean;
 	key: acorn.Node;
 	value: acorn.Node;
 	kind: string;
-};
+}
 
 /**
  * VariableDeclarator type
  */
-type NodeVariableDeclarator = acorn.Node & {
+interface NodeVariableDeclarator extends acorn.Node {
 	id: NodeIdentifier;
 	init: acorn.Node | null;
-};
+}
 
 /**
  * BlockStatement type
  */
-type NodeBlockStatement = acorn.Node & {
+interface NodeBlockStatement extends acorn.Node {
 	body: acorn.Node[];
-};
+}
 
 /**
  * CallExpression type
  */
-type NodeCallExpression = acorn.Node & {
+interface NodeCallExpression extends acorn.Node {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
-};
+}
 
 /**
  * Literal type
  */
-type NodeLiteral = acorn.Node & {
+interface NodeLiteral extends acorn.Node {
 	value: any;
 	raw: string;
-};
+}
 
 /**
  * Identifier type
  */
-type NodeIdentifier = acorn.Node & {
+interface NodeIdentifier extends acorn.Node {
 	name: string;
-};
+}
 
 /**
  * IfStatement type
  */
-type NodeIfStatement = acorn.Node & {
+interface NodeIfStatement extends acorn.Node {
 	test: acorn.Node;
 	consequent: acorn.Node;
 	alternate: acorn.Node | null;
-};
+}
 
 /**
  * ArrayExpression type
  */
-type NodeArrayExpression = acorn.Node & {
+interface NodeArrayExpression extends acorn.Node {
 	elements: acorn.Node[];
-};
+}
 
 /**
  * SpreadElement type
  */
-type NodeSpreadElement = acorn.Node & {
+interface NodeSpreadElement extends acorn.Node {
 	argument: acorn.Node;
-};
+}
 
 /**
  * ConditionalExpression type
  */
-type NodeConditionalExpression = acorn.Node & {
+interface NodeConditionalExpression extends acorn.Node {
 	test: acorn.Node;
 	consequent: acorn.Node;
 	alternate: acorn.Node;
-};
+}
 
 /**
  * BinaryExpression type
  */
-type NodeBinaryExpression = acorn.Node & {
+interface NodeBinaryExpression extends acorn.Node {
 	left: acorn.Node;
 	right: acorn.Node;
 	operator: string;
-};
+}
 
 /**
  * NewExpression type
  */
-type NodeNewExpression = acorn.Node & {
+interface NodeNewExpression extends acorn.Node {
 	callee: acorn.Node;
 	arguments: acorn.Node[];
-};
-
-/**
- * EmptyStatement type
- */
-type NodeEmptyStatement = acorn.Node;
+}
 
 /**
  * ExpressionStatement type
  */
-type NodeExpressionStatement = acorn.Node & {
+interface NodeExpressionStatement extends acorn.Node {
 	expression: acorn.Node;
-};
+}
 
 /**
  * TemplateLiteral type
  */
-type NodeTemplateLiteral = acorn.Node & {
+interface NodeTemplateLiteral extends acorn.Node {
 	expressions: acorn.Node[];
 	quasis: NodeTemplateElement[];
-};
+}
 
 /**
  * ThrowStatement type
  */
-type NodeThrowStatement = acorn.Node & {
+interface NodeThrowStatement extends acorn.Node {
 	argument: acorn.Node;
-};
+}
 
 /**
  * TryStatement type
  */
-type NodeTryStatement = acorn.Node & {
+interface NodeTryStatement extends acorn.Node {
 	block: NodeBlockStatement;
 	handler: NodeCatchClause;
 	finalizer: NodeBlockStatement;
-};
+}
 
 /**
  * CatchClause type
  */
-type NodeCatchClause = acorn.Node & {
+interface NodeCatchClause extends acorn.Node {
 	param: NodeIdentifier;
 	body: NodeBlockStatement;
-};
+}
 
 /**
  * TemplateElement type
  */
-type NodeTemplateElement = acorn.Node & {
+interface NodeTemplateElement extends acorn.Node {
 	value: {
 		raw: string;
 		cooked: string;
 	};
 	tail: boolean;
-};
+}
 
 /**
  * UnaryExpression type
  */
-type NodeUnaryExpression = acorn.Node & {
+interface NodeUnaryExpression extends acorn.Node {
 	operator: string;
 	prefix: boolean;
 	argument: acorn.Node;
-};
+}
 
 /**
  * AwaitExpression type
  */
-type NodeAwaitExpression = acorn.Node & {
+interface NodeAwaitExpression extends acorn.Node {
 	argument: acorn.Node;
-};
+}
 
 /**
  * AssignmentExpression type
  */
-type NodeAssignmentExpression = acorn.Node & {
+interface NodeAssignmentExpression extends acorn.Node {
 	operator: string;
 	left: acorn.Node;
 	right: acorn.Node;
-};
+}
 
 // TODO: Add this later
 // type NodeArrowFunctionExpression = acorn.Node & {

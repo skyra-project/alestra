@@ -10,7 +10,7 @@ export default class extends IPCMonitor {
 		return {
 			name: 'alestra',
 			presence: null,
-			statistics: this.client.ws.shards.map((shard) => ({
+			statistics: this.client.ws.shards.map(shard => ({
 				heapTotal: memoryUsage.heapTotal,
 				heapUsed: memoryUsage.heapUsed,
 				ping: shard.pings,
@@ -24,21 +24,21 @@ export default class extends IPCMonitor {
 /**
  * The return from the broadcast
  */
-export type StatisticsResults = {
+export interface StatisticsResults {
 	name: string;
 	presence: PresenceType | null;
 	statistics: ClientStatistics[];
-};
+}
 
 /**
  * The client statistics for each shard
  */
-export type ClientStatistics = {
+export interface ClientStatistics {
 	status: WebsocketStatus;
 	heapUsed: number;
 	heapTotal: number;
 	ping: number[];
-};
+}
 
 /**
  * The presence types

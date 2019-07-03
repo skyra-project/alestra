@@ -16,7 +16,7 @@ module.exports = class extends Command {
 
 	public async run(message: KlasaMessage, [input]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
 		const result = await util.exec(input, { timeout: 'timeout' in message.flags ? Number(message.flags.timeout) : 60000 })
-			.catch((error) => ({ stdout: null, stderr: error }));
+			.catch(error => ({ stdout: null, stderr: error }));
 		const output = result.stdout ? `**\`OUTPUT\`**${util.codeBlock('prolog', result.stdout)}` : '';
 		const outerr = result.stderr ? `**\`ERROR\`**${util.codeBlock('prolog', result.stderr)}` : '';
 		const joined = [output, outerr].join('\n') || 'No output';

@@ -27,13 +27,7 @@ export class AlreadyDeclaredIdentifier extends CompilationParseError {
 
 }
 
-export class SandboxError extends CompilationParseError {
-
-	public constructor(code: string, start: number, reason: string) {
-		super(code, start, reason);
-	}
-
-}
+export class SandboxError extends CompilationParseError { }
 
 export class SandboxPropertyError extends CompilationParseError {
 

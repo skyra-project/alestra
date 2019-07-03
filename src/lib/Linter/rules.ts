@@ -72,6 +72,6 @@ export const rules: Linter.Config = {
 		'symbol-description': 'error',
 		'use-isnan': 'error',
 		'valid-typeof': 'error',
-		yoda: 'error'
+		'yoda': 'error'
 	}
 };

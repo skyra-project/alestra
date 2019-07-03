@@ -6,15 +6,15 @@ export default class Command extends KlasaCommand {
 	public constructor(client: KlasaClient, store: CommandStore, file: string[], directory: string) {
 		super(client, store, file, directory, {
 			aliases: ['ev'],
-			description: (language) => language.get('COMMAND_EVAL_DESCRIPTION'),
-			extendedHelp: (language) => language.get('COMMAND_EVAL_EXTENDEDHELP'),
+			description: language => language.get('COMMAND_EVAL_DESCRIPTION'),
+			extendedHelp: language => language.get('COMMAND_EVAL_EXTENDEDHELP'),
 			guarded: true,
 			permissionLevel: 10,
 			usage: '<expression:str>'
 		});
 	}
 
-	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
+	public async run(message: KlasaMessage, [code]: [string]) {
 		const { success, result, time, type } = await this.eval(message, code);
 		const footer = util.codeBlock('ts', type);
 		const output = message.language.get(success ? 'COMMAND_EVAL_OUTPUT' : 'COMMAND_EVAL_ERROR',
@@ -25,9 +25,9 @@ export default class Command extends KlasaCommand {
 		// Handle too-long-messages
 		if (output.length > 2000) {
 			// @ts-ignore
-			if (message.guild && message.channel.attachable)
-				// @ts-ignore
+			if (message.guild && message.channel.attachable) {
 				return message.channel.sendFile(Buffer.from(result), 'output.txt', message.language.get('COMMAND_EVAL_SENDFILE', time, footer));
+			}
 
 			this.client.emit('log', result);
 			return message.sendMessage(message.language.get('COMMAND_EVAL_SENDCONSOLE', time, footer));
@@ -40,14 +40,19 @@ export default class Command extends KlasaCommand {
 	// Eval the input
 	public async eval(message: KlasaMessage, code: string): Promise<any> {
 		// @ts-ignore
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const msg = message;
 		const { flags } = message;
 		const stopwatch = new Stopwatch();
-		let success, syncTime, asyncTime, result;
+		let success: boolean;
+		let syncTime: string | undefined;
+		let asyncTime: string | undefined;
+		let result: string;
 		let thenable = false;
-		let type;
+		let type: Type | undefined;
 		try {
 			if (flags.async) code = `(async () => {\n${code}\n})();`;
+			// eslint-disable-next-line no-eval
 			result = eval(code);
 			syncTime = stopwatch.toString();
 			type = new Type(result);
@@ -74,7 +79,7 @@ export default class Command extends KlasaCommand {
 				showHidden: Boolean(flags.showHidden)
 			});
 		}
-		return { success, type, time: this.formatTime(syncTime, asyncTime), result: util.clean(result) };
+		return { success, type, time: this.formatTime(syncTime, asyncTime || ''), result: util.clean(result) };
 	}
 
 	public formatTime(syncTime: string, asyncTime: string): string {
