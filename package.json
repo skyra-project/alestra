@@ -54,7 +54,7 @@
     "veza": "^1.0.0"
   },
   "devDependencies": {
-    "@types/eslint": "^4.16.6",
+    "@types/eslint": "^4.16.8",
     "@types/node": "^12.7.1",
     "@types/node-fetch": "^2.5.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
