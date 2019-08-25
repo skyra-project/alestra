@@ -1,6 +1,6 @@
 # Alestra [![Discord](https://discordapp.com/api/guilds/254360814063058944/embed.png)](https://skyra.pw/join)
 
-Alestra is a private Discord Bot used for [canvas-constructor]'s [official server][cc-server].
+Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official server][cc-server].
 
 [`canvas-constructor`]: https://github.com/kyranet/CanvasConstructor
 [cc-server]: https://discord.gg/taNgb9d
