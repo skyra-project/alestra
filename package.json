@@ -51,7 +51,7 @@
     "klasa": "github:dirigeants/klasa#settings",
     "node-fetch": "^2.6.0",
     "typescript": "^3.6.2",
-    "veza": "^1.0.0"
+    "veza": "^1.1.0"
   },
   "devDependencies": {
     "@types/eslint": "^6.1.1",
