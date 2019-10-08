@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import { CLIENT_OPTIONS, TOKEN } from '../config';
+import { CLIENT_OPTIONS, TOKEN, EVLYN_PORT } from '../config';
 import { AlestraClient } from './lib/AlestraClient';
 inspect.defaultOptions.depth = 1;
 
@@ -11,7 +11,7 @@ client.login(TOKEN).catch(error => {
 });
 
 if (!CLIENT_OPTIONS.dev) {
-	client.ipc.connectTo(9997).catch(error => {
+	client.ipc.connectTo(EVLYN_PORT).catch(error => {
 		client.console.error(error);
 	});
 }
