@@ -11,10 +11,8 @@ Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official ser
 ## Development Requirements
 
 - [`Node.js`]: To run the project.
-- [`Ny-API`]: (Dev Optional) Central server.
 
 [`Node.js`]: https://nodejs.org/en/download/current/
-[`Ny-API`]: https://github.com/kyranet/Ny-API
 
 ## Set-Up
 
@@ -28,8 +26,7 @@ $ yarn lint
 # Run Alestra in development mode:
 $ yarn start
 
-# Run Alestra in production mode, requires
-# Ny-API to be running:
+# Run Alestra in production mode:
 $ yarn pm2:start
 ```
 
