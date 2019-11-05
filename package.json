@@ -50,7 +50,7 @@
     "eslint": "^6.6.0",
     "klasa": "github:dirigeants/klasa#settings",
     "node-fetch": "^2.6.0",
-    "typescript": "^3.6.4",
+    "typescript": "^3.7.2",
     "veza": "^1.1.0"
   },
   "devDependencies": {
