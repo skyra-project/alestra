@@ -31,7 +31,7 @@ export default class Command extends KlasaCommand {
 		if (stdout.includes('Already up-to-date.')) throw '✔ Up to date.';
 		if (!this.isSuccessfulPull(stdout)) {
 			if (this.needsStash(stdout + stderr)) return this.stash(message);
-		} else if (await !this.isCurrentBranch(branch)) {
+		} else if (!await this.isCurrentBranch(branch)) {
 			await this.checkout(message, branch);
 		}
 
