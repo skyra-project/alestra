@@ -1,62 +1,81 @@
-import { Command as KlasaCommand, CommandStore, KlasaMessage, Stopwatch, Type, util } from 'klasa';
+import { codeBlock, isThenable, sleep } from '@klasa/utils';
+import { ApplyOptions } from '@skyra/decorators';
+import { Command, CommandOptions, KlasaMessage, Stopwatch, Type } from 'klasa';
 import { inspect } from 'util';
+import { Events, PermissionLevels } from '../../lib/types/Enums';
+import { clean } from '../../lib/util/clean';
+import { EvalExtraData, handleMessage } from '../../lib/util/ExceededLengthParser';
 
-export default class Command extends KlasaCommand {
+@ApplyOptions<CommandOptions>({
+	aliases: ['ev'],
+	description: 'Evaluates arbitrary Javascript. Reserved for bot owner.',
+	guarded: true,
+	permissionLevel: PermissionLevels.BotOwner,
+	usage: '<expression:str>',
+	flagSupport: true
+})
+export default class extends Command {
 
-	public constructor(store: CommandStore, file: string[], directory: string) {
-		super(store, file, directory, {
-			aliases: ['ev'],
-			description: language => language.get('COMMAND_EVAL_DESCRIPTION'),
-			extendedHelp: language => language.get('COMMAND_EVAL_EXTENDEDHELP'),
-			guarded: true,
-			permissionLevel: 10,
-			usage: '<expression:str>'
+	private readonly kTimeout = 60000;
+
+	public async run(message: KlasaMessage, [code]: [string]) {
+		const flagTime = 'no-timeout' in message.flagArgs ? 'wait' in message.flagArgs ? Number(message.flagArgs.wait) : this.kTimeout : Infinity;
+		const language = message.flagArgs.lang || message.flagArgs.language || (message.flagArgs.json ? 'json' : 'js');
+		const { success, result, time, type } = await this.timedEval(message, code, flagTime);
+
+		if (message.flagArgs.silent) {
+			if (!success && result && (result as unknown as Error).stack) this.client.emit(Events.Wtf, (result as unknown as Error).stack);
+			return null;
+		}
+
+		const footer = codeBlock('ts', type);
+		const sendAs = message.flagArgs.output || message.flagArgs['output-to'] || (message.flagArgs.log ? 'log' : null);
+		return handleMessage<Partial<EvalExtraData>>(message, {
+			sendAs,
+			hastebinUnavailable: false,
+			url: null,
+			canLogToConsole: true,
+			success,
+			result,
+			time,
+			footer,
+			language
 		});
 	}
 
-	public async run(message: KlasaMessage, [code]: [string]) {
-		const { success, result, time, type } = await this.eval(message, code);
-		const footer = util.codeBlock('ts', type);
-		const output = message.language.get(success ? 'COMMAND_EVAL_OUTPUT' : 'COMMAND_EVAL_ERROR',
-			time, util.codeBlock('js', result), footer);
-
-		if ('silent' in message.flags) return null;
-
-		// Handle too-long-messages
-		if (output.length > 2000) {
-			// @ts-ignore
-			if (message.guild && message.channel.attachable) {
-				return message.channel.sendFile(Buffer.from(result), 'output.txt', message.language.get('COMMAND_EVAL_SENDFILE', time, footer));
-			}
-
-			this.client.emit('log', result);
-			return message.sendMessage(message.language.get('COMMAND_EVAL_SENDCONSOLE', time, footer));
-		}
-
-		// If it's a message that can be sent correctly, send it
-		return message.sendMessage(output);
+	private timedEval(message: KlasaMessage, code: string, flagTime: number) {
+		if (flagTime === Infinity || flagTime === 0) return this.eval(message, code);
+		return Promise.race([
+			sleep(flagTime).then(() => ({
+				result: `TIMEOUT: Took longer than ${flagTime / 1000} seconds.`,
+				success: false,
+				time: '⏱ ...',
+				type: 'EvalTimeoutError'
+			})),
+			this.eval(message, code)
+		]);
 	}
 
 	// Eval the input
-	public async eval(message: KlasaMessage, code: string): Promise<any> {
-		// @ts-ignore
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const msg = message;
-		const { flags } = message;
+	private async eval(message: KlasaMessage, code: string) {
 		const stopwatch = new Stopwatch();
 		let success: boolean;
-		let syncTime: string | undefined;
-		let asyncTime: string | undefined;
-		let result: string;
+		let syncTime: string;
+		let asyncTime: string;
+		let result: unknown;
 		let thenable = false;
-		let type: Type | undefined;
+		let type: Type;
 		try {
-			if (flags.async) code = `(async () => {\n${code}\n})();`;
+			if (message.flagArgs.async) code = `(async () => {\n${code}\n})();`;
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore 6133
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const msg = message;
 			// eslint-disable-next-line no-eval
 			result = eval(code);
 			syncTime = stopwatch.toString();
 			type = new Type(result);
-			if (util.isThenable(result)) {
+			if (isThenable(result)) {
 				thenable = true;
 				stopwatch.restart();
 				result = await result;
@@ -64,25 +83,28 @@ export default class Command extends KlasaCommand {
 			}
 			success = true;
 		} catch (error) {
-			if (!syncTime) syncTime = stopwatch.toString();
-			if (!type) type = new Type(error);
-			if (thenable && !asyncTime) asyncTime = stopwatch.toString();
-			if (error && error.stack) this.client.emit('error', error.stack);
+			if (!syncTime!) syncTime = stopwatch.toString();
+			if (thenable && !asyncTime!) asyncTime = stopwatch.toString();
+			if (!type!) type = new Type(error);
 			result = error;
 			success = false;
 		}
 
 		stopwatch.stop();
 		if (typeof result !== 'string') {
-			result = inspect(result, {
-				depth: flags.depth ? Number(flags.depth) || 0 : 0,
-				showHidden: Boolean(flags.showHidden)
-			});
+			result = result instanceof Error
+				? result.stack
+				: message.flagArgs.json
+					? JSON.stringify(result, null, 4)
+					: inspect(result, {
+						depth: message.flagArgs.depth ? parseInt(message.flagArgs.depth, 10) || 0 : 0,
+						showHidden: Boolean(message.flagArgs.showHidden)
+					});
 		}
-		return { success, type, time: this.formatTime(syncTime, asyncTime || ''), result: util.clean(result) };
+		return { success, type: type!, time: this.formatTime(syncTime!, asyncTime!), result: clean(result as string) };
 	}
 
-	public formatTime(syncTime: string, asyncTime: string): string {
+	private formatTime(syncTime: string, asyncTime: string) {
 		return asyncTime ? `⏱ ${asyncTime}<${syncTime}>` : `⏱ ${syncTime}`;
 	}
 

@@ -1,3 +1,4 @@
+import './lib/util/initClean';
 import { inspect } from 'util';
 import { CLIENT_OPTIONS, TOKEN, EVLYN_PORT } from '../config';
 import { AlestraClient } from './lib/AlestraClient';

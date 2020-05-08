@@ -11,6 +11,7 @@ export default class Monitor extends KlasaMonitor {
 
 	public handlers: Map<string, { handler: ReactionHandler; message: KlasaMessage }> = new Map();
 	public dev: boolean = this.client.options.dev;
+	private readonly kCanvasConstructorEmoji = '<:canvasconstructor:451438332375728128>';
 
 	public constructor(store: MonitorStore, file: string[], directory: string) {
 		super(store, file, directory, {
@@ -76,7 +77,7 @@ export default class Monitor extends KlasaMonitor {
 		}
 		const handler = await richDisplay.run(
 			// @ts-ignore
-			await message.channel.send('<:canvasconstructor:451438332375728128> | Please wait...'),
+			await message.channel.send(`${this.kCanvasConstructorEmoji} | Please wait...`),
 			{ filter: (_, user) => user.id === message.author!.id, time: 120000 }
 		);
 

@@ -2,8 +2,7 @@
 	"extends": "eslint-config-bamboo",
 	"compilerOptions": {
 		"noImplicitAny": false,
-		"outDir": "./dist",
-		"types": ["node", "node-fetch", "discord.js", "klasa"]
+		"outDir": "./dist"
 	},
 	"include": [
 		"./src/**/*"

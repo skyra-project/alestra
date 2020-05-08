@@ -1,5 +1,6 @@
+import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
-import { Command as KlasaCommand, CommandStore, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
+import { Command as KlasaCommand, CommandOptions, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
@@ -8,24 +9,22 @@ const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true,
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
-export default class Command extends KlasaCommand {
-
-	public constructor(store: CommandStore, file: string[], directory: string) {
-		super(store, file, directory, {
-			bucket: 1,
-			cooldown: 5,
-			description: 'Execute a sandboxed subset of JavaScript',
-			requiredPermissions: ['ATTACH_FILES'],
-			runIn: ['text'],
-			usage: '<code:string>'
-		});
-	}
+@ApplyOptions<CommandOptions>({
+	bucket: 1,
+	cooldown: 5,
+	description: 'Execute a sandboxed subset of JavaScript',
+	requiredPermissions: ['ATTACH_FILES'],
+	runIn: ['text'],
+	usage: '<code:string>',
+	flagSupport: true
+})
+export default class extends KlasaCommand {
 
 	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
 		code = this.parseCodeblock(code);
 		const sw = new Stopwatch(5);
 		try {
-			let output = await evaluate(message.flags.ts ? transpileModule(code, tsTranspileOptions).outputText : code);
+			let output = await evaluate(message.flagArgs.ts ? transpileModule(code, tsTranspileOptions).outputText : code);
 			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			// @ts-ignore
