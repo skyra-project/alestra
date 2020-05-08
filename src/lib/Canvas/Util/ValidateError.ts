@@ -2,7 +2,7 @@ import { getLineAndColumn } from './Util';
 
 export class CompilationParseError extends Error {
 
-	public constructor(code: string, start: number, message: string = 'Unknown Error') {
+	public constructor(code: string, start: number, message = 'Unknown Error') {
 		const position = getLineAndColumn(code, start);
 		super(`${message} (at ${position.line}:${position.column}).`);
 	}

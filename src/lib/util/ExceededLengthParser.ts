@@ -46,7 +46,7 @@ export async function handleMessage<ED extends ExtraDataPartial>(message: KlasaM
 			}
 			return message.sendMessage(options.success
 				? `**Output**:${codeBlock(options.language!, options.result!)}${options.footer !== undefined && options.time !== undefined ? `\n**Type**:${options.footer}\n${options.time}` : ''}`
-				: `**Error**:${codeBlock(options.language!, options.result!)}\n**Type**:${options.footer}\n${options.time}`)
+				: `**Error**:${codeBlock(options.language!, options.result!)}\n**Type**:${options.footer}\n${options.time}`);
 		}
 	}
 }

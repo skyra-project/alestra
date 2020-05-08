@@ -28,5 +28,3 @@ jobs:
         run: cp config.ts.example config.ts
       - name: Compile TypeScript
         uses: icrawl/action-tsc@v1
-        with:
-          build: src

@@ -34,13 +34,13 @@ const zws = String.fromCharCode(8203);
  * @param text The text to clean
  */
 export function clean(text: string) {
-    if (typeof sensitivePattern === 'undefined') {
-        throw new Error('initClean must be called before running this.');
-    }
-    return text
-        .replace(sensitivePattern, '「ｒｅｄａｃｔｅｄ」')
-        .replace(/`/g, `\`${zws}`)
-        .replace(/@/g, `@${zws}`);
+	if (typeof sensitivePattern === 'undefined') {
+		throw new Error('initClean must be called before running this.');
+	}
+	return text
+		.replace(sensitivePattern, '「ｒｅｄａｃｔｅｄ」')
+		.replace(/`/g, `\`${zws}`)
+		.replace(/@/g, `@${zws}`);
 }
 
 /**
@@ -48,5 +48,5 @@ export function clean(text: string) {
  * @param tokens The tokens to clean
  */
 export function initClean(tokens: readonly string[]) {
-    sensitivePattern = new RegExp(tokens.map(regExpEsc).join('|'), 'gi');
+	sensitivePattern = new RegExp(tokens.map(regExpEsc).join('|'), 'gi');
 }

@@ -13,6 +13,7 @@ import { fetch, FetchMethods, FetchResultTypes } from '../../lib/util/util';
 	flagSupport: true
 })
 export default class extends Command {
+
 	public async run(message: KlasaMessage, [input]: [string]) {
 		const result = await util.exec(input, { timeout: 'timeout' in message.flagArgs ? Number(message.flagArgs.timeout) : 60000 })
 			.catch(error => ({ stdout: null, stderr: error }));
@@ -27,4 +28,5 @@ export default class extends Command {
 		const { key } = await fetch('https://hasteb.in/documents', { method: FetchMethods.Post, body: result }, FetchResultTypes.JSON) as { key: string };
 		return `https://hasteb.in/${key}.js`;
 	}
+
 }
