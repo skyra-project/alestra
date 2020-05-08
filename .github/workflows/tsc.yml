@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
 
 jobs:
@@ -11,18 +11,22 @@ jobs:
     name: tsc
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: install node v12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-    - name: yarn install
-      run: yarn install
-    - name: configuration
-      run: cp config.ts.example config.ts
-    - name: tsc
-      uses: icrawl/action-tsc@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        job-name: tsc
+      - name: Checkout Project
+        uses: actions/checkout@v2
+      - name: Install NodeJS v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Restore CI Cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-12-${{ hashFiles('**/yarn.lock') }}
+      - name: Install Dependencies
+        run: yarn --ignore-scripts --frozen-lockfile
+      - name: Copy Configuration
+        run: cp config.ts.example config.ts
+      - name: Compile TypeScript
+        uses: icrawl/action-tsc@v1
+        with:
+          build: src
