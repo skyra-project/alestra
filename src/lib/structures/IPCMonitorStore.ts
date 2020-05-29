@@ -1,14 +1,12 @@
-import { Store } from 'klasa';
+import { Store, Constructor } from '@klasa/core';
 import { NodeMessage } from 'veza';
 import { AlestraClient } from '../AlestraClient';
-import { ConstructorType } from '../types/Misc';
 import { IPCMonitor } from './IPCMonitor';
 
-export class IPCMonitorStore extends Store<string, IPCMonitor, ConstructorType<IPCMonitor>> {
+export class IPCMonitorStore extends Store<IPCMonitor> {
 
 	public constructor(client: AlestraClient) {
-		// @ts-ignore
-		super(client, 'ipcMonitors', IPCMonitor);
+		super(client, 'ipcMonitors', IPCMonitor as Constructor<IPCMonitor>);
 	}
 
 	public async run(message: NodeMessage): Promise<void> {
@@ -18,7 +16,7 @@ export class IPCMonitorStore extends Store<string, IPCMonitor, ConstructorType<I
 			return;
 		}
 
-		const [route, payload = null] = message.data;
+		const [route, payload = null] = message.data as [string, unknown];
 		const monitor = this.get(route);
 		if (!monitor) {
 			message.reply([0, 'UNKNOWN_ROUTE']);
