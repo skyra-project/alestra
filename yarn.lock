@@ -55,20 +55,28 @@
   version "0.0.3"
   resolved "https://codeload.github.com/dirigeants/core/tar.gz/608e144475599c9460c9c914147af10377a02c38"
   dependencies:
-    "@klasa/bitfield" "^0.0.2"
+    "@klasa/bitfield" "^0.0.3"
     "@klasa/cache" "^0.0.3"
-    "@klasa/event-iterator" "^0.0.8"
-    "@klasa/rest" "^0.4.0"
+    "@klasa/dapi-types" "^0.2.0"
+    "@klasa/event-iterator" "^0.0.10"
+    "@klasa/rest" "^0.4.2"
     "@klasa/snowflake" "^0.0.1"
     "@klasa/timer-manager" "^0.0.1"
-    "@klasa/utils" "^0.0.5"
-    "@klasa/ws" "^0.0.12"
+    "@klasa/utils" "^0.0.8"
+    "@klasa/ws" "^0.0.13"
+    "@types/node" "^14.0.0"
+    "@types/node-fetch" "^2.5.7"
     fs-nextra "^0.5.1"
 
 "@klasa/cron@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@klasa/cron/-/cron-0.0.1.tgz#88f0325e00f6eaed19bd14657eb959cac448172b"
   integrity sha512-YqT8ybFWY4CnW4il4IdntES+RV6vWEPQ5fZa3xzC3rhi6Nfq38yHTG0NtqqVqTlXZWyutgZq/2TPrCAk8jDd1A==
+
+"@klasa/dapi-types@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@klasa/dapi-types/-/dapi-types-0.2.0.tgz#660b7f688cc9ec31e2d194b7bb9723cec0d28ae0"
+  integrity sha512-JPuqL0I7e1BCu9szsXq/owp/Ni8YHmsIHfNDQPy84qdNoRLyPcBrlwgmck9RrI5h/S5/LLNJ9Hu6Oy8bMYDqFw==
 
 "@klasa/duration@^0.0.3":
   version "0.0.3"

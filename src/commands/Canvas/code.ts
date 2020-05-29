@@ -4,7 +4,7 @@ import { Command, CommandOptions } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
-import { Message, Attachment } from '@klasa/core';
+import { Message, Attachment, Permissions } from '@klasa/core';
 import { Stopwatch } from '@klasa/stopwatch';
 import { codeBlock } from '@klasa/utils';
 
@@ -16,7 +16,7 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	bucket: 1,
 	cooldown: 5,
 	description: 'Execute a sandboxed subset of JavaScript',
-	requiredPermissions: ['ATTACH_FILES'],
+	requiredPermissions: [Permissions.FLAGS.ATTACH_FILES],
 	runIn: [0],
 	usage: '<code:string>',
 	flagSupport: true
