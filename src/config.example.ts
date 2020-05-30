@@ -16,7 +16,6 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	commands: {
 		editing: true,
 		messageLifetime: 200,
-		noPrefixDM: true,
 		prefix: DEV ? 'ad.' : 'a.',
 		prefixCaseInsensitive: true,
 		regexPrefix: /alestra[,!]/i,
@@ -27,15 +26,11 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	},
 	console: { useColor: true, utc: true },
 	pieces: { createFolders: false },
-	cache: {
-		messageLifetime: 300,
-		messageSweepInterval: 120,
-		limits: { messages: 0 }
-	},
+	cache: { limits: { messages: 0 } },
 	consoleEvents: { verbose: true },
 	dev: DEV,
 	ws: {
-		intents: new Intents(IntentsFlags.GuildMessages),
+		intents: new Intents([IntentsFlags.GuildMessages, IntentsFlags.Guilds]),
 		additionalOptions: {
 			presence: { status: 'online', activity: { type: 'LISTENING', name: 'Alestra, help' } }
 		}
