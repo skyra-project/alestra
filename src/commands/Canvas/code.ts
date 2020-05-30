@@ -1,9 +1,12 @@
 import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
-import { Command as KlasaCommand, CommandOptions, KlasaMessage, Stopwatch, util as KlasaUtil } from 'klasa';
+import { Command, CommandOptions } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
+import { Message, Attachment, Permissions } from '@klasa/core';
+import { Stopwatch } from '@klasa/stopwatch';
+import { codeBlock } from '@klasa/utils';
 
 const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true, checkJs: true, target: ScriptTarget.ESNext } };
 
@@ -13,32 +16,93 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	bucket: 1,
 	cooldown: 5,
 	description: 'Execute a sandboxed subset of JavaScript',
-	requiredPermissions: ['ATTACH_FILES'],
-	runIn: ['text'],
+	requiredPermissions: [Permissions.FLAGS.ATTACH_FILES],
+	runIn: [0],
 	usage: '<code:string>',
 	flagSupport: true
 })
-export default class extends KlasaCommand {
+export default class extends Command {
 
-	public async run(message: KlasaMessage, [code]: [string]): Promise<KlasaMessage | KlasaMessage[]> {
+	public async run(message: Message, [code]: [string]) {
 		code = this.parseCodeblock(code);
 		const sw = new Stopwatch(5);
 		try {
-			let output = await evaluate(message.flagArgs.ts ? transpileModule(code, tsTranspileOptions).outputText : code);
+			let output = await evaluate(message.flagArgs.ts ? transpileModule(code, tsTranspileOptions).outputText : code, [
+				['message', this.createMessageMock(message)],
+				['client', this.createClientMock()]
+			]);
 			sw.stop();
 			if (output instanceof Canvas) output = await output.toBufferAsync();
-			// @ts-ignore
-			if (output instanceof Buffer) return message.channel.sendFile(output, 'output.png', `\`✔\` \`⏱ ${sw}\``);
-			// @ts-ignore
-			return message.send(`\`✔\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('js', inspect(output, false, 0, false))}`);
+			if (output instanceof Buffer) {
+				// output, 'output.png',
+				return message.channel.send(async mb => mb
+					.setContent(`\`✔\` \`⏱ ${sw}\``)
+					.addFile(await new Attachment()
+						.setName('output.png')
+						.setFile(output as Buffer)
+						.resolve()));
+			}
+
+			return message.send(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
 		} catch (error) {
 			if (sw.running) sw.stop();
-			throw `\`❌\` \`⏱ ${sw}\`\n${KlasaUtil.codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? error.stack : error)}`;
+			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error)}`;
 		}
 	}
 
 	public parseCodeblock(code: string): string {
 		return CODEBLOCK.test(code) ? CODEBLOCK.exec(code)![1].trim() : code;
+	}
+
+	private createMessageMock(message: Message) {
+		const author = Object.freeze({
+			id: message.author.id,
+			avatar: message.author.avatar,
+			username: message.author.username,
+			discriminator: message.author.discriminator,
+			bot: message.author.bot
+		});
+
+		const member = message.member
+			? Object.freeze({
+				id: message.author.id,
+				user: author,
+				nick: message.member.nick
+			})
+			: null;
+
+		const guild = message.guild
+			? Object.freeze({
+				id: message.guild.id,
+				name: message.guild.name,
+				icon: message.guild.icon
+			})
+			: null;
+
+		return Object.freeze({
+			id: message.id,
+			content: message.content,
+			author,
+			member,
+			guild
+		});
+	}
+
+	private createClientMock() {
+		const clientUser = this.client.user;
+		const user = clientUser
+			? Object.freeze({
+				id: clientUser.id,
+				avatar: clientUser.avatar,
+				username: clientUser.username,
+				discriminator: clientUser.discriminator,
+				bot: clientUser.bot
+			})
+			: null;
+
+		return Object.freeze({
+			user
+		});
 	}
 
 }

@@ -1,27 +1,35 @@
+import { Command, CommandOptions } from 'klasa';
+import { exec, codeBlock } from '@klasa/utils';
+import { Attachment, Message } from '@klasa/core';
 import { ApplyOptions } from '@skyra/decorators';
-import { MessageAttachment } from 'discord.js';
-import { Command, CommandOptions, KlasaMessage, util } from 'klasa';
-import { PermissionLevels } from '../../lib/types/Enums';
 import { fetch, FetchMethods, FetchResultTypes } from '../../lib/util/util';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['execute'],
-	description: 'Executes bash commands',
+	description: language => language.get('COMMAND_EXEC_DESCRIPTION'),
+	extendedHelp: language => language.get('COMMAND_EXEC_EXTENDED'),
 	guarded: true,
-	permissionLevel: PermissionLevels.BotOwner,
+	permissionLevel: 10,
 	usage: '<expression:string>',
 	flagSupport: true
 })
 export default class extends Command {
 
-	public async run(message: KlasaMessage, [input]: [string]) {
-		const result = await util.exec(input, { timeout: 'timeout' in message.flagArgs ? Number(message.flagArgs.timeout) : 60000 })
-			.catch(error => ({ stdout: null, stderr: error }));
-		const output = result.stdout ? `**\`OUTPUT\`**${util.codeBlock('prolog', result.stdout)}` : '';
-		const outerr = result.stderr ? `**\`ERROR\`**${util.codeBlock('prolog', result.stderr)}` : '';
+	public async run(message: Message, [input]: [string]) {
+		const result = await exec(input, { timeout: 'timeout' in message.flagArgs ? Number(message.flagArgs.timeout) : 60000 })
+			.catch(error => ({ stdout: null, stderr: error as Error }));
+		const output = result.stdout ? `**\`OUTPUT\`**${codeBlock('prolog', result.stdout)}` : '';
+		const outerr = result.stderr ? `**\`ERROR\`**${codeBlock('prolog', result.stderr)}` : '';
 		const joined = [output, outerr].join('\n') || 'No output';
 
-		return message.sendMessage(joined.length > 2000 ? await this.getHaste(joined).catch(() => new MessageAttachment(Buffer.from(joined), 'output.txt')) : joined);
+		return message.send(mb => joined.length <= 2000
+			? mb.setContent(joined)
+			: this.getHaste(joined)
+				.then(url => mb.setContent(url))
+				.catch(async () => mb.addFile(await new Attachment()
+					.setName('output.txt')
+					.setFile(Buffer.from(joined))
+					.resolve())));
 	}
 
 	private async getHaste(result: string) {

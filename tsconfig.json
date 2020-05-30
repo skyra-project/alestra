@@ -1,10 +1,6 @@
 {
 	"extends": "eslint-config-bamboo",
 	"compilerOptions": {
-		"noImplicitAny": false,
-		"outDir": "./dist"
-	},
-	"include": [
-		"./src/**/*"
-	]
+		"target": "ES2019"
+	}
 }

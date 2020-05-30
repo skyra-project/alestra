@@ -2,7 +2,7 @@ import { Linter } from 'eslint';
 
 export const rules: Linter.Config = {
 	parserOptions: {
-		ecmaVersion: 2018,
+		ecmaVersion: 2020,
 		sourceType: 'module'
 	},
 	rules: {

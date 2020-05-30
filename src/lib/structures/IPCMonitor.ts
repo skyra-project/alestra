@@ -1,4 +1,4 @@
-import { Piece } from 'klasa';
+import { Piece } from '@klasa/core';
 
 export abstract class IPCMonitor extends Piece {
 
