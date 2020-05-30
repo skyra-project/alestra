@@ -25,6 +25,6 @@ jobs:
       - name: Install Dependencies
         run: yarn --ignore-scripts --frozen-lockfile
       - name: Copy Configuration
-        run: cp src/config.ts.example src/config.ts
+        run: cp src/config.example.ts src/config.ts
       - name: Compile TypeScript
         uses: icrawl/action-tsc@v1
