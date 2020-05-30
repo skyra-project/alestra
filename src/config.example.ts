@@ -26,7 +26,7 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	},
 	console: { useColor: true, utc: true },
 	pieces: { createFolders: false },
-	cache: { limits: { messages: 0 } },
+	cache: { limits: { messages: 20 } },
 	consoleEvents: { verbose: true },
 	dev: DEV,
 	ws: {
