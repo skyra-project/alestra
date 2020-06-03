@@ -48,7 +48,7 @@
 
 "@klasa/core@github:dirigeants/core#build":
   version "0.0.3"
-  resolved "https://codeload.github.com/dirigeants/core/tar.gz/753c3f2fd5af4166fdd98521f1dd261bdb027bca"
+  resolved "https://codeload.github.com/dirigeants/core/tar.gz/a7eaa1d49a8e453825007ba545220f2be567dd99"
   dependencies:
     "@klasa/bitfield" "^0.0.3"
     "@klasa/cache" "^0.0.3"
@@ -199,6 +199,11 @@
   version "14.0.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.6.tgz#f9e178b2da31a4b0ec60b64649e244c31ce18daf"
   integrity sha512-FbNmu4F67d3oZMWBV6Y4MaPER+0EpE9eIYf2yaHhCWovc1dlXCZkqGX4NLHfVVr6umt20TNBdRzrNJIzIKfdbw==
+
+"@types/node@^14.0.9":
+  version "14.0.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.9.tgz#43896ab87fc82bda1dfd600cdf44a0c8a64e11d2"
+  integrity sha512-0sCTiXKXELOBxvZLN4krQ0FPOAA7ij+6WwvD0k/PHd9/KAkr4dXel5J9fh6F4x1FwAQILqAWkmpeuS6mjf1iKA==
 
 "@typescript-eslint/eslint-plugin@^3.1.0":
   version "3.1.0"
@@ -963,7 +968,7 @@ json-stable-stringify-without-jsonify@^1.0.1:
 
 "klasa@github:dirigeants/klasa#build":
   version "0.6.0-dev"
-  resolved "https://codeload.github.com/dirigeants/klasa/tar.gz/4b16c5db0e4b273f35852d116e07c10f5e868736"
+  resolved "https://codeload.github.com/dirigeants/klasa/tar.gz/1f860bf93ba5faf0969c8b1ed5e804bf46a2195d"
   dependencies:
     "@klasa/cache" "^0.0.3"
     "@klasa/console" "^0.0.3"
