@@ -46,7 +46,7 @@
     "@klasa/stopwatch": "^0.0.1",
     "@klasa/utils": "^0.0.8",
     "@klasa/ws": "^0.0.13",
-    "@skyra/decorators": "^2.1.1",
+    "@skyra/decorators": "^2.1.2",
     "acorn": "^7.2.0",
     "acorn-numeric-separator": "^0.3.2",
     "canvas": "^2.6.1",

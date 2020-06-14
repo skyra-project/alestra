@@ -154,10 +154,10 @@
     utf-8-validate "^5.0.2"
     zlib-sync "^0.1.6"
 
-"@skyra/decorators@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@skyra/decorators/-/decorators-2.1.1.tgz#6c5ef2e2590c8470a3335aada756deb369a9b267"
-  integrity sha512-XMIAVa6kTRqr2C9u7BMdEwzJAofU4yDpA5k9Ja00ZEgUBxPuMy5wETKoUdQnI50Kzpqe2l94SGaAOPPKbl9qAg==
+"@skyra/decorators@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@skyra/decorators/-/decorators-2.1.2.tgz#ef9193a02baaaf68655a03787fb6e2d6e1320f55"
+  integrity sha512-dCh9CBmb2yeXJH7XIcvtFWgoFJqFYxfjjw3MDZTsJVerNIFzP1VKaiotAWtQsctEr6fPL3zst3k7qdV9JlS/Kg==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
