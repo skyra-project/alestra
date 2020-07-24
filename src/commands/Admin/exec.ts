@@ -22,7 +22,7 @@ export default class extends Command {
 		const outerr = result.stderr ? `**\`ERROR\`**${codeBlock('prolog', result.stderr)}` : '';
 		const joined = [output, outerr].join('\n') || 'No output';
 
-		return message.send(mb => joined.length <= 2000
+		return message.channel.send(mb => joined.length <= 2000
 			? mb.setContent(joined)
 			: this.getHaste(joined)
 				.then(url => mb.setContent(url))

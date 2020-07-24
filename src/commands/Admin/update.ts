@@ -62,24 +62,24 @@ export default class extends Command {
 		}
 
 		// For all other cases, return the original output
-		return message.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))));
+		return message.channel.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))));
 	}
 
 	private async stash(message: Message) {
-		await message.send(mb => mb.setContent('Unsuccessful pull, stashing...'));
+		await message.channel.send(mb => mb.setContent('Unsuccessful pull, stashing...'));
 		await sleep(1000);
 		const { stdout, stderr } = await this.exec(`git stash`);
 		if (!this.isSuccessfulStash(stdout + stderr)) {
 			throw `Unsuccessful pull, stashing:\n\n${codeBlock('prolog', [stdout || '✔', stderr || '✔'].join('\n-=-=-=-\n'))}`;
 		}
 
-		return message.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n'))));
+		return message.channel.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n'))));
 	}
 
 	private async checkout(message: Message, branch: string) {
-		await message.send(mb => mb.setContent(`Switching to ${branch}...`));
+		await message.channel.send(mb => mb.setContent(`Switching to ${branch}...`));
 		await this.exec(`git checkout ${branch}`);
-		return message.send(mb => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
+		return message.channel.send(mb => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
 	}
 
 	private async isCurrentBranch(branch: string) {

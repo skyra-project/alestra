@@ -28,6 +28,7 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	cache: { limits: { messages: 20 } },
 	consoleEvents: { verbose: true },
 	dev: DEV,
+	owners: [''],
 	ws: {
 		intents: new Intents([IntentsFlags.GuildMessages, IntentsFlags.Guilds]),
 		additionalOptions: {
