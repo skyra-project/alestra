@@ -35,7 +35,7 @@ export default class extends Command {
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
-				return message.channel.send(async mb => mb
+				return message.reply(async mb => mb
 					.setContent(`\`✔\` \`⏱ ${sw}\``)
 					.addFile(await new Attachment()
 						.setName('output.png')
@@ -43,7 +43,7 @@ export default class extends Command {
 						.resolve()));
 			}
 
-			return message.channel.send(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
+			return message.reply(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
 		} catch (error) {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error)}`;

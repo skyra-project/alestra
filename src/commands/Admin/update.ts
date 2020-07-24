@@ -27,20 +27,20 @@ export default class extends Command {
 	private async compile(message: Message) {
 		const { stderr, code } = await this.exec('yarn build');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.channel.send(mb => mb.setContent(`${Emojis.GreenTick} Successfully compiled.`));
+		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully compiled.`));
 	}
 
 	private async cleanDist(message: Message) {
 		if (message.flagArgs.fullRebuild) {
 			await remove(resolve(rootFolder, 'dist'));
-			return message.channel.send(mb => mb.setContent(`${Emojis.GreenTick} Successfully cleaned old dist directory.`));
+			return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully cleaned old dist directory.`));
 		}
 	}
 
 	private async updateDependencies(message: Message) {
 		const { stderr, code } = await this.exec('yarn install --frozen-lockfile');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.channel.send(mb => mb.setContent(`${Emojis.GreenTick} Successfully updated dependencies.`));
+		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully updated dependencies.`));
 	}
 
 	private async fetch(message: Message, branch: string) {
@@ -62,24 +62,24 @@ export default class extends Command {
 		}
 
 		// For all other cases, return the original output
-		return message.channel.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))));
+		return message.reply(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))));
 	}
 
 	private async stash(message: Message) {
-		await message.channel.send(mb => mb.setContent('Unsuccessful pull, stashing...'));
+		await message.reply(mb => mb.setContent('Unsuccessful pull, stashing...'));
 		await sleep(1000);
 		const { stdout, stderr } = await this.exec(`git stash`);
 		if (!this.isSuccessfulStash(stdout + stderr)) {
 			throw `Unsuccessful pull, stashing:\n\n${codeBlock('prolog', [stdout || '✔', stderr || '✔'].join('\n-=-=-=-\n'))}`;
 		}
 
-		return message.channel.send(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n'))));
+		return message.reply(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n'))));
 	}
 
 	private async checkout(message: Message, branch: string) {
-		await message.channel.send(mb => mb.setContent(`Switching to ${branch}...`));
+		await message.reply(mb => mb.setContent(`Switching to ${branch}...`));
 		await this.exec(`git checkout ${branch}`);
-		return message.channel.send(mb => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
+		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
 	}
 
 	private async isCurrentBranch(branch: string) {
