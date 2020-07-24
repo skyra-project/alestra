@@ -18,7 +18,6 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 		messageLifetime: 200,
 		prefix: DEV ? 'ad.' : 'a.',
 		prefixCaseInsensitive: true,
-		regexPrefix: /alestra[,!]/i,
 		slowmode: 1000,
 		slowmodeAggressive: true,
 		typing: true,
