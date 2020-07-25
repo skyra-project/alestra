@@ -18,7 +18,6 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 		messageLifetime: 200,
 		prefix: DEV ? 'ad.' : 'a.',
 		prefixCaseInsensitive: true,
-		regexPrefix: /alestra[,!]/i,
 		slowmode: 1000,
 		slowmodeAggressive: true,
 		typing: true,
@@ -29,6 +28,7 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	cache: { limits: { messages: 20 } },
 	consoleEvents: { verbose: true },
 	dev: DEV,
+	owners: [''],
 	ws: {
 		intents: new Intents([IntentsFlags.GuildMessages, IntentsFlags.Guilds]),
 		additionalOptions: {

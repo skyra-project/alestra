@@ -35,7 +35,7 @@ export default class extends Command {
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
-				return message.channel.send(async mb => mb
+				return message.reply(async mb => mb
 					.setContent(`\`✔\` \`⏱ ${sw}\``)
 					.addFile(await new Attachment()
 						.setName('output.png')
@@ -43,7 +43,7 @@ export default class extends Command {
 						.resolve()));
 			}
 
-			return message.send(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
+			return message.reply(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
 		} catch (error) {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error)}`;
@@ -58,6 +58,8 @@ export default class extends Command {
 		const author = Object.freeze({
 			id: message.author.id,
 			avatar: message.author.avatar,
+			avatarURL: message.author.avatarURL.bind(message.author),
+			displayAvatarURL: message.author.displayAvatarURL.bind(message.author),
 			username: message.author.username,
 			discriminator: message.author.discriminator,
 			bot: message.author.bot
@@ -94,6 +96,8 @@ export default class extends Command {
 			? Object.freeze({
 				id: clientUser.id,
 				avatar: clientUser.avatar,
+				avatarURL: clientUser.avatarURL.bind(clientUser),
+				displayAvatarURL: clientUser.displayAvatarURL.bind(clientUser),
 				username: clientUser.username,
 				discriminator: clientUser.discriminator,
 				bot: clientUser.bot

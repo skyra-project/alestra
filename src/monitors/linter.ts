@@ -75,7 +75,7 @@ export default class Monitor extends KlasaMonitor {
 			].join('\n')));
 		}
 
-		const sent = (await message.channel.send(mb => mb.setContent(`${this.kCanvasConstructorEmoji} | Please wait...`)))[0];
+		const sent = (await message.reply(mb => mb.setContent(`${this.kCanvasConstructorEmoji} | Please wait...`)))[0];
 		const handler = await richDisplay.run(sent, {
 			filter: ([, user]) => user.id === message.author!.id, idle: 120000, onceDone: () => {
 				this.handlers.delete(message.author!.id);
