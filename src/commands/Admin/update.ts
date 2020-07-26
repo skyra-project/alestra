@@ -1,11 +1,11 @@
-import { ApplyOptions } from '@skyra/decorators';
-import { Command, CommandOptions } from 'klasa';
-import { exec, sleep, codeBlock } from '@klasa/utils';
-import { remove } from 'fs-nextra';
-import { resolve } from 'path';
-import { cutText } from '../../lib/util/util';
-import { rootFolder, Emojis } from '../../lib/util/constants';
 import type { Message } from '@klasa/core';
+import { codeBlock, exec, sleep } from '@klasa/utils';
+import { ApplyOptions } from '@skyra/decorators';
+import { remove } from 'fs-nextra';
+import { Command, CommandOptions } from 'klasa';
+import { resolve } from 'path';
+import { Emojis, rootFolder } from '../../lib/util/constants';
+import { cutText } from '../../lib/util/util';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['pull'],
@@ -16,7 +16,7 @@ import type { Message } from '@klasa/core';
 })
 export default class extends Command {
 
-	public async run(message: Message, [branch = 'master']: [string?]) {
+	public async run(message: Message, [branch = 'main']: [string?]) {
 		await this.fetch(message, branch);
 		await this.updateDependencies(message);
 		await this.cleanDist(message);

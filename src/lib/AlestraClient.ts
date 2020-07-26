@@ -1,8 +1,8 @@
+import { Colors } from '@klasa/console';
+import { mergeDefault } from '@klasa/utils';
 import { KlasaClient, KlasaClientOptions } from 'klasa';
 import { Client as VezaClient } from 'veza';
 import { IPCMonitorStore } from './structures/IPCMonitorStore';
-import { Colors } from '@klasa/console';
-import { mergeDefault } from '@klasa/utils';
 
 const g = new Colors({ text: 'green' }).format('[IPC   ]');
 const y = new Colors({ text: 'yellow' }).format('[IPC   ]');
@@ -11,7 +11,7 @@ const r = new Colors({ text: 'red' }).format('[IPC   ]');
 export class AlestraClient extends KlasaClient {
 
 	public ipcMonitors: IPCMonitorStore;
-	public ipc = new VezaClient('alestra-master');
+	public ipc = new VezaClient('alestra-main');
 
 	public constructor(options: Partial<KlasaClientOptions> = {}) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
