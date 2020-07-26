@@ -164,15 +164,15 @@
     utf-8-validate "^5.0.2"
     zlib-sync "^0.1.7"
 
-"@skyra/decorators@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@skyra/decorators/-/decorators-2.2.0.tgz#baf6feecf893fc972666ff626dec06c67eefa719"
-  integrity sha512-pUfcInGEv2cDctE1xRYJIxLHEks4aEe2OlR73DFsM2xGbNSoqVq85EZrAJCiuGJP/+UsPbmAYb4jpButeiwp+w==
+"@skyra/decorators@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@skyra/decorators/-/decorators-2.3.0.tgz#bfd7f95c764c0f2791aa18b47a3f5a620e638eae"
+  integrity sha512-40z/OAje4j1OsjnHYfgBu6/L/PSIJ9riGqO2baGZj3Z6PKA3hd4fQQQe4w2CXu2zBnV7Bawu17kQtWnq/ma/rg==
 
-"@skyra/eslint-config@^5.2.1":
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/@skyra/eslint-config/-/eslint-config-5.2.1.tgz#c9444c578855f6511e0184956c8ea98161d8fb99"
-  integrity sha512-Pfyy0BS6FCaHruFu19KOuMvxOm33UFa6mg2t1rySCq24sC4q8FNtJkwaqPUG3mVmdgzR/AxjjMt2+6w1DMn1mQ==
+"@skyra/eslint-config@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@skyra/eslint-config/-/eslint-config-5.3.0.tgz#9f4f49bea425d0aac6877fa42daec0c4fc00f0ad"
+  integrity sha512-MO/JbDZjd5NvdS82pooOBiDHq3Njb54lo8XsMBYUM2vUxYAzpFcjZ2SIVnfj76MWZS9yQcvV+2MFLtTKaOuFOQ==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
