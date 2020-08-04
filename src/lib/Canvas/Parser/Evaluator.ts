@@ -7,6 +7,13 @@ import { extname } from 'path';
 import { URL } from 'url';
 import { AlreadyDeclaredIdentifier, CompilationParseError, MissingPropertyError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
 
+function *filter<T>(object: Record<string, T>, keys: readonly string[]) {
+	for (const [key, value] of Object.entries<T>(object)) {
+		if (keys.includes(key)) continue;
+		yield [key, value] as [string, T];
+	}
+}
+
 const kUnset = Symbol('unset');
 const defaultIdentifiers: [string, unknown][] = [
 	// Function#bind allows the code to be censored
@@ -38,7 +45,7 @@ const defaultIdentifiers: [string, unknown][] = [
 		Date,
 		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError
 	}),
-	...Object.entries(CanvasConstructor)
+	...filter(CanvasConstructor, ['resolveImage'])
 ];
 
 const binaryOperators = new Map<string, (left: any, right: any) => unknown>()
