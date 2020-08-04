@@ -1,5 +1,6 @@
 /* eslint-disable func-call-spacing */
 import { Parser } from 'acorn';
+import { Image, loadImage } from 'canvas';
 import * as CanvasConstructor from 'canvas-constructor';
 import { default as _fetch } from 'node-fetch';
 import { extname } from 'path';
@@ -114,14 +115,14 @@ export class InternalError {
 
 }
 
-async function fetch(...args: [string]): Promise<Buffer> {
+async function fetch(...args: [string]): Promise<Image> {
 	if (args.length !== 1) throw new TypeError('Expected only 1 argument (at fetch).');
 	if (typeof args[0] !== 'string') throw new TypeError('Expected url to be a string (at fetch).');
 	const url = new URL(args[0]);
 	const ext = extname(url.pathname);
 	if (/^\.(jpe?g|png)$/.test(ext)) {
 		const response = await _fetch(url.href);
-		if (response.ok) return response.buffer();
+		if (response.ok) return loadImage(await response.buffer());
 		throw new InternalError(new Error(`${response.status}: ${response.statusText} | ${url.href}`));
 	}
 	throw new InternalError(new Error(`The url ${url.href} must have unknown of the following extensions: .png, .jpg, .jpeg`));
