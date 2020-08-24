@@ -4,7 +4,6 @@ import { GuildChannel, Permissions, Embed } from '@klasa/core';
 import { codeBlock } from '@klasa/utils';
 
 export default class Monitor extends KlasaMonitor {
-
 	private readonly handlers = new Map<string, { handler: ReactionHandler; message: KlasaMessage }>();
 	private readonly dev: boolean;
 	private readonly kCanvasConstructorEmoji = '<:canvasconstructor:451438332375728128>';
@@ -47,7 +46,11 @@ export default class Monitor extends KlasaMonitor {
 		if (!oldHandler || oldHandler.message !== message) {
 			await message.reactions.add('redCross:451517251464593411');
 			await message.reactions.add('🔍');
-			const reactions = await message.awaitReactions({ idle: 15000, limit: 1, filter: ([reaction, user]) => user.id === message.author!.id && reaction.emoji.name === '🔍' });
+			const reactions = await message.awaitReactions({
+				idle: 15000,
+				limit: 1,
+				filter: ([reaction, user]) => user.id === message.author!.id && reaction.emoji.name === '🔍'
+			});
 			if (message.deleted) return;
 			if (reactions.size) {
 				const reaction = message.reactions.get('🔍');
@@ -60,24 +63,36 @@ export default class Monitor extends KlasaMonitor {
 
 		const richDisplay = new RichDisplay({
 			template: new Embed()
-				.setColor(0xFF7327)
+				.setColor(0xff7327)
 				// .setAuthor(this.client.user!.username, this.client.user!.avatarURL({ size: 64 }))
 				.setAuthor(this.client.user!.username)
 				.setTitle('ESLint Errors')
 		});
 
 		for (const error of errors) {
-			richDisplay.addPage(template => template.setDescription([
-				`[\`${error.ruleId || 'Parsing Error'}\`] (Severity ${error.severity}) at ${
-					this._displayRanges(error.line, error.endLine || 0)}:${
-					this._displayRanges(error.column, error.endColumn || 0)
-				}\n\`\`${error.message}\`\`${this._displayText(code, error.line, error.endLine ?? error.line, error.column, error.endColumn)}`
-			].join('\n')));
+			richDisplay.addPage((template) =>
+				template.setDescription(
+					[
+						`[\`${error.ruleId || 'Parsing Error'}\`] (Severity ${error.severity}) at ${this._displayRanges(
+							error.line,
+							error.endLine || 0
+						)}:${this._displayRanges(error.column, error.endColumn || 0)}\n\`\`${error.message}\`\`${this._displayText(
+							code,
+							error.line,
+							error.endLine ?? error.line,
+							error.column,
+							error.endColumn
+						)}`
+					].join('\n')
+				)
+			);
 		}
 
-		const sent = (await message.reply(mb => mb.setContent(`${this.kCanvasConstructorEmoji} | Please wait...`)))[0];
+		const sent = (await message.reply((mb) => mb.setContent(`${this.kCanvasConstructorEmoji} | Please wait...`)))[0];
 		const handler = await richDisplay.run(sent, {
-			filter: ([, user]) => user.id === message.author!.id, idle: 120000, onceDone: () => {
+			filter: ([, user]) => user.id === message.author!.id,
+			idle: 120000,
+			onceDone: () => {
 				this.handlers.delete(message.author!.id);
 				if (!sent.deleted) sent.delete().catch(() => null);
 				if (!message.deleted) {
@@ -104,5 +119,4 @@ export default class Monitor extends KlasaMonitor {
 		}
 		return '';
 	}
-
 }

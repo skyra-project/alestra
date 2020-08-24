@@ -5,9 +5,16 @@ import * as CanvasConstructor from 'canvas-constructor';
 import { default as _fetch } from 'node-fetch';
 import { extname } from 'path';
 import { URL } from 'url';
-import { AlreadyDeclaredIdentifier, CompilationParseError, MissingPropertyError, SandboxError, SandboxPropertyError, UnknownIdentifier } from '../Util/ValidateError';
+import {
+	AlreadyDeclaredIdentifier,
+	CompilationParseError,
+	MissingPropertyError,
+	SandboxError,
+	SandboxPropertyError,
+	UnknownIdentifier
+} from '../Util/ValidateError';
 
-function *filter<T>(object: Record<string, T>, keys: readonly string[]) {
+function* filter<T>(object: Record<string, T>, keys: readonly string[]) {
 	for (const [key, value] of Object.entries<T>(object)) {
 		if (keys.includes(key)) continue;
 		yield [key, value] as [string, T];
@@ -21,29 +28,47 @@ const defaultIdentifiers: [string, unknown][] = [
 	...Object.entries({
 		undefined,
 		Infinity,
-		NaN, isFinite, isNaN,
-		parseFloat, parseInt,
-		decodeURI, decodeURIComponent, encodeURI, encodeURIComponent,
+		NaN,
+		isFinite,
+		isNaN,
+		parseFloat,
+		parseInt,
+		decodeURI,
+		decodeURIComponent,
+		encodeURI,
+		encodeURIComponent,
 		Boolean,
 		Number,
 		Symbol,
 		Object,
 		Array,
-		Int8Array, Uint8Array, Uint8ClampedArray,
-		Int16Array, Uint16Array,
-		Int32Array, Uint32Array,
-		Float32Array, Float64Array,
+		Int8Array,
+		Uint8Array,
+		Uint8ClampedArray,
+		Int16Array,
+		Uint16Array,
+		Int32Array,
+		Uint32Array,
+		Float32Array,
+		Float64Array,
 		ArrayBuffer,
 		DataView,
 		JSON,
 		Reflect,
-		Map, WeakMap,
-		Set, WeakSet,
+		Map,
+		WeakMap,
+		Set,
+		WeakSet,
 		Promise,
 		Proxy,
 		Math,
 		Date,
-		Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError
+		Error,
+		EvalError,
+		RangeError,
+		ReferenceError,
+		SyntaxError,
+		TypeError
 	}),
 	...filter(CanvasConstructor, ['resolveImage'])
 ];
@@ -114,12 +139,10 @@ enum ScopeType {
 }
 
 export class InternalError {
-
 	public error: Error;
 	public constructor(error: Error) {
 		this.error = error;
 	}
-
 }
 
 async function fetch(...args: [string]): Promise<Image> {
@@ -137,14 +160,18 @@ async function fetch(...args: [string]): Promise<Image> {
 
 export async function evaluate(input: string, extraVariables: [string, unknown][] = []): Promise<unknown> {
 	try {
-		return await parseNode({
-			allowSpread: false,
-			code: input,
-			identifiers: new Map(defaultIdentifiers.concat(extraVariables))
-		}, Parser.parse(input, {
-			allowAwaitOutsideFunction: true,
-			ecmaVersion: 2019
-		}), null);
+		return await parseNode(
+			{
+				allowSpread: false,
+				code: input,
+				identifiers: new Map(defaultIdentifiers.concat(extraVariables))
+			},
+			Parser.parse(input, {
+				allowAwaitOutsideFunction: true,
+				ecmaVersion: 2019
+			}),
+			null
+		);
 	} catch (error) {
 		if (error instanceof InternalError) throw error.error;
 		throw error;
@@ -157,31 +184,56 @@ async function parseNode(ctx: EvaluatorContext, node: acorn.Node, scope: Scope):
 	switch (node.type) {
 		// case 'ArrowFunctionExpression': return parseArrowFunctionExpression(ctx, unknownNode as NodeArrowFunctionExpression);
 		// case 'CatchClause': return parseCatchClause(ctx, unknownNode as NodeCatchClause, scope);
-		case 'ArrayExpression': return parseArrayExpression(ctx, unknownNode as NodeArrayExpression, scope);
-		case 'AssignmentExpression': return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
-		case 'AwaitExpression': return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
-		case 'BinaryExpression': return parseBinaryExpression(ctx, unknownNode as NodeBinaryExpression, scope);
-		case 'BlockStatement': return parseBlockStatement(ctx, unknownNode as NodeBlockStatement, scope);
-		case 'CallExpression': return parseCallExpression(ctx, unknownNode as NodeCallExpression, scope);
-		case 'ConditionalExpression': return parseConditionalExpression(ctx, unknownNode as NodeConditionalExpression, scope);
-		case 'EmptyStatement': return parseEmptyStatement();
-		case 'ExpressionStatement': return parseExpressionStatement(ctx, unknownNode as NodeExpressionStatement, scope);
-		case 'Identifier': return parseIdentifier(ctx, unknownNode as NodeIdentifier, scope);
-		case 'IfStatement': return parseIfStatement(ctx, unknownNode as NodeIfStatement, scope);
-		case 'Literal': return parseLiteral(ctx, unknownNode as NodeLiteral);
-		case 'MemberExpression': return parseMemberExpression(ctx, unknownNode as NodeMemberExpression, scope);
-		case 'NewExpression': return parseNewExpression(ctx, unknownNode as NodeNewExpression, scope);
-		case 'ObjectExpression': return parseObjectExpression(ctx, unknownNode as NodeObjectExpression, scope);
-		case 'Program': return parseProgram(ctx, unknownNode as NodeProgram, scope);
-		case 'SpreadElement': return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
-		case 'TemplateElement': return parseTemplateElement(ctx, unknownNode as NodeTemplateElement);
-		case 'TemplateLiteral': return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
-		case 'ThrowStatement': return parseThrowStatement(ctx, unknownNode as NodeThrowStatement, scope);
-		case 'TryStatement': return parseTryStatement(ctx, unknownNode as NodeTryStatement, scope);
-		case 'UnaryExpression': return parseUnaryExpression(ctx, unknownNode as NodeUnaryExpression, scope);
-		case 'VariableDeclaration': return parseVariableDeclaration(ctx, unknownNode as NodeVariableDeclaration, scope);
-		case 'VariableDeclarator': return parseVariableDeclarator(ctx, unknownNode as NodeVariableDeclarator, scope);
-		default: throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
+		case 'ArrayExpression':
+			return parseArrayExpression(ctx, unknownNode as NodeArrayExpression, scope);
+		case 'AssignmentExpression':
+			return parseAssignmentExpression(ctx, unknownNode as NodeAssignmentExpression, scope);
+		case 'AwaitExpression':
+			return parseAwaitExpression(ctx, unknownNode as NodeAwaitExpression, scope);
+		case 'BinaryExpression':
+			return parseBinaryExpression(ctx, unknownNode as NodeBinaryExpression, scope);
+		case 'BlockStatement':
+			return parseBlockStatement(ctx, unknownNode as NodeBlockStatement, scope);
+		case 'CallExpression':
+			return parseCallExpression(ctx, unknownNode as NodeCallExpression, scope);
+		case 'ConditionalExpression':
+			return parseConditionalExpression(ctx, unknownNode as NodeConditionalExpression, scope);
+		case 'EmptyStatement':
+			return parseEmptyStatement();
+		case 'ExpressionStatement':
+			return parseExpressionStatement(ctx, unknownNode as NodeExpressionStatement, scope);
+		case 'Identifier':
+			return parseIdentifier(ctx, unknownNode as NodeIdentifier, scope);
+		case 'IfStatement':
+			return parseIfStatement(ctx, unknownNode as NodeIfStatement, scope);
+		case 'Literal':
+			return parseLiteral(ctx, unknownNode as NodeLiteral);
+		case 'MemberExpression':
+			return parseMemberExpression(ctx, unknownNode as NodeMemberExpression, scope);
+		case 'NewExpression':
+			return parseNewExpression(ctx, unknownNode as NodeNewExpression, scope);
+		case 'ObjectExpression':
+			return parseObjectExpression(ctx, unknownNode as NodeObjectExpression, scope);
+		case 'Program':
+			return parseProgram(ctx, unknownNode as NodeProgram, scope);
+		case 'SpreadElement':
+			return parseSpreadElement(ctx, unknownNode as NodeSpreadElement, scope);
+		case 'TemplateElement':
+			return parseTemplateElement(ctx, unknownNode as NodeTemplateElement);
+		case 'TemplateLiteral':
+			return parseTemplateLiteral(ctx, unknownNode as NodeTemplateLiteral, scope);
+		case 'ThrowStatement':
+			return parseThrowStatement(ctx, unknownNode as NodeThrowStatement, scope);
+		case 'TryStatement':
+			return parseTryStatement(ctx, unknownNode as NodeTryStatement, scope);
+		case 'UnaryExpression':
+			return parseUnaryExpression(ctx, unknownNode as NodeUnaryExpression, scope);
+		case 'VariableDeclaration':
+			return parseVariableDeclaration(ctx, unknownNode as NodeVariableDeclaration, scope);
+		case 'VariableDeclarator':
+			return parseVariableDeclarator(ctx, unknownNode as NodeVariableDeclarator, scope);
+		default:
+			throw new CompilationParseError(ctx.code, node.start, 'Unsupported feature');
 	}
 }
 
@@ -201,17 +253,21 @@ function parseTemplateElement(_: EvaluatorContext, node: NodeTemplateElement): s
 }
 
 async function parseTemplateLiteral(ctx: EvaluatorContext, node: NodeTemplateLiteral, scope: Scope): Promise<string> {
-	return (await Promise.all(node.expressions.concat(node.quasis)
-		.sort((a, b) => a.start - b.start)
-		.map(element => parseNode(ctx, element, scope))))
-		.join('');
+	return (
+		await Promise.all(
+			node.expressions
+				.concat(node.quasis)
+				.sort((a, b) => a.start - b.start)
+				.map((element) => parseNode(ctx, element, scope))
+		)
+	).join('');
 }
 
 async function parseArrayExpression(ctx: EvaluatorContext, node: NodeArrayExpression, scope: Scope): Promise<Array<unknown>> {
 	const array: unknown[] = [];
 	for (const element of node.elements) {
 		ctx.allowSpread = true;
-		if (element.type === 'SpreadElement') array.push(...await parseSpreadElement(ctx, element as NodeSpreadElement, scope));
+		if (element.type === 'SpreadElement') array.push(...(await parseSpreadElement(ctx, element as NodeSpreadElement, scope)));
 		else array.push(await parseNode(ctx, element, scope));
 	}
 	ctx.allowSpread = false;
@@ -221,7 +277,7 @@ async function parseArrayExpression(ctx: EvaluatorContext, node: NodeArrayExpres
 async function parseObjectExpression(ctx: EvaluatorContext, node: NodeObjectExpression, scope: Scope): Promise<unknown> {
 	const entries: Record<string, unknown>[] = [];
 	for (const property of node.properties) {
-		const key = await parseNode(ctx, property.key, scope) as PropertyKey;
+		const key = (await parseNode(ctx, property.key, scope)) as PropertyKey;
 		const value = await parseNode(ctx, property.value, scope);
 		entries.push({ [key]: value });
 	}
@@ -230,11 +286,7 @@ async function parseObjectExpression(ctx: EvaluatorContext, node: NodeObjectExpr
 
 async function parseAssignmentExpression(ctx: EvaluatorContext, node: NodeAssignmentExpression, scope: Scope): Promise<unknown> {
 	const { name } = node.left as NodeIdentifier;
-	const type = scope && scope.has(name)
-		? ScopeType.Local
-		: ctx.identifiers.has(name)
-			? ScopeType.Global
-			: ScopeType.None;
+	const type = scope && scope.has(name) ? ScopeType.Local : ctx.identifiers.has(name) ? ScopeType.Global : ScopeType.None;
 
 	if (type === ScopeType.None) throw new UnknownIdentifier(ctx.code, node.start, name);
 
@@ -265,7 +317,7 @@ async function parseBlockStatement(ctx: EvaluatorContext, node: NodeBlockStateme
 async function parseCallExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<unknown> {
 	const member = await parseNode(ctx, node.callee, scope);
 	if (typeof member !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Tried to call a non-function');
-	const args = await Promise.all(node.arguments.map(arg => parseNode(ctx, arg, scope)));
+	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return member(...args) as unknown;
 }
 
@@ -282,9 +334,9 @@ async function parseConditionalExpression(ctx: EvaluatorContext, node: NodeCondi
 }
 
 async function parseNewExpression(ctx: EvaluatorContext, node: NodeNewExpression, scope: Scope): Promise<unknown> {
-	const ctor = await parseNode(ctx, node.callee, scope) as new (...args: unknown[]) => unknown;
+	const ctor = (await parseNode(ctx, node.callee, scope)) as new (...args: unknown[]) => unknown;
 	if (typeof ctor !== 'function') throw new CompilationParseError(ctx.code, node.callee.start, 'Constructor is not a function');
-	const args = await Promise.all(node.arguments.map(arg => parseNode(ctx, arg, scope)));
+	const args = await Promise.all(node.arguments.map((arg) => parseNode(ctx, arg, scope)));
 	return new ctor(...args);
 }
 
@@ -298,7 +350,9 @@ function parseExpressionStatement(ctx: EvaluatorContext, node: NodeExpressionSta
 
 async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpression, scope: Scope): Promise<unknown> {
 	const object = await parseNode(ctx, node.object, scope);
-	const propertyValue = (node.property.type === 'Identifier' ? (node.property as NodeIdentifier).name : await parseNode(ctx, node.property, scope)) as string;
+	const propertyValue = (node.property.type === 'Identifier'
+		? (node.property as NodeIdentifier).name
+		: await parseNode(ctx, node.property, scope)) as string;
 	let property: unknown = kUnset;
 
 	if (node.computed && node.property.type !== 'Literal') {
@@ -318,7 +372,7 @@ async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpr
 	if (!Reflect.has(O, K)) throw new InternalError(new MissingPropertyError(ctx.code, node.property.start, K));
 
 	const value = Reflect.get(O, K) as unknown;
-	return typeof value === 'function' ? value.bind(object) as unknown : value;
+	return typeof value === 'function' ? (value.bind(object) as unknown) : value;
 }
 
 async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariableDeclaration, scope: Scope) {
@@ -326,7 +380,8 @@ async function parseVariableDeclaration(ctx: EvaluatorContext, node: NodeVariabl
 }
 
 async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariableDeclarator, scope: Scope) {
-	if (ctx.identifiers.has(node.id.name) || (scope && scope.has(node.id.name))) throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
+	if (ctx.identifiers.has(node.id.name) || (scope && scope.has(node.id.name)))
+		throw new AlreadyDeclaredIdentifier(ctx.code, node.id.start, node.id.name);
 	const value = node.init ? await parseNode(ctx, node.init, scope) : undefined;
 	if (scope) scope.set(node.id.name, value);
 	else ctx.identifiers.set(node.id.name, value);
@@ -337,7 +392,7 @@ async function parseVariableDeclarator(ctx: EvaluatorContext, node: NodeVariable
 // }
 
 async function parseThrowStatement(ctx: EvaluatorContext, node: NodeThrowStatement, scope: Scope) {
-	throw new InternalError(await parseNode(ctx, node.argument, scope) as Error);
+	throw new InternalError((await parseNode(ctx, node.argument, scope)) as Error);
 }
 
 async function parseTryStatement(ctx: EvaluatorContext, node: NodeTryStatement, scope: Scope) {

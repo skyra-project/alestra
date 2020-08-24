@@ -4,7 +4,6 @@ import { AlestraClient } from '../AlestraClient';
 import { IPCMonitor } from './IPCMonitor';
 
 export class IPCMonitorStore extends Store<IPCMonitor> {
-
 	public constructor(client: AlestraClient) {
 		super(client, 'ipcMonitors', IPCMonitor as Constructor<IPCMonitor>);
 	}
@@ -30,5 +29,4 @@ export class IPCMonitorStore extends Store<IPCMonitor> {
 			message.reply([0, error]);
 		}
 	}
-
 }

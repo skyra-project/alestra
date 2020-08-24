@@ -22,7 +22,6 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	flagSupport: true
 })
 export default class extends Command {
-
 	public async run(message: Message, [code]: [string]) {
 		code = this.parseCodeblock(code);
 		const sw = new Stopwatch(5);
@@ -35,18 +34,23 @@ export default class extends Command {
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
-				return message.reply(async mb => mb
-					.setContent(`\`✔\` \`⏱ ${sw}\``)
-					.addFile(await new Attachment()
-						.setName('output.png')
-						.setFile(output as Buffer)
-						.resolve()));
+				return message.reply(async (mb) =>
+					mb.setContent(`\`✔\` \`⏱ ${sw}\``).addFile(
+						await new Attachment()
+							.setName('output.png')
+							.setFile(output as Buffer)
+							.resolve()
+					)
+				);
 			}
 
-			return message.reply(mb => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
+			return message.reply((mb) => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
 		} catch (error) {
 			if (sw.running) sw.stop();
-			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', 'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error)}`;
+			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock(
+				'',
+				'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error
+			)}`;
 		}
 	}
 
@@ -67,18 +71,18 @@ export default class extends Command {
 
 		const member = message.member
 			? Object.freeze({
-				id: message.author.id,
-				user: author,
-				nick: message.member.nick
-			})
+					id: message.author.id,
+					user: author,
+					nick: message.member.nick
+			  })
 			: null;
 
 		const guild = message.guild
 			? Object.freeze({
-				id: message.guild.id,
-				name: message.guild.name,
-				icon: message.guild.icon
-			})
+					id: message.guild.id,
+					name: message.guild.name,
+					icon: message.guild.icon
+			  })
 			: null;
 
 		return Object.freeze({
@@ -94,19 +98,18 @@ export default class extends Command {
 		const clientUser = this.client.user;
 		const user = clientUser
 			? Object.freeze({
-				id: clientUser.id,
-				avatar: clientUser.avatar,
-				avatarURL: clientUser.avatarURL.bind(clientUser),
-				displayAvatarURL: clientUser.displayAvatarURL.bind(clientUser),
-				username: clientUser.username,
-				discriminator: clientUser.discriminator,
-				bot: clientUser.bot
-			})
+					id: clientUser.id,
+					avatar: clientUser.avatar,
+					avatarURL: clientUser.avatarURL.bind(clientUser),
+					displayAvatarURL: clientUser.displayAvatarURL.bind(clientUser),
+					username: clientUser.username,
+					discriminator: clientUser.discriminator,
+					bot: clientUser.bot
+			  })
 			: null;
 
 		return Object.freeze({
 			user
 		});
 	}
-
 }

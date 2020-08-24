@@ -6,10 +6,11 @@ export const DEV = 'DEV' in process.env ? process.env.DEV === 'true' : !('PM2_HO
 export const EVLYN_PORT = 3100;
 
 export type DeepPartial<T> = {
-	[P in keyof T]?:
-	T[P] extends Array<infer U> ? Array<DeepPartial<U>> :
-		T[P] extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> :
-			DeepPartial<T[P]>
+	[P in keyof T]?: T[P] extends Array<infer U>
+		? Array<DeepPartial<U>>
+		: T[P] extends ReadonlyArray<infer U>
+		? ReadonlyArray<DeepPartial<U>>
+		: DeepPartial<T[P]>;
 };
 
 export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {

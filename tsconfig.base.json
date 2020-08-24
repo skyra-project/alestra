@@ -1,6 +1,7 @@
 {
 	"extends": "@skyra/eslint-config",
 	"compilerOptions": {
-		"target": "ES2019"
+		"target": "ESNext",
+		"useDefineForClassFields": true
 	}
 }

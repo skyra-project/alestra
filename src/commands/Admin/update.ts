@@ -1,11 +1,11 @@
 import type { Message } from '@klasa/core';
 import { codeBlock, exec, sleep } from '@klasa/utils';
+import { cutText } from '@sapphire/utilities';
 import { ApplyOptions } from '@skyra/decorators';
 import { remove } from 'fs-nextra';
 import { Command, CommandOptions } from 'klasa';
 import { resolve } from 'path';
 import { Emojis, rootFolder } from '../../lib/util/constants';
-import { cutText } from '../../lib/util/util';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['pull'],
@@ -15,7 +15,6 @@ import { cutText } from '../../lib/util/util';
 	usage: '[branch:string]'
 })
 export default class extends Command {
-
 	public async run(message: Message, [branch = 'main']: [string?]) {
 		await this.fetch(message, branch);
 		await this.updateDependencies(message);
@@ -27,20 +26,20 @@ export default class extends Command {
 	private async compile(message: Message) {
 		const { stderr, code } = await this.exec('yarn build');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully compiled.`));
+		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully compiled.`));
 	}
 
 	private async cleanDist(message: Message) {
 		if (message.flagArgs.fullRebuild) {
 			await remove(resolve(rootFolder, 'dist'));
-			return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully cleaned old dist directory.`));
+			return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully cleaned old dist directory.`));
 		}
 	}
 
 	private async updateDependencies(message: Message) {
 		const { stderr, code } = await this.exec('yarn install --frozen-lockfile');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Successfully updated dependencies.`));
+		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully updated dependencies.`));
 	}
 
 	private async fetch(message: Message, branch: string) {
@@ -53,7 +52,7 @@ export default class extends Command {
 		// If it was not a successful pull, return the output
 		if (!this.isSuccessfulPull(stdout)) {
 			// If the pull failed because it was in a different branch, run checkout
-			if (!await this.isCurrentBranch(branch)) {
+			if (!(await this.isCurrentBranch(branch))) {
 				return this.checkout(message, branch);
 			}
 
@@ -62,24 +61,30 @@ export default class extends Command {
 		}
 
 		// For all other cases, return the original output
-		return message.reply(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))));
+		return message.reply((mb) =>
+			mb.setContent(
+				codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))
+			)
+		);
 	}
 
 	private async stash(message: Message) {
-		await message.reply(mb => mb.setContent('Unsuccessful pull, stashing...'));
+		await message.reply((mb) => mb.setContent('Unsuccessful pull, stashing...'));
 		await sleep(1000);
 		const { stdout, stderr } = await this.exec(`git stash`);
 		if (!this.isSuccessfulStash(stdout + stderr)) {
 			throw `Unsuccessful pull, stashing:\n\n${codeBlock('prolog', [stdout || '✔', stderr || '✔'].join('\n-=-=-=-\n'))}`;
 		}
 
-		return message.reply(mb => mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n'))));
+		return message.reply((mb) =>
+			mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n')))
+		);
 	}
 
 	private async checkout(message: Message, branch: string) {
-		await message.reply(mb => mb.setContent(`Switching to ${branch}...`));
+		await message.reply((mb) => mb.setContent(`Switching to ${branch}...`));
 		await this.exec(`git checkout ${branch}`);
-		return message.reply(mb => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
+		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
 	}
 
 	private async isCurrentBranch(branch: string) {
@@ -107,5 +112,4 @@ export default class extends Command {
 			return { stdout: '', stderr: (error as Error).message, code: ((error as Error & { code: number }).code ?? 1) as number };
 		}
 	}
-
 }
