@@ -1,10 +1,4 @@
 /* eslint-disable func-call-spacing */
-import { Parser } from 'acorn';
-import { Image, loadImage } from 'canvas';
-import * as CanvasConstructor from 'canvas-constructor';
-import { default as _fetch } from 'node-fetch';
-import { extname } from 'path';
-import { URL } from 'url';
 import {
 	AlreadyDeclaredIdentifier,
 	CompilationParseError,
@@ -12,7 +6,13 @@ import {
 	SandboxError,
 	SandboxPropertyError,
 	UnknownIdentifier
-} from '../Util/ValidateError';
+} from '@lib/Canvas/Util/ValidateError';
+import { Parser } from 'acorn';
+import { Image, loadImage } from 'canvas';
+import * as CanvasConstructor from 'canvas-constructor';
+import { default as _fetch } from 'node-fetch';
+import { extname } from 'path';
+import { URL } from 'url';
 
 function* filter<T>(object: Record<string, T>, keys: readonly string[]) {
 	for (const [key, value] of Object.entries<T>(object)) {

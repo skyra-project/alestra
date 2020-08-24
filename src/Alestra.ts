@@ -1,8 +1,8 @@
 import 'module-alias/register';
-import { inspect } from 'util';
-import { CLIENT_OPTIONS, TOKEN, EVLYN_PORT, DEV } from './config';
-import { AlestraClient } from './lib/AlestraClient';
+import { AlestraClient } from '@lib/AlestraClient';
+import { CLIENT_OPTIONS, DEV, EVLYN_PORT, TOKEN } from '@root/config';
 import { KlasaClientOptions } from 'klasa';
+import { inspect } from 'util';
 inspect.defaultOptions.depth = 1;
 
 AlestraClient.defaultGuildSchema.add('supportChannels', 'TextChannel', { array: true });

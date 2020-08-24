@@ -1,8 +1,8 @@
 import { Colors } from '@klasa/console';
 import { mergeDefault } from '@klasa/utils';
+import { IPCMonitorStore } from '@lib/structures/IPCMonitorStore';
 import { KlasaClient, KlasaClientOptions } from 'klasa';
 import { Client as VezaClient } from 'veza';
-import { IPCMonitorStore } from './structures/IPCMonitorStore';
 
 const g = new Colors({ text: 'green' }).format('[IPC   ]');
 const y = new Colors({ text: 'yellow' }).format('[IPC   ]');
@@ -32,15 +32,5 @@ export class AlestraClient extends KlasaClient {
 			.on('message', this.ipcMonitors.run.bind(this.ipcMonitors));
 
 		if (this.options.dev) this.permissionLevels.add(0, ({ author, client }) => client.options.owners.includes(author!.id), { break: true });
-	}
-}
-
-declare module '@klasa/core/dist/src/lib/client/Client' {
-	interface Client {
-		ipcMonitors: IPCMonitorStore;
-		ipc: VezaClient;
-	}
-	interface ClientOptions {
-		dev?: boolean;
 	}
 }

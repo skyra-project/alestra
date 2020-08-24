@@ -1,7 +1,7 @@
-import { KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay } from 'klasa';
-import { checkErrors, CODEBLOCK_REGEXP } from '../lib/Linter/Linter';
-import { GuildChannel, Permissions, Embed } from '@klasa/core';
+import { Embed, GuildChannel, Permissions } from '@klasa/core';
 import { codeBlock } from '@klasa/utils';
+import { checkErrors, CODEBLOCK_REGEXP } from '@lib/Linter/Linter';
+import { KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay } from 'klasa';
 
 export default class Monitor extends KlasaMonitor {
 	private readonly handlers = new Map<string, { handler: ReactionHandler; message: KlasaMessage }>();

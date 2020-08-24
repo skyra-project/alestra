@@ -1,8 +1,8 @@
-import { Command, CommandOptions } from 'klasa';
-import { exec, codeBlock } from '@klasa/utils';
 import { Attachment, Message } from '@klasa/core';
+import { codeBlock, exec } from '@klasa/utils';
 import { ApplyOptions } from '@skyra/decorators';
-import { fetch, FetchMethods, FetchResultTypes } from '../../lib/util/util';
+import { fetch, FetchMethods, FetchResultTypes } from '@utils/util';
+import { Command, CommandOptions } from 'klasa';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['execute'],

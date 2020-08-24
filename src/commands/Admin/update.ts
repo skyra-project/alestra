@@ -2,10 +2,10 @@ import type { Message } from '@klasa/core';
 import { codeBlock, exec, sleep } from '@klasa/utils';
 import { cutText } from '@sapphire/utilities';
 import { ApplyOptions } from '@skyra/decorators';
+import { Emojis, rootFolder } from '@utils/constants';
 import { remove } from 'fs-nextra';
 import { Command, CommandOptions } from 'klasa';
 import { resolve } from 'path';
-import { Emojis, rootFolder } from '../../lib/util/constants';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['pull'],

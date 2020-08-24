@@ -1,6 +1,6 @@
-import { Store, Constructor } from '@klasa/core';
+import { Constructor, Store } from '@klasa/core';
+import { AlestraClient } from '@lib/AlestraClient';
 import { NodeMessage } from 'veza';
-import { AlestraClient } from '../AlestraClient';
 import { IPCMonitor } from './IPCMonitor';
 
 export class IPCMonitorStore extends Store<IPCMonitor> {

@@ -1,12 +1,13 @@
+import { Attachment, Message, Permissions } from '@klasa/core';
+import { ChannelType } from '@klasa/dapi-types';
+import { Stopwatch } from '@klasa/stopwatch';
+import { codeBlock } from '@klasa/utils';
+import { evaluate } from '@lib/Canvas/Parser/Evaluator';
 import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
 import { Command, CommandOptions } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
-import { evaluate } from '../../lib/Canvas/Parser/Evaluator';
-import { Message, Attachment, Permissions } from '@klasa/core';
-import { Stopwatch } from '@klasa/stopwatch';
-import { codeBlock } from '@klasa/utils';
 
 const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true, checkJs: true, target: ScriptTarget.ESNext } };
 
@@ -17,7 +18,7 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	cooldown: 5,
 	description: 'Execute a sandboxed subset of JavaScript',
 	requiredPermissions: [Permissions.FLAGS.ATTACH_FILES],
-	runIn: [0],
+	runIn: [ChannelType.GuildText, ChannelType.GuildNews, ChannelType.GuildStore],
 	usage: '<code:string>',
 	flagSupport: true
 })
