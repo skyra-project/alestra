@@ -5,7 +5,7 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Debugger",
-			"args": ["${workspaceFolder}/dist/Skyra.js"],
+			"args": ["${workspaceFolder}/dist/Alestra.js"],
 			"protocol": "inspector",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
