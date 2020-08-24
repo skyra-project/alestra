@@ -3,9 +3,9 @@ import { ChannelType } from '@klasa/dapi-types';
 import { Stopwatch } from '@klasa/stopwatch';
 import { codeBlock } from '@klasa/utils';
 import { evaluate } from '@lib/Canvas/Parser/Evaluator';
+import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
 import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
-import { Command, CommandOptions } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 
@@ -13,7 +13,7 @@ const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true,
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<AlestraCommandOptions>({
 	bucket: 1,
 	cooldown: 5,
 	description: 'Execute a sandboxed subset of JavaScript',
@@ -22,7 +22,7 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	usage: '<code:string>',
 	flagSupport: true
 })
-export default class extends Command {
+export default class extends AlestraCommand {
 	public async run(message: Message, [code]: [string]) {
 		code = this.parseCodeblock(code);
 		const sw = new Stopwatch(5);

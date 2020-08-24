@@ -19,7 +19,3 @@ if (!DEV) {
 		client.console.error(error);
 	});
 }
-
-declare module 'klasa' {
-	export interface PieceOptions {}
-}

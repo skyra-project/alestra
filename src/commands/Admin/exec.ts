@@ -1,19 +1,20 @@
 import { Attachment, Message } from '@klasa/core';
 import { codeBlock, exec } from '@klasa/utils';
+import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
+import { PermissionLevels } from '@lib/types/Enums';
 import { ApplyOptions } from '@skyra/decorators';
 import { fetch, FetchMethods, FetchResultTypes } from '@utils/util';
-import { Command, CommandOptions } from 'klasa';
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<AlestraCommandOptions>({
 	aliases: ['execute'],
 	description: (language) => language.get('COMMAND_EXEC_DESCRIPTION'),
 	extendedHelp: (language) => language.get('COMMAND_EXEC_EXTENDED'),
 	guarded: true,
-	permissionLevel: 10,
+	permissionLevel: PermissionLevels.BotOwner,
 	usage: '<expression:string>',
 	flagSupport: true
 })
-export default class extends Command {
+export default class extends AlestraCommand {
 	public async run(message: Message, [input]: [string]) {
 		const result = await exec(input, { timeout: 'timeout' in message.flagArgs ? Number(message.flagArgs.timeout) : 60000 }).catch((error) => ({
 			stdout: null,

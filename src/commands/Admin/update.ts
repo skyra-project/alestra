@@ -1,20 +1,21 @@
 import type { Message } from '@klasa/core';
 import { codeBlock, exec, sleep } from '@klasa/utils';
+import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
+import { PermissionLevels } from '@lib/types/Enums';
 import { cutText } from '@sapphire/utilities';
 import { ApplyOptions } from '@skyra/decorators';
 import { Emojis, rootFolder } from '@utils/constants';
 import { remove } from 'fs-nextra';
-import { Command, CommandOptions } from 'klasa';
 import { resolve } from 'path';
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<AlestraCommandOptions>({
 	aliases: ['pull'],
 	description: 'Update the bot',
 	guarded: true,
-	permissionLevel: 10,
+	permissionLevel: PermissionLevels.BotOwner,
 	usage: '[branch:string]'
 })
-export default class extends Command {
+export default class extends AlestraCommand {
 	public async run(message: Message, [branch = 'main']: [string?]) {
 		await this.fetch(message, branch);
 		await this.updateDependencies(message);
