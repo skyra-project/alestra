@@ -1,28 +1,25 @@
-import { KlasaClientOptions } from 'klasa';
+import { Client, PresenceBuilder } from '@klasa/core';
+import { ActivityType } from '@klasa/dapi-types';
 import { Intents, IntentsFlags } from '@klasa/ws';
+import { DeepPartial } from '@sapphire/utilities';
+import { KlasaClientOptions } from 'klasa';
 
-// eslint-disable-next-line no-process-env
-export const DEV = 'DEV' in process.env ? process.env.DEV === 'true' : !('PM2_HOME' in process.env);
+export const DEV = Reflect.has(process.env, 'DEV') ? process.env.DEV === 'true' : !('PM2_HOME' in process.env);
 export const EVLYN_PORT = 3100;
-
-export type DeepPartial<T> = {
-	[P in keyof T]?: T[P] extends Array<infer U>
-		? Array<DeepPartial<U>>
-		: T[P] extends ReadonlyArray<infer U>
-		? ReadonlyArray<DeepPartial<U>>
-		: DeepPartial<T[P]>;
-};
+export const EVLYN_HOST = 'http://evelyn';
 
 export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	commands: {
 		editing: true,
+		logging: true,
 		messageLifetime: 200,
 		prefix: DEV ? 'ad.' : 'a.',
 		prefixCaseInsensitive: true,
 		slowmode: 1000,
 		slowmodeAggressive: true,
 		typing: true,
-		prompts: { limit: 5 }
+		prompts: { limit: 5 },
+		noPrefixDM: true
 	},
 	console: { useColor: true, utc: true },
 	pieces: { createFolders: false },
@@ -30,10 +27,14 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	consoleEvents: { verbose: true },
 	dev: DEV,
 	owners: [''],
+	readyMessage: (client: Client) =>
+		`Alestra v4.0.0 ready! [${client.user!.tag}] [ ${client.guilds.size} [G]] [ ${client.guilds
+			.reduce((a, b) => a + (b.memberCount ?? 0), 0)
+			.toLocaleString()} [U]].`,
 	ws: {
 		intents: new Intents([IntentsFlags.GuildMessages, IntentsFlags.Guilds]),
 		additionalOptions: {
-			presence: { status: 'online', activity: { type: 'LISTENING', name: 'Alestra, help' } }
+			presence: new PresenceBuilder().setGame((pg) => pg.setType(ActivityType.Listening).setName(`a${DEV ? 'd' : ''}.help`))
 		}
 	}
 };

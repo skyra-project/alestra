@@ -5,10 +5,11 @@
 	"main": "dist/Alestra.js",
 	"scripts": {
 		"docker:build": "yarn build && docker build -t skyrabot/alestra .",
-		"docker:run": "docker run -d -it skyrabot/alestra",
-		"docker:logs": "docker logs skyrabot/alestra -f",
+		"docker:run": "docker run --rm -d -it --name alestra skyrabot/alestra",
+		"docker:logs": "docker logs alestra -f",
 		"docker:restart": "docker container rm -f alestra && yarn docker:run",
 		"docker:stop": "docker container stop alestra",
+		"docker:dev": "yarn docker:build && yarn docker:run && yarn docker:logs",
 		"start": "node dist/Alestra.js",
 		"lint": "eslint --ext ts src --fix",
 		"format": "prettier --write --loglevel=warn src/**/*.ts",

@@ -30,7 +30,5 @@ export class AlestraClient extends KlasaClient {
 				this.console.error(`${r} Error from ${client.name}`, error);
 			})
 			.on('message', this.ipcMonitors.run.bind(this.ipcMonitors));
-
-		// if (this.options.dev) this.permissionLevels.add(0, ({ author, client }) => client.options.owners.includes(author!.id), { break: true });
 	}
 }
