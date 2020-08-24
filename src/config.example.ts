@@ -7,13 +7,14 @@ import { KlasaClientOptions } from 'klasa';
 export const DEV = Reflect.has(process.env, 'DEV') ? process.env.DEV === 'true' : !('PM2_HOME' in process.env);
 export const EVLYN_PORT = 3100;
 export const EVLYN_HOST = 'http://evelyn';
+export const PREFIX = DEV ? 'ad.' : 'a.';
 
 export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	commands: {
 		editing: true,
 		logging: true,
 		messageLifetime: 200,
-		prefix: DEV ? 'ad.' : 'a.',
+		prefix: PREFIX,
 		prefixCaseInsensitive: true,
 		slowmode: 1000,
 		slowmodeAggressive: true,

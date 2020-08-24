@@ -30,16 +30,12 @@
 		"helper",
 		"klasa"
 	],
-	"contributors": [
-		"kyranet"
-	],
 	"private": true,
 	"author": "kyranet <kyradiscord@gmail.com>",
 	"license": "Apache-2.0",
 	"bugs": {
 		"url": "https://github.com/skyra-project/alestra/issues"
 	},
-	"homepage": "https://github.com/skyra-project/alestra#readme",
 	"dependencies": {
 		"@klasa/console": "^0.0.3",
 		"@klasa/core": "github:dirigeants/core#build",
@@ -57,6 +53,7 @@
 		"klasa": "github:dirigeants/klasa#build",
 		"module-alias": "^2.2.2",
 		"node-fetch": "^2.6.0",
+		"reflect-metadata": "^0.1.13",
 		"veza": "^1.1.0",
 		"zlib-sync": "^0.1.7"
 	},

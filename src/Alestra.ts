@@ -1,4 +1,5 @@
 import 'module-alias/register';
+import 'reflect-metadata';
 import { AlestraClient } from '@lib/AlestraClient';
 import { CLIENT_OPTIONS, DEV, EVLYN_HOST, EVLYN_PORT, TOKEN } from '@root/config';
 import { KlasaClientOptions } from 'klasa';
