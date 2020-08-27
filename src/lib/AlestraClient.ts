@@ -1,5 +1,5 @@
 import { Colors } from '@klasa/console';
-import { mergeDefault } from '@klasa/utils';
+import { mergeDefault } from '@sapphire/utilities';
 import { IPCMonitorStore } from '@lib/structures/IPCMonitorStore';
 import { KlasaClient, KlasaClientOptions } from 'klasa';
 import { Client as VezaClient } from 'veza';

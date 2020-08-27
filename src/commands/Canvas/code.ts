@@ -1,7 +1,7 @@
 import { Attachment, Message, Permissions } from '@klasa/core';
 import { ChannelType } from '@klasa/dapi-types';
 import { Stopwatch } from '@klasa/stopwatch';
-import { codeBlock } from '@klasa/utils';
+import { codeBlock } from '@sapphire/utilities';
 import { evaluate } from '@lib/Canvas/Parser/Evaluator';
 import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
 import { ApplyOptions } from '@skyra/decorators';

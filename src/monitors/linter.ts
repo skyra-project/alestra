@@ -1,5 +1,5 @@
 import { Embed, GuildChannel, Permissions } from '@klasa/core';
-import { codeBlock } from '@klasa/utils';
+import { codeBlock } from '@sapphire/utilities';
 import { checkErrors, CODEBLOCK_REGEXP } from '@lib/Linter/Linter';
 import { KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay } from 'klasa';
 

@@ -1,10 +1,11 @@
 import type { Message } from '@klasa/core';
-import { codeBlock, exec, sleep } from '@klasa/utils';
 import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
 import { PermissionLevels } from '@lib/types/Enums';
-import { cutText } from '@sapphire/utilities';
+import { codeBlock, cutText } from '@sapphire/utilities';
 import { ApplyOptions } from '@skyra/decorators';
 import { Emojis, rootFolder } from '@utils/constants';
+import { exec } from '@utils/exec';
+import { sleep } from '@utils/sleep';
 import { remove } from 'fs-nextra';
 import { resolve } from 'path';
 
