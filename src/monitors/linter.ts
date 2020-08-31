@@ -1,6 +1,7 @@
 import { Embed, GuildChannel, Permissions } from '@klasa/core';
-import { codeBlock } from '@sapphire/utilities';
+import { AlestraClient } from '@lib/AlestraClient';
 import { checkErrors, CODEBLOCK_REGEXP } from '@lib/Linter/Linter';
+import { codeBlock } from '@sapphire/utilities';
 import { KlasaMessage, Monitor as KlasaMonitor, MonitorStore, ReactionHandler, RichDisplay } from 'klasa';
 
 export default class Monitor extends KlasaMonitor {
@@ -13,7 +14,7 @@ export default class Monitor extends KlasaMonitor {
 			ignoreOthers: false,
 			ignoreEdits: false
 		});
-		this.dev = this.client.options.dev;
+		this.dev = (this.client as AlestraClient).dev;
 	}
 
 	public async run(message: KlasaMessage): Promise<void> {

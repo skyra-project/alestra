@@ -1,11 +1,12 @@
 import { Attachment, Message, Permissions } from '@klasa/core';
 import { ChannelType } from '@klasa/dapi-types';
 import { Stopwatch } from '@klasa/stopwatch';
-import { codeBlock } from '@sapphire/utilities';
 import { evaluate } from '@lib/Canvas/Parser/Evaluator';
 import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
+import { codeBlock } from '@sapphire/utilities';
 import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
+import { KlasaClientOptions } from 'klasa';
 import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
 import { inspect } from 'util';
 
@@ -50,7 +51,9 @@ export default class extends AlestraCommand {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock(
 				'',
-				'stack' in message.flags && this.client.options.owners.includes(message.author!.id) ? (error as Error).stack : error
+				'stack' in message.flags && ((this.client.options as unknown) as KlasaClientOptions).owners!.includes(message.author!.id)
+					? (error as Error).stack
+					: error
 			)}`;
 		}
 	}
