@@ -26,7 +26,6 @@ export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
 	pieces: { createFolders: false },
 	cache: { limits: { messages: 20 } },
 	consoleEvents: { verbose: true },
-	dev: DEV,
 	owners: [''],
 	readyMessage: (client: Client) =>
 		`Alestra v4.0.0 ready! [${client.user!.tag}] [ ${client.guilds.size} [G]] [ ${client.guilds
