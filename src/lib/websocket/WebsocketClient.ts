@@ -31,6 +31,7 @@ export class WebsocketClient {
 
 			switch (action) {
 				case MessageFromServerAction.Ping: {
+					this.#client.console.log('Received a ping');
 					const memoryUsage = process.memoryUsage();
 					this.sendJSON({
 						action: MessageFromClientAction.HeartBeat,
