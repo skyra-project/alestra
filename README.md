@@ -7,7 +7,7 @@ Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official ser
 
 ## Development Requirements
 
-- [`Node.js`]: To run the project.
+-   [`Node.js`]: To run the project.
 
 ## Set-Up
 
@@ -26,22 +26,22 @@ $ yarn pm2:start
 ```
 
 > **Note**: Before pushing to the repository, please run `yarn lint` so formatting stays consistent and there are no
-linter warnings.
+> linter warnings.
 
 ## Links
 
 **Alestra links**
 
-- [Support Server](https://join.skyra.pw)
-- [Patreon](https://www.patreon.com/kyranet)
+-   [Support Server](https://join.skyra.pw)
+-   [Patreon](https://donate.skyra.pw/patreon)
 
 **Framework links**
 
-- [Klasa's Website](https://klasa.js.org)
+-   [Klasa's Website](https://klasa.js.org)
 
 <!-- Link Dump -->
 
 [`canvas-constructor`]: https://github.com/kyranet/CanvasConstructor
 [cc-server]: https://discord.gg/taNgb9d
-[`Node.js`]: https://nodejs.org/en/download/current/
+[`node.js`]: https://nodejs.org/en/download/current/
 [`config.ts.example`]: /config.ts.example
