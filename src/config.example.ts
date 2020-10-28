@@ -6,7 +6,9 @@ export const ENABLE_EVLYN = !DEV;
 export const EVLYN_HOST = 'localhost';
 export const EVLYN_PORT = 3100;
 
+export const OWNERS: string[] = ['242043489611808769'];
 export const PREFIX = DEV ? 'ad.' : 'a.';
+export const VERSION = 'v5.0.0';
 
 export const CLIENT_OPTIONS: ClientOptions = {
 	defaultPrefix: PREFIX,
@@ -19,5 +21,4 @@ export const CLIENT_OPTIONS: ClientOptions = {
 	}
 };
 
-export const OWNERS: string[] = [];
 export const TOKEN = '';
