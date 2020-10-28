@@ -2,15 +2,13 @@ import 'module-alias/register';
 import 'reflect-metadata';
 import { AlestraClient } from '@lib/AlestraClient';
 import { CLIENT_OPTIONS, TOKEN } from '@root/config';
-import { KlasaClientOptions } from 'klasa';
 import { inspect } from 'util';
+import * as colorette from 'colorette';
+
 inspect.defaultOptions.depth = 1;
+colorette.options.enabled = true;
 
-AlestraClient.defaultGuildSchema.add('supportChannels', 'TextChannel', { array: true });
-
-const client = new AlestraClient(CLIENT_OPTIONS as KlasaClientOptions);
-client.token = TOKEN;
-
-client.connect().catch((error) => {
-	client.console.error(error);
+const client = new AlestraClient(CLIENT_OPTIONS);
+client.login(TOKEN).catch((error) => {
+	client.logger.error(error);
 });

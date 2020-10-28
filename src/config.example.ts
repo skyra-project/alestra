@@ -1,42 +1,23 @@
-import { Client, PresenceBuilder } from '@klasa/core';
-import { ActivityType } from '@klasa/dapi-types';
-import { Intents, IntentsFlags } from '@klasa/ws';
-import { DeepPartial } from '@sapphire/utilities';
-import { KlasaClientOptions } from 'klasa';
+import { ClientOptions, Intents } from 'discord.js';
 
-export const DEV = Reflect.has(process.env, 'DEV') ? process.env.DEV === 'true' : !('PM2_HOME' in process.env);
+// eslint-disable-next-line no-process-env
+export const DEV = 'DEV' in process.env ? process.env.DEV === 'true' : !('PM2_HOME' in process.env);
+export const ENABLE_EVLYN = !DEV;
+export const EVLYN_HOST = 'localhost';
 export const EVLYN_PORT = 3100;
-export const EVLYN_HOST = 'http://evelyn';
+
 export const PREFIX = DEV ? 'ad.' : 'a.';
 
-export const CLIENT_OPTIONS: DeepPartial<KlasaClientOptions> = {
-	commands: {
-		editing: true,
-		logging: true,
-		messageLifetime: 200,
-		prefix: PREFIX,
-		prefixCaseInsensitive: true,
-		slowmode: 1000,
-		slowmodeAggressive: true,
-		typing: true,
-		prompts: { limit: 5 },
-		noPrefixDM: true
-	},
-	console: { useColor: true, utc: true },
-	pieces: { createFolders: false },
-	cache: { limits: { messages: 20 } },
-	consoleEvents: { verbose: true },
-	owners: [''],
-	readyMessage: (client: Client) =>
-		`Alestra v4.0.0 ready! [${client.user!.tag}] [ ${client.guilds.size} [G]] [ ${client.guilds
-			.reduce((a, b) => a + (b.memberCount ?? 0), 0)
-			.toLocaleString()} [U]].`,
+export const CLIENT_OPTIONS: ClientOptions = {
+	defaultPrefix: PREFIX,
+	messageCacheLifetime: 120,
+	messageCacheMaxSize: 20,
+	messageEditHistoryMaxSize: 0,
+	presence: { status: 'online', activity: { type: 'LISTENING', name: `${PREFIX}help` } },
 	ws: {
-		intents: new Intents([IntentsFlags.GuildMessages, IntentsFlags.Guilds]),
-		additionalOptions: {
-			presence: new PresenceBuilder().setGame((pg) => pg.setType(ActivityType.Listening).setName(`a${DEV ? 'd' : ''}.help`))
-		}
+		intents: new Intents(['GUILD_MESSAGES', 'GUILDS'])
 	}
 };
 
+export const OWNERS: string[] = [];
 export const TOKEN = '';

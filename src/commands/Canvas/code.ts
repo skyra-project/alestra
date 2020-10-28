@@ -1,34 +1,23 @@
-import { Attachment, Message, Permissions } from '@klasa/core';
-import { ChannelType } from '@klasa/dapi-types';
 import { Stopwatch } from '@klasa/stopwatch';
 import { evaluate } from '@lib/Canvas/Parser/Evaluator';
-import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Args, Command, CommandOptions } from '@sapphire/framework';
 import { codeBlock } from '@sapphire/utilities';
-import { ApplyOptions } from '@skyra/decorators';
 import { Canvas } from 'canvas-constructor';
-import { KlasaClientOptions } from 'klasa';
-import { ScriptTarget, transpileModule, TranspileOptions } from 'typescript';
+import { Message, MessageAttachment } from 'discord.js';
 import { inspect } from 'util';
-
-const tsTranspileOptions: TranspileOptions = { compilerOptions: { allowJs: true, checkJs: true, target: ScriptTarget.ESNext } };
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
-@ApplyOptions<AlestraCommandOptions>({
-	bucket: 1,
-	cooldown: 5,
-	description: 'Execute a sandboxed subset of JavaScript',
-	requiredPermissions: [Permissions.FLAGS.ATTACH_FILES],
-	runIn: [ChannelType.GuildText, ChannelType.GuildNews, ChannelType.GuildStore],
-	usage: '<code:string>',
-	flagSupport: true
+@ApplyOptions<CommandOptions>({
+	description: 'Execute a sandboxed subset of JavaScript'
 })
-export default class extends AlestraCommand {
-	public async run(message: Message, [code]: [string]) {
-		code = this.parseCodeblock(code);
+export default class UserCommand extends Command {
+	public async run(message: Message, args: Args) {
+		const code = this.parseCodeblock(await args.rest('string'));
 		const sw = new Stopwatch(5);
 		try {
-			let output = await evaluate(message.flagArgs.ts ? transpileModule(code, tsTranspileOptions).outputText : code, [
+			let output = await evaluate(code, [
 				['message', this.createMessageMock(message)],
 				['client', this.createClientMock()]
 			]);
@@ -36,25 +25,14 @@ export default class extends AlestraCommand {
 			if (output instanceof Canvas) output = await output.toBufferAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
-				return message.reply(async (mb) =>
-					mb.setContent(`\`✔\` \`⏱ ${sw}\``).addFile(
-						await new Attachment()
-							.setName('output.png')
-							.setFile(output as Buffer)
-							.resolve()
-					)
-				);
+				const attachment = new MessageAttachment(output, 'output.png');
+				return message.channel.send(`\`✔\` \`⏱ ${sw}\``, attachment);
 			}
 
-			return message.reply((mb) => mb.setContent(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`));
+			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
-			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock(
-				'',
-				'stack' in message.flags && ((this.client.options as unknown) as KlasaClientOptions).owners!.includes(message.author!.id)
-					? (error as Error).stack
-					: error
-			)}`;
+			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', error)}`;
 		}
 	}
 
@@ -77,7 +55,7 @@ export default class extends AlestraCommand {
 			? Object.freeze({
 					id: message.author.id,
 					user: author,
-					nick: message.member.nick
+					nick: message.member.nickname
 			  })
 			: null;
 

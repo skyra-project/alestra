@@ -26,28 +26,24 @@
 		"canvas-constructor",
 		"canvas",
 		"helper",
-		"klasa"
+		"sapphire"
 	],
 	"private": true,
-	"author": "kyranet <kyradiscord@gmail.com>",
+	"author": "Antonio Román <kyradiscord@gmail.com>",
 	"license": "Apache-2.0",
 	"bugs": {
 		"url": "https://github.com/skyra-project/alestra/issues"
 	},
 	"dependencies": {
-		"@klasa/console": "^0.0.3",
-		"@klasa/core": "github:dirigeants/core#build",
 		"@klasa/stopwatch": "^0.0.1",
-		"@klasa/ws": "^0.0.14",
+		"@sapphire/decorators": "^1.0.1",
+		"@sapphire/framework": "github:sapphire-project/framework#build",
 		"@sapphire/utilities": "^1.0.0",
-		"@skyra/decorators": "^2.3.0",
 		"acorn": "^8.0.1",
-		"acorn-numeric-separator": "^0.3.6",
 		"canvas": "^2.6.1",
 		"canvas-constructor": "^4.1.0",
-		"eslint": "^7.8.1",
-		"fs-nextra": "^0.5.1",
-		"klasa": "github:dirigeants/klasa#build",
+		"colorette": "^1.2.1",
+		"discord.js": "^12.4.1",
 		"module-alias": "^2.2.2",
 		"node-fetch": "^2.6.1",
 		"reflect-metadata": "^0.1.13",
@@ -55,9 +51,8 @@
 		"zlib-sync": "^0.1.7"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^9.1.2",
-		"@commitlint/config-conventional": "^9.1.2",
-		"@klasa/dapi-types": "^0.3.0",
+		"@commitlint/cli": "^11.0.0",
+		"@commitlint/config-conventional": "^11.0.0",
 		"@skyra/eslint-config": "^5.3.3",
 		"@types/eslint": "^7.2.1",
 		"@types/node": "^14.10.0",
@@ -66,6 +61,8 @@
 		"@typescript-eslint/eslint-plugin": "^4.1.0",
 		"@typescript-eslint/parser": "^4.1.0",
 		"cz-conventional-changelog": "^3.3.0",
+		"discord-api-types": "^0.7.0",
+		"eslint": "^7.8.1",
 		"eslint-config-prettier": "^6.11.0",
 		"eslint-plugin-prettier": "^3.1.4",
 		"husky": "^4.3.0",
@@ -81,7 +78,6 @@
 	},
 	"resolutions": {
 		"chalk": "^4.1.0",
-		"fs-nextra": "^0.5.1",
 		"kind-of": "^6.0.3",
 		"lodash": "^4.17.20",
 		"minimist": "^1.2.2"
