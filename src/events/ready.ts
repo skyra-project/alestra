@@ -1,28 +1,29 @@
-import { VERSION } from '@root/config';
+import { DEV, VERSION } from '@root/config';
 import { Event } from '@sapphire/framework';
-import { green, red, yellow } from 'colorette';
+import { green, magenta, red, yellow } from 'colorette';
 
 const success = green('+');
 const failed = red('-');
+const logoColor = DEV ? magenta : yellow;
 
 export class UserEvent extends Event<'ready'> {
 	public run() {
 		this.client.logger.info(`
-${yellow(`         ¿        `)}       __      ___       _______   ________  ___________  _______        __
-${yellow(`        ▓▓¿       `)}      /""\\    |"  |     /"     "| /"       )("     _   ")/"      \\      /""\\
-${yellow(`       ▓▓▓▓Ç      `)}     /    \\   ||  |    (: ______)(:   \\___/  )__/  \\\\__/|:        |    /    \\
-${yellow(`      ▓▓╝╙▓▓Ç     `)}    /' /\\  \\  |:  |     \\/    |   \\___  \\       \\\\_ /   |_____/   )   /' /\\  \\
-${yellow(`     ▓▓╜  ╙▓▓╕    `)}   //  __'  \\  \\  |___  // ___)_   __/  \\\\      |.  |    //      /   //  __'  \\
-${yellow(`    á╣╛    └▓╣╕   `)}  /   /  \\\\  \\( \\_|:  \\(:      "| /" \\   :)     \\:  |   |:  __   \\  /   /  \\\\  \\
-${yellow(`   "▓╛  ▓▓⌐ "▓╜   `)} (___/    \\___)\\_______)\\_______)(_______/       \\__|   |__|  \\___)(___/    \\___)
-${yellow(`      ┌▓▓▓▓╕      `)} ${VERSION.padStart(80, ' ')}
-${yellow(`     ╓▓▓▓▓▓▓▄     `)} [${success}] Gateway
-${yellow(`    Æ▓▓▓┘└▓▓▓▓    `)} [${Reflect.get(this.client, 'websocket') ? success : failed}] Evlyn Bridge
-${yellow(`   ▓▓▓▓└  '▓▓▓▓,  `)}
-${yellow(` ,▓╣╣▓      ╚╣╣▓┐ `)}
-${yellow(` ╙▓▓▓W,     g▓▓▓▀ `)}
-${yellow(`   └▓▓▓▓¿,φ▓▓▓└   `)}
-${yellow(`     ,╚▓╣╣╣▓└     `)}
-${yellow(`        ╙╜,       `)}`);
+${logoColor(`         ¿        `)}       __      ___       _______   ________  ___________  _______        __
+${logoColor(`        ▓▓¿       `)}      /""\\    |"  |     /"     "| /"       )("     _   ")/"      \\      /""\\
+${logoColor(`       ▓▓▓▓Ç      `)}     /    \\   ||  |    (: ______)(:   \\___/  )__/  \\\\__/|:        |    /    \\
+${logoColor(`      ▓▓╝╙▓▓Ç     `)}    /' /\\  \\  |:  |     \\/    |   \\___  \\       \\\\_ /   |_____/   )   /' /\\  \\
+${logoColor(`     ▓▓╜  ╙▓▓╕    `)}   //  __'  \\  \\  |___  // ___)_   __/  \\\\      |.  |    //      /   //  __'  \\
+${logoColor(`    á╣╛    └▓╣╕   `)}  /   /  \\\\  \\( \\_|:  \\(:      "| /" \\   :)     \\:  |   |:  __   \\  /   /  \\\\  \\
+${logoColor(`   "▓╛  ▓▓⌐ "▓╜   `)} (___/    \\___)\\_______)\\_______)(_______/       \\__|   |__|  \\___)(___/    \\___)
+${logoColor(`      ┌▓▓▓▓╕      `)} ${VERSION.padStart(80, ' ')}
+${logoColor(`     ╓▓▓▓▓▓▓▄     `)} [${success}] Gateway
+${logoColor(`    Æ▓▓▓┘└▓▓▓▓    `)} [${Reflect.get(this.client, 'websocket') ? success : failed}] Evlyn Bridge
+${logoColor(`   ▓▓▓▓└  '▓▓▓▓,  `)}
+${logoColor(` ,▓╣╣▓      ╚╣╣▓┐ `)}
+${logoColor(` ╙▓▓▓W,     g▓▓▓▀ `)}
+${logoColor(`   └▓▓▓▓¿,φ▓▓▓└   `)}
+${logoColor(`     ,╚▓╣╣╣▓└     `)}${DEV ? ' DEVELOPMENT MODE' : ''}
+${logoColor(`        ╙╜,       `)}`);
 	}
 }
