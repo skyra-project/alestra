@@ -10,7 +10,7 @@ import { inspect } from 'util';
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
 @ApplyOptions<CommandOptions>({
-	description: 'Execute a sandboxed subset of JavaScript'
+	description: 'Execute a sandboxed subset of JavaScript.'
 })
 export default class UserCommand extends Command {
 	public async run(message: Message, args: Args) {

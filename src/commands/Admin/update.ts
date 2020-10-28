@@ -10,16 +10,16 @@ import { resolve } from 'path';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['pull'],
-	description: 'Update the bot',
+	description: 'Updates the bot.',
 	preconditions: ['OwnerOnly'],
-	strategyOptions: { flags: ['fullRebuild'] }
+	strategyOptions: { flags: ['clean'] }
 })
 export default class UserCommand extends Command {
 	public async run(message: Message, args: Args) {
 		const branch = await args.pick('string').catch(() => 'main');
 		await this.fetch(message, branch);
 		await this.updateDependencies(message);
-		if (args.getFlags('fullRebuild')) await this.cleanDist(message);
+		if (args.getFlags('clean')) await this.cleanDist(message);
 		await this.compile(message);
 	}
 

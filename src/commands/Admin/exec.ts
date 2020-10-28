@@ -7,7 +7,7 @@ import { Message, MessageAttachment } from 'discord.js';
 
 @ApplyOptions<CommandOptions>({
 	aliases: ['execute'],
-	description: 'COMMAND_EXEC_DESCRIPTION',
+	description: 'Executes a Bash command.',
 	preconditions: ['OwnerOnly'],
 	strategyOptions: { options: ['timeout'] }
 })

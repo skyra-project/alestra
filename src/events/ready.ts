@@ -1,11 +1,13 @@
 import { DEV, VERSION } from '@root/config';
-import { Event } from '@sapphire/framework';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Event, EventOptions } from '@sapphire/framework';
 import { green, magenta, red, yellow } from 'colorette';
 
 const success = green('+');
 const failed = red('-');
 const logoColor = DEV ? magenta : yellow;
 
+@ApplyOptions<EventOptions>({ once: true })
 export class UserEvent extends Event<'ready'> {
 	public run() {
 		this.client.logger.info(`
