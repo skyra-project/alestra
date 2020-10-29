@@ -1,47 +1,43 @@
-import type { Message } from '@klasa/core';
-import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
-import { PermissionLevels } from '@lib/types/Enums';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Args, Command, CommandOptions } from '@sapphire/framework';
 import { codeBlock, cutText } from '@sapphire/utilities';
-import { ApplyOptions } from '@skyra/decorators';
 import { Emojis, rootFolder } from '@utils/constants';
 import { exec } from '@utils/exec';
 import { sleep } from '@utils/sleep';
-import { remove } from 'fs-nextra';
+import type { Message } from 'discord.js';
+import { rm } from 'fs/promises';
 import { resolve } from 'path';
 
-@ApplyOptions<AlestraCommandOptions>({
+@ApplyOptions<CommandOptions>({
 	aliases: ['pull'],
-	description: 'Update the bot',
-	guarded: true,
-	permissionLevel: PermissionLevels.BotOwner,
-	usage: '[branch:string]'
+	description: 'Updates the bot.',
+	preconditions: ['OwnerOnly'],
+	strategyOptions: { flags: ['clean'] }
 })
-export default class extends AlestraCommand {
-	public async run(message: Message, [branch = 'main']: [string?]) {
+export default class UserCommand extends Command {
+	public async run(message: Message, args: Args) {
+		const branch = await args.pick('string').catch(() => 'main');
 		await this.fetch(message, branch);
 		await this.updateDependencies(message);
-		await this.cleanDist(message);
+		if (args.getFlags('clean')) await this.cleanDist(message);
 		await this.compile(message);
-		return message.responses;
 	}
 
 	private async compile(message: Message) {
 		const { stderr, code } = await this.exec('yarn build');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully compiled.`));
+		return message.channel.send(`${Emojis.GreenTick} Successfully compiled.`);
 	}
 
 	private async cleanDist(message: Message) {
-		if (message.flagArgs.fullRebuild) {
-			await remove(resolve(rootFolder, 'dist'));
-			return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully cleaned old dist directory.`));
-		}
+		await rm(resolve(rootFolder, 'dist'), { recursive: true, force: true });
+		return message.channel.send(`${Emojis.GreenTick} Successfully cleaned old dist directory.`);
 	}
 
 	private async updateDependencies(message: Message) {
 		const { stderr, code } = await this.exec('yarn install --frozen-lockfile');
 		if (code !== 0 && stderr.length) throw stderr.trim();
-		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Successfully updated dependencies.`));
+		return message.channel.send(`${Emojis.GreenTick} Successfully updated dependencies.`);
 	}
 
 	private async fetch(message: Message, branch: string) {
@@ -63,30 +59,26 @@ export default class extends AlestraCommand {
 		}
 
 		// For all other cases, return the original output
-		return message.reply((mb) =>
-			mb.setContent(
-				codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))
-			)
+		return message.channel.send(
+			codeBlock('prolog', [cutText(stdout, 1800) || Emojis.GreenTick, cutText(stderr, 100) || Emojis.GreenTick].join('\n-=-=-=-\n'))
 		);
 	}
 
 	private async stash(message: Message) {
-		await message.reply((mb) => mb.setContent('Unsuccessful pull, stashing...'));
+		await message.channel.send('Unsuccessful pull, stashing...');
 		await sleep(1000);
-		const { stdout, stderr } = await this.exec(`git stash`);
+		const { stdout, stderr } = await this.exec('git stash');
 		if (!this.isSuccessfulStash(stdout + stderr)) {
 			throw `Unsuccessful pull, stashing:\n\n${codeBlock('prolog', [stdout || '✔', stderr || '✔'].join('\n-=-=-=-\n'))}`;
 		}
 
-		return message.reply((mb) =>
-			mb.setContent(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n')))
-		);
+		return message.channel.send(codeBlock('prolog', [cutText(stdout, 1800) || '✔', cutText(stderr, 100) || '✔'].join('\n-=-=-=-\n')));
 	}
 
 	private async checkout(message: Message, branch: string) {
-		await message.reply((mb) => mb.setContent(`Switching to ${branch}...`));
+		await message.channel.send(`Switching to ${branch}...`);
 		await this.exec(`git checkout ${branch}`);
-		return message.reply((mb) => mb.setContent(`${Emojis.GreenTick} Switched to ${branch}.`));
+		return message.channel.send(`${Emojis.GreenTick} Switched to ${branch}.`);
 	}
 
 	private async isCurrentBranch(branch: string) {

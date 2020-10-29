@@ -1,18 +1,10 @@
-import { PresenceUpdateStatus } from '@klasa/dapi-types';
+import { Status } from 'discord.js';
 
 export const enum ClientNames {
 	Aelia = 'aelia',
 	Alestra = 'alestra',
 	Evlyn = 'evlyn',
 	Skyra = 'skyra'
-}
-
-export const enum WebsocketEvents {
-	Message = 'message',
-	Connection = 'connection',
-	Close = 'close',
-	Error = 'error',
-	Listening = 'listening'
 }
 
 export const enum MessageFromClientAction {
@@ -26,8 +18,6 @@ export const enum MessageFromServerAction {
 export interface MessageFromClientData {
 	/** The Client ID of the client sending this data */
 	name: ClientNames;
-	/** The Discord presence of the bot */
-	presence: PresenceUpdateStatus;
 	/** The total size of the heap */
 	heapTotal: number;
 	/** The used amount of the heap */
@@ -35,7 +25,7 @@ export interface MessageFromClientData {
 	/** The ping of the shard */
 	ping: number;
 	/** The status of the websocket connection to Discord */
-	status: WebsocketStatus;
+	status: Status;
 }
 
 export interface MessageFromClient {
@@ -56,42 +46,4 @@ export const enum CloseCodes {
 	InternalError = 1011,
 	Unauthorized = 4301,
 	DuplicatedConnection = 4302
-}
-
-/**
- * The websocket status
- */
-export const enum WebsocketStatus {
-	/**
-	 * The websocket is active
-	 */
-	Ready,
-	/**
-	 * The websocket is connecting
-	 */
-	Connecting,
-	/**
-	 * The websocket is connected
-	 */
-	Connected,
-	/**
-	 * The websocket is reconnecting
-	 */
-	Reconnecting,
-	/**
-	 * The websocket is resuming connection
-	 */
-	Resuming,
-	/**
-	 * The websocket is idle
-	 */
-	Idle,
-	/**
-	 * The websocket is nearly ready, fetching last data
-	 */
-	Nearly,
-	/**
-	 * The websocket is disconnected
-	 */
-	Disconnected
 }

@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { Colors } from '@klasa/console';
-import { PresenceUpdateStatus } from '@klasa/dapi-types';
-import { WebSocketShardStatus as KlasaWsStatus } from '@klasa/ws';
 import { AlestraClient } from '@lib/AlestraClient';
 import { EVLYN_HOST, EVLYN_PORT } from '@root/config';
-import { DeepPartial } from '@sapphire/utilities';
-import { ClientNames, MessageFromClient, MessageFromClientAction, MessageFromServer, MessageFromServerAction, WebsocketStatus } from './types';
+import { red, yellow } from 'colorette';
+import { ClientNames, MessageFromClient, MessageFromClientAction, MessageFromServer, MessageFromServerAction } from './types';
 import WebSocket = require('ws');
 
-const y = new Colors({ text: 'yellow' }).format('[STAT-WS ]');
-const r = new Colors({ text: 'red' }).format('[STAT-WS ]');
+const y = yellow('[STAT-WS ]');
+const r = red('[STAT-WS ]');
 
 export class WebsocketClient {
 	#ws = new WebSocket(`ws://${EVLYN_HOST}:${EVLYN_PORT}`, { headers: { authorization: ClientNames.Alestra } });
@@ -19,11 +16,11 @@ export class WebsocketClient {
 		this.#client = client;
 
 		this.#ws.onerror = (event) => {
-			this.#client.console.error(`${r} Error from ${ClientNames.Evlyn}`, event.error);
+			this.#client.logger.error(`${r} Error from ${ClientNames.Evlyn}`, event.error);
 		};
 
 		this.#ws.onclose = (event) => {
-			this.#client.console.warn(`${y} Closed with code ${event.code}\n with reason ${event.reason}`);
+			this.#client.logger.warn(`${y} Closed with code ${event.code}\n with reason ${event.reason}`);
 		};
 
 		this.#ws.onmessage = (event) => {
@@ -31,17 +28,17 @@ export class WebsocketClient {
 
 			switch (action) {
 				case MessageFromServerAction.Ping: {
-					this.#client.console.log('Received a ping');
+					this.#client.logger.debug('Received a ping');
 					const memoryUsage = process.memoryUsage();
+					const shard = this.#client.ws.shards.first()!;
 					this.sendJSON({
 						action: MessageFromClientAction.HeartBeat,
 						data: {
 							name: ClientNames.Alestra,
 							heapTotal: memoryUsage.heapTotal,
 							heapUsed: memoryUsage.heapUsed,
-							ping: this.#client.ws.shards.firstValue!.ping,
-							status: WebsocketClient.KlasaWsStatusTransformer[this.#client.ws.shards.firstValue!.status],
-							presence: this.#client.user!.presence.status ?? PresenceUpdateStatus.Offline
+							ping: shard.ping,
+							status: shard.status
 						}
 					});
 					break;
@@ -50,15 +47,7 @@ export class WebsocketClient {
 		};
 	}
 
-	private sendJSON(data: DeepPartial<MessageFromClient>) {
+	private sendJSON(data: MessageFromClient) {
 		this.#ws.send(JSON.stringify(data));
 	}
-
-	public static KlasaWsStatusTransformer: Record<KlasaWsStatus, WebsocketStatus> = {
-		[KlasaWsStatus.Connected]: WebsocketStatus.Connected,
-		[KlasaWsStatus.Connecting]: WebsocketStatus.Connecting,
-		[KlasaWsStatus.Reconnecting]: WebsocketStatus.Reconnecting,
-		[KlasaWsStatus.Disconnected]: WebsocketStatus.Disconnected,
-		[KlasaWsStatus.Resuming]: WebsocketStatus.Resuming
-	};
 }
