@@ -40,6 +40,7 @@
 		"@sapphire/decorators": "^2.0.3",
 		"@sapphire/framework": "^1.0.0-alpha.9",
 		"@sapphire/utilities": "^1.4.4",
+		"@skyra/editable-commands": "^1.0.0",
 		"acorn": "^8.0.5",
 		"canvas": "^2.6.1",
 		"canvas-constructor": "^4.1.0",

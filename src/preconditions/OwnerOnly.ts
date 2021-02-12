@@ -4,6 +4,6 @@ import { Message } from 'discord.js';
 
 export class UserPrecondition extends Precondition {
 	public run(message: Message): PreconditionResult {
-		return OWNERS.includes(message.author.id) ? this.ok() : this.error('This command is reserved for bot owners.');
+		return OWNERS.includes(message.author.id) ? this.ok() : this.error({ message: 'This command is reserved for bot owners.' });
 	}
 }
