@@ -9,7 +9,7 @@ import { cpus, uptime } from 'os';
 })
 export default class UserCommand extends Command {
 	public async run(message: Message) {
-		return message.channel.send(
+		return message.send(
 			new MessageEmbed()
 				.setColor(0xfcac42)
 				.addField('Statistics', this.generalStatistics)
@@ -20,9 +20,9 @@ export default class UserCommand extends Command {
 
 	private get generalStatistics(): string {
 		return [
-			this.format('Users', this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0).toLocaleString()),
-			this.format('Guilds', this.client.guilds.cache.size.toLocaleString()),
-			this.format('Channels', this.client.channels.cache.size.toLocaleString()),
+			this.format('Users', this.context.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0).toLocaleString()),
+			this.format('Guilds', this.context.client.guilds.cache.size.toLocaleString()),
+			this.format('Channels', this.context.client.channels.cache.size.toLocaleString()),
 			this.format('Discord.js', `v${version}`),
 			this.format('Node.js', process.version),
 			this.format('Sapphire', 'v1.0.0')
@@ -33,7 +33,7 @@ export default class UserCommand extends Command {
 		return [
 			this.format('Host', this.formatDuration(uptime() * 1000)),
 			this.format('Total', this.formatDuration(process.uptime() * 1000)),
-			this.format('Client', this.formatDuration(this.client.uptime!))
+			this.format('Client', this.formatDuration(this.context.client.uptime!))
 		].join('\n');
 	}
 

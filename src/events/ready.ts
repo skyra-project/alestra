@@ -28,7 +28,7 @@ export class UserEvent extends Event<'ready'> {
 		const line15 = blc(`     ,╚▓╣╣╣▓└     `);
 		const line16 = blc(`        ╙╜,       `);
 
-		this.client.logger.info(
+		this.context.logger.info(
 			String.raw`
 ${line01}       __      ___       _______   ________  ___________  _______        __
 ${line02}      /""\    |"  |     /"     "| /"       )("     _   ")/"      \      /""\
@@ -39,7 +39,7 @@ ${line06}  /   /  \\  \( \_|:  \(:      "| /" \   :)     \:  |   |:  __   \  /  
 ${line07} (___/    \___)\_______)\_______)(_______/       \__|   |__|  \___)(___/    \___)
 ${line08} ${llc(VERSION.padStart(80, ' '))}
 ${line09} [${success}] Gateway
-${line10} [${Reflect.get(this.client, 'websocket') ? success : failed}] Evlyn Bridge
+${line10} [${Reflect.get(this.context.client, 'websocket') ? success : failed}] Evlyn Bridge
 ${line11}
 ${line12}
 ${line13}

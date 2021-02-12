@@ -5,6 +5,8 @@ import { CLIENT_OPTIONS, TOKEN } from '@root/config';
 import { inspect } from 'util';
 import * as colorette from 'colorette';
 
+import '@skyra/editable-commands';
+
 inspect.defaultOptions.depth = 1;
 colorette.options.enabled = true;
 

@@ -26,10 +26,10 @@ export default class UserCommand extends Command {
 			if (output instanceof Buffer) {
 				// output, 'output.png',
 				const attachment = new MessageAttachment(output, 'output.png');
-				return message.channel.send(`\`✔\` \`⏱ ${sw}\``, attachment);
+				return message.send(`\`✔\` \`⏱ ${sw}\``, attachment);
 			}
 
-			return message.channel.send(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`);
+			return message.send(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', error)}`;
@@ -77,7 +77,7 @@ export default class UserCommand extends Command {
 	}
 
 	private createClientMock() {
-		const clientUser = this.client.user;
+		const clientUser = this.context.client.user;
 		const user = clientUser
 			? Object.freeze({
 					id: clientUser.id,

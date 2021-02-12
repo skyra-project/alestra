@@ -12,6 +12,7 @@ export const VERSION = 'v5.0.0';
 
 export const CLIENT_OPTIONS: ClientOptions = {
 	defaultPrefix: PREFIX,
+	loadDefaultErrorEvents: false,
 	messageCacheLifetime: 120,
 	messageCacheMaxSize: 20,
 	messageEditHistoryMaxSize: 0,
