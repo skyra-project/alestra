@@ -1,8 +1,5 @@
 # Alestra [![Discord](https://discordapp.com/api/guilds/254360814063058944/embed.png)](https://join.skyra.pw)
 
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/skyra-project/alestra.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/skyra-project/alestra/alerts/)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/skyra-project/alestra.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/skyra-project/alestra/context:javascript)
-
 Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official server][cc-server].
 
 ## Development Requirements
