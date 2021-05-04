@@ -1,29 +1,53 @@
-FROM node:14-alpine
+FROM --platform=linux/amd64 node:15-buster-slim as BUILDER
 
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache \
-	build-base \
-	cairo-dev \
-	freetype-dev \
-	g++ \
-	gcc \
-	giflib-dev \
-	git \
-	jpeg-dev \
-	libjpeg-turbo-dev \
-	musl-dev \
-	pango-dev \
-	pangomm-dev \
-	pixman-dev \
-	pkgconfig \
-	python
+ENV NODE_ENV="development"
 
-COPY package.json ./
-COPY yarn.lock ./
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev
 
-RUN yarn install --frozen-lockfile --link-duplicates
+COPY yarn.lock .
+COPY package.json .
+COPY tsconfig.base.json tsconfig.base.json
+COPY src/ src/
 
-COPY dist/ dist/
+RUN yarn install --production=false --frozen-lockfile --link-duplicates
 
-CMD ["yarn", "start"]
+RUN yarn build
+
+# ================ #
+#   Runner Stage   #
+# ================ #
+
+FROM --platform=linux/amd64 node:15-buster-slim AS RUNNER
+
+ENV NODE_ENV="production"
+
+WORKDIR /usr/src/app
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev
+
+COPY --from=BUILDER /usr/src/app/dist dist
+
+COPY yarn.lock .
+COPY package.json .
+
+RUN yarn install --production=true --frozen-lockfile --link-duplicates
+
+CMD [ "yarn", "start" ]
