@@ -21,13 +21,9 @@ RUN apk add --no-cache \
 
 COPY package.json ./
 COPY yarn.lock ./
-COPY .yarnclean ./
-
-# Replace dist with . because it will output to cwd
-RUN sed -i 's/dist/./g' package.json
 
 RUN yarn install --frozen-lockfile --link-duplicates
 
-COPY dist/ .
+COPY dist/ dist/
 
-CMD ["node", "./Alestra.js"]
+CMD ["yarn", "start"]
