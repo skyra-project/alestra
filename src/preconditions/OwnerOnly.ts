@@ -1,6 +1,6 @@
 import { OWNERS } from '@root/config';
 import { Precondition, PreconditionResult } from '@sapphire/framework';
-import { Message } from 'discord.js';
+import type { Message } from 'discord.js';
 
 export class UserPrecondition extends Precondition {
 	public run(message: Message): PreconditionResult {

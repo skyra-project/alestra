@@ -1,5 +1,5 @@
 import { Event, Events } from '@sapphire/framework';
-import { Message } from 'discord.js';
+import type { Message } from 'discord.js';
 
 export class UserEvent extends Event<Events.MessageUpdate> {
 	public run(_: Message, message: Message) {

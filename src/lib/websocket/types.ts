@@ -1,4 +1,4 @@
-import { Status } from 'discord.js';
+import type { Status } from 'discord.js';
 
 export const enum ClientNames {
 	Aelia = 'aelia',
