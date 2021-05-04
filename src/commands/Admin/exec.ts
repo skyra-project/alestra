@@ -1,23 +1,24 @@
-import { Attachment, Message } from '@klasa/core';
-import { AlestraCommand, AlestraCommandOptions } from '@lib/structures/AlestraCommand';
-import { PermissionLevels } from '@lib/types/Enums';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Args, Command, CommandOptions } from '@sapphire/framework';
 import { codeBlock } from '@sapphire/utilities';
-import { ApplyOptions } from '@skyra/decorators';
 import { exec } from '@utils/exec';
 import { fetch, FetchMethods, FetchResultTypes } from '@utils/util';
+import { Message, MessageAttachment } from 'discord.js';
 
-@ApplyOptions<AlestraCommandOptions>({
+@ApplyOptions<CommandOptions>({
 	aliases: ['execute'],
-	description: (language) => language.get('COMMAND_EXEC_DESCRIPTION'),
-	extendedHelp: (language) => language.get('COMMAND_EXEC_EXTENDED'),
-	guarded: true,
-	permissionLevel: PermissionLevels.BotOwner,
-	usage: '<expression:string>',
-	flagSupport: true
+	description: 'Executes a Bash command.',
+	preconditions: ['OwnerOnly'],
+	strategyOptions: { options: ['timeout'] }
 })
-export default class extends AlestraCommand {
-	public async run(message: Message, [input]: [string]) {
-		const result = await exec(input, { timeout: 'timeout' in message.flagArgs ? Number(message.flagArgs.timeout) : 60000 }).catch((error) => ({
+export default class UserCommand extends Command {
+	public async run(message: Message, args: Args) {
+		// Get input and timeout option:
+		const input = await args.rest('string');
+		const timeout = args.getOption('timeout');
+
+		// Execute the command:
+		const result = await exec(input, { timeout: timeout ? Number(timeout) : 60000 }).catch((error) => ({
 			stdout: null,
 			stderr: error as Error
 		}));
@@ -25,12 +26,8 @@ export default class extends AlestraCommand {
 		const outerr = result.stderr ? `**\`ERROR\`**${codeBlock('prolog', result.stderr)}` : '';
 		const joined = [output, outerr].join('\n') || 'No output';
 
-		return message.reply((mb) =>
-			joined.length <= 2000
-				? mb.setContent(joined)
-				: this.getHaste(joined)
-						.then((url) => mb.setContent(url))
-						.catch(async () => mb.addFile(await new Attachment().setName('output.txt').setFile(Buffer.from(joined)).resolve()))
+		return message.send(
+			joined.length > 2000 ? await this.getHaste(joined).catch(() => new MessageAttachment(Buffer.from(joined), 'output.txt')) : joined
 		);
 	}
 
