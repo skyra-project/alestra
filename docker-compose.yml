@@ -1,0 +1,21 @@
+version: '2.4'
+services:
+  evlyn:
+    container_name: evlyn
+    env_file:
+      - ../evlyn/src/.env.production.local
+    image: skyrabot/evlyn:latest
+    networks:
+      - alestra
+
+  alestra:
+    build: ./
+    container_name: alestra
+    image: skyrabot/alestra:latest
+    depends_on:
+      - evlyn
+    networks:
+      - alestra
+
+networks:
+  alestra:
