@@ -14,10 +14,10 @@ RUN apt-get update && \
     libgif-dev \
     librsvg2-dev
 
-COPY yarn.lock .
-COPY package.json .
-COPY tsconfig.base.json tsconfig.base.json
-COPY src/ src/
+COPY --chown=node:node yarn.lock .
+COPY --chown=node:node package.json .
+COPY --chown=node:node tsconfig.base.json tsconfig.base.json
+COPY --chown=node:node src/ src/
 
 RUN yarn install --production=false --frozen-lockfile --link-duplicates
 
@@ -37,17 +37,20 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     build-essential \
+	dumb-init \
     libcairo2-dev \
     libpango1.0-dev \
     libjpeg-dev \
     libgif-dev \
     librsvg2-dev
 
-COPY --from=BUILDER /usr/src/app/dist dist
+COPY --chown=node:node --from=BUILDER /usr/src/app/dist dist
 
-COPY yarn.lock .
-COPY package.json .
+COPY --chown=node:node yarn.lock .
+COPY --chown=node:node package.json .
 
 RUN yarn install --production=true --frozen-lockfile --link-duplicates
 
-CMD [ "yarn", "start" ]
+USER node
+
+CMD [ "dumb-init", "yarn", "start" ]
