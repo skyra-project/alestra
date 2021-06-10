@@ -350,9 +350,9 @@ function parseExpressionStatement(ctx: EvaluatorContext, node: NodeExpressionSta
 
 async function parseMemberExpression(ctx: EvaluatorContext, node: NodeMemberExpression, scope: Scope): Promise<unknown> {
 	const object = await parseNode(ctx, node.object, scope);
-	const propertyValue = (node.property.type === 'Identifier'
-		? (node.property as NodeIdentifier).name
-		: await parseNode(ctx, node.property, scope)) as string;
+	const propertyValue = (
+		node.property.type === 'Identifier' ? (node.property as NodeIdentifier).name : await parseNode(ctx, node.property, scope)
+	) as string;
 	let property: unknown = kUnset;
 
 	if (node.computed && node.property.type !== 'Literal') {
