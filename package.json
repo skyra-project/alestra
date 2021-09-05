@@ -85,7 +85,7 @@
 		"kind-of": "^6.0.3",
 		"lodash": "^4.17.20",
 		"minimist": "^1.2.5",
-		"tar": "^6.1.6",
+		"tar": "^6.1.11",
 		"trim-newlines": "^3.0.1"
 	},
 	"engines": {
