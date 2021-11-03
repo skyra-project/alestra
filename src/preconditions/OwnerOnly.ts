@@ -1,4 +1,4 @@
-import { OWNERS } from '@root/config';
+import { OWNERS } from '#root/config';
 import { Precondition, PreconditionResult } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 

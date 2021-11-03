@@ -1,14 +1,10 @@
-import 'module-alias/register';
-import 'reflect-metadata';
-import { AlestraClient } from '@lib/AlestraClient';
-import { CLIENT_OPTIONS, TOKEN } from '@root/config';
+import { AlestraClient } from '#lib/AlestraClient';
+import { CLIENT_OPTIONS, TOKEN } from '#root/config';
 import { inspect } from 'util';
-import * as colorette from 'colorette';
 
-import '@skyra/editable-commands';
+import '@sapphire/plugin-editable-commands/register';
 
 inspect.defaultOptions.depth = 1;
-colorette.options.enabled = true;
 
 const client = new AlestraClient(CLIENT_OPTIONS);
 client.login(TOKEN).catch((error) => {

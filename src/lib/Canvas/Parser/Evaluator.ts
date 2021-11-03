@@ -6,25 +6,25 @@ import {
 	SandboxError,
 	SandboxPropertyError,
 	UnknownIdentifier
-} from '@lib/Canvas/Util/ValidateError';
+} from '#lib/Canvas/Util/ValidateError';
 import { Parser } from 'acorn';
-import { Image, loadImage } from 'canvas';
-import * as CanvasConstructor from 'canvas-constructor';
-import { default as _fetch } from 'node-fetch';
+import * as CanvasConstructor from 'canvas-constructor/skia';
 import { extname } from 'path';
 import { URL } from 'url';
 
-function* filter<T>(object: Record<string, T>, keys: readonly string[]) {
-	for (const [key, value] of Object.entries<T>(object)) {
-		if (keys.includes(key)) continue;
+function* filter<T>(object: T, keys: readonly (keyof T)[]) {
+	for (const [key, value] of Object.entries(object)) {
+		if (keys.includes(key as keyof T)) continue;
 		yield [key, value] as [string, T];
 	}
 }
 
 const kUnset = Symbol('unset');
+const boundResolveImage = fetch.bind(null);
 const defaultIdentifiers: [string, unknown][] = [
 	// Function#bind allows the code to be censored
-	['fetch', fetch.bind(null)],
+	['fetch', boundResolveImage],
+	['resolveImage', boundResolveImage],
 	...Object.entries({
 		undefined,
 		Infinity,
@@ -70,7 +70,7 @@ const defaultIdentifiers: [string, unknown][] = [
 		SyntaxError,
 		TypeError
 	}),
-	...filter(CanvasConstructor, ['resolveImage'])
+	...filter(CanvasConstructor, ['resolveImage', 'registerFont', 'FontLibrary', 'Image', 'Path2D', 'fontRegExp'])
 ];
 
 const binaryOperators = new Map<string, (left: any, right: any) => unknown>()
@@ -145,15 +145,17 @@ export class InternalError {
 	}
 }
 
-async function fetch(...args: [string]): Promise<Image> {
+async function fetch(...args: [string]): Promise<CanvasConstructor.Image> {
 	if (args.length !== 1) throw new TypeError('Expected only 1 argument (at fetch).');
 	if (typeof args[0] !== 'string') throw new TypeError('Expected url to be a string (at fetch).');
 	const url = new URL(args[0]);
 	const ext = extname(url.pathname);
 	if (/^\.(jpe?g|png)$/.test(ext)) {
-		const response = await _fetch(url.href);
-		if (response.ok) return loadImage(await response.buffer());
-		throw new InternalError(new Error(`${response.status}: ${response.statusText} | ${url.href}`));
+		try {
+			return await CanvasConstructor.resolveImage(url.href);
+		} catch {
+			throw new InternalError(new Error(`Could not load "${url.href}""`));
+		}
 	}
 	throw new InternalError(new Error(`The url ${url.href} must have unknown of the following extensions: .png, .jpg, .jpeg`));
 }

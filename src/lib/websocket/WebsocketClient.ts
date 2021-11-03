@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import type { AlestraClient } from '@lib/AlestraClient';
-import { EVLYN_HOST, EVLYN_PORT } from '@root/config';
+import type { AlestraClient } from '#lib/AlestraClient';
+import { EVLYN_HOST, EVLYN_PORT } from '#root/config';
 import { red, yellow } from 'colorette';
 import { ClientNames, MessageFromClient, MessageFromClientAction, MessageFromServer, MessageFromServerAction } from './types';
 import WebSocket = require('ws');
