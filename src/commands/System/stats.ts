@@ -1,13 +1,9 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { Command, CommandOptions } from '@sapphire/framework';
+import { Command } from '@sapphire/framework';
 import { send } from '@sapphire/plugin-editable-commands';
 import { DurationFormatter } from '@sapphire/time-utilities';
 import { Message, MessageEmbed, version } from 'discord.js';
 import { cpus, uptime } from 'os';
 
-@ApplyOptions<CommandOptions>({
-	aliases: ['execute']
-})
 export default class UserCommand extends Command {
 	private readonly formatter = new DurationFormatter();
 
@@ -55,7 +51,6 @@ export default class UserCommand extends Command {
 	}
 
 	private formatDuration(value: number): string {
-		// eslint-disable-next-line @typescript-eslint/no-use-before-define
 		return this.formatter.format(value, 2);
 	}
 }
