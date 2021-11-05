@@ -12,14 +12,9 @@ export const VERSION = 'v5.0.0';
 
 export const CLIENT_OPTIONS: ClientOptions = {
 	defaultPrefix: PREFIX,
-	loadDefaultErrorEvents: false,
-	messageCacheLifetime: 120,
-	messageCacheMaxSize: 20,
-	messageEditHistoryMaxSize: 0,
-	presence: { status: 'online', activity: { type: 'LISTENING', name: `${PREFIX}help` } },
-	ws: {
-		intents: new Intents(['GUILD_MESSAGES', 'GUILDS'])
-	}
+	loadDefaultErrorListeners: false,
+	presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${PREFIX}help` }] },
+	intents: new Intents(['GUILD_MESSAGES', 'GUILDS'])
 };
 
 export const TOKEN = '';

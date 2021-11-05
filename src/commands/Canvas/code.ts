@@ -1,19 +1,21 @@
-import { Stopwatch } from '@klasa/stopwatch';
-import { evaluate } from '@lib/Canvas/Parser/Evaluator';
+import { evaluate } from '#lib/Canvas/Parser/Evaluator';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command, CommandOptions } from '@sapphire/framework';
+import { Stopwatch } from '@sapphire/stopwatch';
 import { codeBlock } from '@sapphire/utilities';
-import { Canvas } from 'canvas-constructor';
-import { Message, MessageAttachment } from 'discord.js';
+import { send } from '@skyra/editable-commands';
+import { Canvas } from 'canvas-constructor/skia';
+import { GuildMember, ImageURLOptions, Message, MessageAttachment, User } from 'discord.js';
 import { inspect } from 'util';
 
 const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 
 @ApplyOptions<CommandOptions>({
-	description: 'Execute a sandboxed subset of JavaScript.'
+	description: 'Execute a sandboxed subset of JavaScript.',
+	quotes: []
 })
 export default class UserCommand extends Command {
-	public async run(message: Message, args: Args) {
+	public async messageRun(message: Message, args: Args) {
 		const code = this.parseCodeblock(await args.rest('string'));
 		const sw = new Stopwatch(5);
 		try {
@@ -22,14 +24,14 @@ export default class UserCommand extends Command {
 				['client', this.createClientMock()]
 			]);
 			sw.stop();
-			if (output instanceof Canvas) output = await output.toBufferAsync();
+			if (output instanceof Canvas) output = await output.png();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
 				const attachment = new MessageAttachment(output, 'output.png');
-				return message.send(`\`✔\` \`⏱ ${sw}\``, attachment);
+				return send(message, { content: `\`✔\` \`⏱ ${sw}\``, files: [attachment] });
 			}
 
-			return message.send(`\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`);
+			return send(message, `\`✔\` \`⏱ ${sw}\`\n${codeBlock('js', inspect(output, false, 0, false))}`);
 		} catch (error) {
 			if (sw.running) sw.stop();
 			throw `\`❌\` \`⏱ ${sw}\`\n${codeBlock('', error)}`;
@@ -41,23 +43,8 @@ export default class UserCommand extends Command {
 	}
 
 	private createMessageMock(message: Message) {
-		const author = Object.freeze({
-			id: message.author.id,
-			avatar: message.author.avatar,
-			avatarURL: message.author.avatarURL.bind(message.author),
-			displayAvatarURL: message.author.displayAvatarURL.bind(message.author),
-			username: message.author.username,
-			discriminator: message.author.discriminator,
-			bot: message.author.bot
-		});
-
-		const member = message.member
-			? Object.freeze({
-					id: message.author.id,
-					user: author,
-					nick: message.member.nickname
-			  })
-			: null;
+		const author = Object.freeze(this.createUserMock(message.author));
+		const member = message.member ? Object.freeze(this.createGuildMemberMock(message.member, message.author)) : null;
 
 		const guild = message.guild
 			? Object.freeze({
@@ -76,8 +63,72 @@ export default class UserCommand extends Command {
 		});
 	}
 
+	private createUserMock(user: User) {
+		return {
+			accentColor: user.accentColor,
+			avatar: user.avatar,
+			banner: user.banner,
+			bot: user.bot,
+			discriminator: user.discriminator,
+			id: user.id,
+			system: user.system,
+			username: user.username,
+			get createdAt() {
+				return user.createdAt;
+			},
+			get createdTimestamp() {
+				return user.createdTimestamp;
+			},
+			get defaultAvatarURL() {
+				return user.defaultAvatarURL;
+			},
+			get tag() {
+				return user.tag;
+			},
+			avatarURL(options?: ImageURLOptions) {
+				return user.avatarURL(options);
+			},
+			bannerURL(options?: ImageURLOptions) {
+				return user.bannerURL(options);
+			},
+			displayAvatarURL(options?: ImageURLOptions) {
+				return user.displayAvatarURL(options);
+			},
+			toString() {
+				return user.toString();
+			}
+		};
+	}
+
+	private createGuildMemberMock(member: GuildMember, user: User) {
+		return {
+			id: user.id,
+			user,
+			nickname: member.nickname,
+			joinedTimestamp: member.joinedTimestamp,
+			get displayColor() {
+				return member.displayColor;
+			},
+			get displayHexColor() {
+				return member.displayHexColor;
+			},
+			get displayName() {
+				return member.displayName;
+			},
+			get joinedAt() {
+				return member.joinedAt;
+			},
+			toString() {
+				return member.toString();
+			},
+			valueOf() {
+				return member.valueOf();
+			}
+		};
+	}
+
 	private createClientMock() {
-		const clientUser = this.context.client.user;
+		const clientUser = this.container.client.user;
 		const user = clientUser
 			? Object.freeze({
 					id: clientUser.id,
