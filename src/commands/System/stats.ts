@@ -1,4 +1,4 @@
-import { Command } from '@sapphire/framework';
+import { Command, version as sapphireVersion } from '@sapphire/framework';
 import { send } from '@sapphire/plugin-editable-commands';
 import { DurationFormatter } from '@sapphire/time-utilities';
 import { Message, MessageEmbed, version } from 'discord.js';
@@ -23,7 +23,7 @@ export default class UserCommand extends Command {
 			this.format('Channels', this.container.client.channels.cache.size.toLocaleString()),
 			this.format('Discord.js', `v${version}`),
 			this.format('Node.js', process.version),
-			this.format('Sapphire', 'v1.0.0')
+			this.format('Sapphire', `v${sapphireVersion}`)
 		].join('\n');
 	}
 
