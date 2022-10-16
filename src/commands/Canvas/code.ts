@@ -24,7 +24,7 @@ export class UserCommand extends Command {
 				['client', this.createClientMock()]
 			]);
 			sw.stop();
-			if (output instanceof Canvas) output = await output.png();
+			if (output instanceof Canvas) output = await output.pngAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
 				const attachment = new MessageAttachment(output, 'output.png');
