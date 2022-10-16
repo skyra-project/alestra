@@ -1,13 +1,12 @@
 import { DEV, VERSION } from '#root/config';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Listener, ListenerOptions } from '@sapphire/framework';
-import { green, magenta, magentaBright, red, yellow, yellowBright } from 'colorette';
+import { green, magenta, magentaBright, yellow, yellowBright } from 'colorette';
 
 @ApplyOptions<ListenerOptions>({ once: true })
 export class UserEvent extends Listener<'ready'> {
 	public run() {
 		const success = green('+');
-		const failed = red('-');
 		const llc = DEV ? magentaBright : yellowBright;
 		const blc = DEV ? magenta : yellow;
 
@@ -39,7 +38,7 @@ ${line06}  /   /  \\  \( \_|:  \(:      "| /" \   :)     \:  |   |:  __   \  /  
 ${line07} (___/    \___)\_______)\_______)(_______/       \__|   |__|  \___)(___/    \___)
 ${line08} ${llc(VERSION.padStart(80, ' '))}
 ${line09} [${success}] Gateway
-${line10} [${Reflect.get(this.container.client, 'websocket') ? success : failed}] Evlyn Bridge
+${line10} 
 ${line11}
 ${line12}
 ${line13}

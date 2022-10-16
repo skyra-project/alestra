@@ -8,8 +8,6 @@ export const ROOT_FOLDER = join(getRootData().root, '..');
 setup(join(ROOT_FOLDER, 'src', '.env'));
 
 export const DEV = envParseString('NODE_ENV') !== 'production';
-export const EVLYN_HOST = envParseString('EVLYN_HOST');
-export const EVLYN_PORT = 3100;
 
 export const OWNERS = envParseArray('CLIENT_OWNERS');
 export const PREFIX = envParseString('CLIENT_PREFIX');
