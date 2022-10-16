@@ -8,11 +8,11 @@ import {
 	UnknownIdentifier
 } from '#lib/Canvas/Util/ValidateError';
 import { Parser } from 'acorn';
-import * as CanvasConstructor from 'canvas-constructor/skia';
+import * as CanvasConstructor from 'canvas-constructor/napi-rs';
 import { extname } from 'path';
 import { URL } from 'url';
 
-function* filter<T>(object: T, keys: readonly (keyof T)[]) {
+function* filter<T extends object>(object: T, keys: readonly (keyof T)[]) {
 	for (const [key, value] of Object.entries(object)) {
 		if (keys.includes(key as keyof T)) continue;
 		yield [key, value] as [string, T];
@@ -25,6 +25,7 @@ const defaultIdentifiers: [string, unknown][] = [
 	// Function#bind allows the code to be censored
 	['fetch', boundResolveImage],
 	['resolveImage', boundResolveImage],
+	['loadImage', boundResolveImage],
 	...Object.entries({
 		undefined,
 		Infinity,
@@ -70,7 +71,16 @@ const defaultIdentifiers: [string, unknown][] = [
 		SyntaxError,
 		TypeError
 	}),
-	...filter(CanvasConstructor, ['resolveImage', 'registerFont', 'FontLibrary', 'Image', 'Path2D', 'fontRegExp'])
+	...filter(CanvasConstructor, [
+		'GlobalFonts',
+		'Image',
+		'fontRegExp',
+		'loadFont',
+		'loadFontsFromDirectory',
+		'loadImage',
+		'registerFont',
+		'resolveImage'
+	])
 ];
 
 const binaryOperators = new Map<string, (left: any, right: any) => unknown>()
@@ -152,7 +162,7 @@ async function fetch(...args: [string]): Promise<CanvasConstructor.Image> {
 	const ext = extname(url.pathname);
 	if (/^\.(jpe?g|png)$/.test(ext)) {
 		try {
-			return await CanvasConstructor.resolveImage(url.href);
+			return await CanvasConstructor.loadImage(url.href);
 		} catch {
 			throw new InternalError(new Error(`Could not load "${url.href}""`));
 		}

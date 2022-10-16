@@ -1,56 +1,188 @@
-import { Command, version as sapphireVersion } from '@sapphire/framework';
+import { hideLinkEmbed, hyperlink, inlineCode, time, TimestampStyles } from '@discordjs/builders';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Command, CommandOptions, version as sapphireVersion } from '@sapphire/framework';
 import { send } from '@sapphire/plugin-editable-commands';
-import { DurationFormatter } from '@sapphire/time-utilities';
-import { Message, MessageEmbed, version } from 'discord.js';
-import { cpus, uptime } from 'os';
+import { Time } from '@sapphire/time-utilities';
+import { roundNumber } from '@sapphire/utilities';
+import { envParseString } from '@skyra/env-utilities';
+import { PermissionFlagsBits } from 'discord-api-types/v10';
+import { Message, MessageActionRow, MessageButton, MessageEmbed, Permissions, version as discordjsVersion } from 'discord.js';
+import { cpus, uptime, type CpuInfo } from 'node:os';
 
-export default class UserCommand extends Command {
-	private readonly formatter = new DurationFormatter();
+@ApplyOptions<CommandOptions>({
+	aliases: ['info'],
+	description: 'Provides information about Alestra'
+})
+export class UserCommand extends Command {
+	private numberFormat = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2 });
+	private readonly canvasConstructorServerInviteLink = 'https://discord.gg/taNgb9d';
 
-	public async messageRun(message: Message) {
-		const embed = new MessageEmbed()
+	public override messageRun(message: Message) {
+		return send(message, {
+			embeds: [this.embed],
+			components: this.components
+		});
+	}
+
+	private get components(): MessageActionRow[] {
+		return [
+			new MessageActionRow().addComponents(
+				new MessageButton() //
+					.setStyle('LINK')
+					.setURL(this.inviteLink)
+					.setLabel('Add me to your server!')
+					.setEmoji('🎉'),
+				new MessageButton() //
+					.setStyle('LINK')
+					.setURL(this.canvasConstructorServerInviteLink)
+					.setLabel('Support server')
+					.setEmoji('🆘')
+			),
+			new MessageActionRow().addComponents(
+				new MessageButton()
+					.setStyle('LINK')
+					.setURL('https://github.com/skyra-project/alestra')
+					.setLabel('GitHub Repository')
+					.setEmoji('<:github2:950888087188283422>'),
+				new MessageButton() //
+					.setStyle('LINK')
+					.setURL('https://donate.skyra.pw/patreon')
+					.setLabel('Donate')
+					.setEmoji('🧡')
+			)
+		];
+	}
+
+	private get inviteLink() {
+		return this.container.client.generateInvite({
+			scopes: ['bot', 'applications.commands'],
+			permissions: new Permissions([
+				PermissionFlagsBits.ViewChannel,
+				PermissionFlagsBits.ReadMessageHistory,
+				PermissionFlagsBits.SendMessages,
+				PermissionFlagsBits.EmbedLinks
+			])
+		});
+	}
+
+	private get embed(): MessageEmbed {
+		const titles = {
+			stats: 'Statistics',
+			uptime: 'Uptime',
+			serverUsage: 'Server Usage'
+		};
+		const stats = this.generalStatistics;
+		const uptime = this.uptimeStatistics;
+		const usage = this.usageStatistics;
+
+		const fields = {
+			stats: [
+				//
+				`• **Users**: ${stats.users}`,
+				`• **Guilds**: ${stats.guilds}`,
+				`• **Channels**: ${stats.channels}`,
+				`• **Node.js**: ${stats.nodeJs}`,
+				`• **Discord.js**: ${stats.discordjsVersion}`,
+				`• **Sapphire Framework**: ${stats.sapphireVersion}`
+			].join('\n'),
+			uptime: [
+				//
+				`• **Host**: ${uptime.host}`,
+				`• **Total**: ${uptime.total}`,
+				`• **Client**: ${uptime.client}`
+			].join('\n'),
+			serverUsage: [
+				//
+				`• **CPU Load**: ${usage.cpuLoad}`,
+				`• **Heap**: ${usage.ramUsed}MB (Total: ${usage.ramTotal}MB)`
+			].join('\n')
+		};
+
+		const clientVersion = envParseString('CLIENT_VERSION');
+		const canvasConstructorPackage = hyperlink(inlineCode("canvas-constructor's"), hideLinkEmbed('https://github.com/kyranet/CanvasConstructor'));
+		const canvasConstructorServer = hyperlink('official canvas constructor server', hideLinkEmbed(this.canvasConstructorServerInviteLink));
+
+		return new MessageEmbed() //
 			.setColor(0xfcac42)
-			.addField('Statistics', this.generalStatistics)
-			.addField('Uptime', this.uptimeStatistics)
-			.addField('Server Usage', this.usageStatistics);
-		return send(message, { embeds: [embed] });
+			.setDescription(`Alestra ${clientVersion} is a private Discord Bot used for ${canvasConstructorPackage} ${canvasConstructorServer}`)
+			.setFields(
+				{
+					name: titles.stats,
+					value: fields.stats,
+					inline: true
+				},
+				{
+					name: titles.uptime,
+					value: fields.uptime
+				},
+				{
+					name: titles.serverUsage,
+					value: fields.serverUsage
+				}
+			);
 	}
 
-	private get generalStatistics(): string {
-		return [
-			this.format('Users', this.container.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0).toLocaleString()),
-			this.format('Guilds', this.container.client.guilds.cache.size.toLocaleString()),
-			this.format('Channels', this.container.client.channels.cache.size.toLocaleString()),
-			this.format('Discord.js', `v${version}`),
-			this.format('Node.js', process.version),
-			this.format('Sapphire', `v${sapphireVersion}`)
-		].join('\n');
+	private get generalStatistics(): StatsGeneral {
+		const { client } = this.container;
+		return {
+			channels: client.channels.cache.size,
+			guilds: client.guilds.cache.size,
+			nodeJs: process.version,
+			users: client.guilds.cache.reduce((acc, val) => acc + (val.memberCount ?? 0), 0),
+			discordjsVersion: `v${discordjsVersion}`,
+			sapphireVersion: `v${sapphireVersion}`
+		};
 	}
 
-	private get uptimeStatistics(): string {
-		return [
-			this.format('Host', this.formatDuration(uptime() * 1000)),
-			this.format('Total', this.formatDuration(process.uptime() * 1000)),
-			this.format('Client', this.formatDuration(this.container.client.uptime!))
-		].join('\n');
+	private get uptimeStatistics(): StatsUptime {
+		const now = Date.now();
+		const nowSeconds = roundNumber(now / 1_000);
+		return {
+			client: time(this.secondsFromMilliseconds(now - this.container.client.uptime!), TimestampStyles.RelativeTime),
+			host: time(roundNumber(nowSeconds - uptime()), TimestampStyles.RelativeTime),
+			total: time(roundNumber(nowSeconds - process.uptime()), TimestampStyles.RelativeTime)
+		};
 	}
 
-	private get usageStatistics(): string {
+	private get usageStatistics(): StatsUsage {
 		const usage = process.memoryUsage();
-		const ramUsed = `${Math.round(100 * (usage.heapUsed / 1048576)) / 100}MB`;
-		const ramTotal = `${Math.round(100 * (usage.heapTotal / 1048576)) / 100}MB`;
-		const cpu = cpus()
-			.map(({ times }) => `${Math.round(((times.user + times.nice + times.sys + times.irq) / times.idle) * 10000) / 100}%`)
-			.join(' | ');
-
-		return [this.format('CPU Load', cpu), this.format('Heap', `${ramUsed} (${ramTotal})`)].join('\n');
+		return {
+			cpuLoad: cpus().slice(0, 2).map(UserCommand.formatCpuInfo.bind(null)).join(' | '),
+			ramTotal: this.formatNumber(usage.heapTotal / 1_048_576),
+			ramUsed: this.formatNumber(usage.heapUsed / 1_048_576)
+		};
 	}
 
-	private format(name: string, value: string): string {
-		return `• **${name}**: ${value}`;
+	private secondsFromMilliseconds(milliseconds: number): number {
+		return roundNumber(milliseconds / Time.Second);
 	}
 
-	private formatDuration(value: number): string {
-		return this.formatter.format(value, 2);
+	private formatNumber(number: number): string {
+		return this.numberFormat.format(number);
 	}
+
+	private static formatCpuInfo({ times }: CpuInfo) {
+		return `${roundNumber(((times.user + times.nice + times.sys + times.irq) / times.idle) * 10_000) / 100}%`;
+	}
+}
+
+interface StatsGeneral {
+	channels: number;
+	guilds: number;
+	nodeJs: string;
+	users: number;
+	discordjsVersion: string;
+	sapphireVersion: string;
+}
+
+interface StatsUptime {
+	client: string;
+	host: string;
+	total: string;
+}
+
+interface StatsUsage {
+	cpuLoad: string;
+	ramTotal: string;
+	ramUsed: string;
 }

@@ -4,7 +4,7 @@ import { Args, Command, CommandOptions } from '@sapphire/framework';
 import { Stopwatch } from '@sapphire/stopwatch';
 import { codeBlock } from '@sapphire/utilities';
 import { send } from '@skyra/editable-commands';
-import { Canvas } from 'canvas-constructor/skia';
+import { Canvas } from 'canvas-constructor/napi-rs';
 import { GuildMember, ImageURLOptions, Message, MessageAttachment, User } from 'discord.js';
 import { inspect } from 'util';
 
@@ -14,9 +14,9 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	description: 'Execute a sandboxed subset of JavaScript.',
 	quotes: []
 })
-export default class UserCommand extends Command {
+export class UserCommand extends Command {
 	public async messageRun(message: Message, args: Args) {
-		const code = this.parseCodeblock(await args.rest('string'));
+		const code = this.parseCodeblock(await args.rest('string')).replaceAll('%22', '"');
 		const sw = new Stopwatch(5);
 		try {
 			let output = await evaluate(code, [
@@ -24,7 +24,7 @@ export default class UserCommand extends Command {
 				['client', this.createClientMock()]
 			]);
 			sw.stop();
-			if (output instanceof Canvas) output = await output.png();
+			if (output instanceof Canvas) output = await output.pngAsync();
 			if (output instanceof Buffer) {
 				// output, 'output.png',
 				const attachment = new MessageAttachment(output, 'output.png');

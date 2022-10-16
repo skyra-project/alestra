@@ -7,9 +7,6 @@ node_modules/
 .env.local
 .env.development.local
 
-# Ignore bwd folders
-dist/bwd/
-
 # Ignore the dist output
 dist/
 

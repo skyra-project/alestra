@@ -1,56 +1,59 @@
-FROM --platform=linux/amd64 node:15-buster-slim as BUILDER
+# ================ #
+#    Base Stage    #
+# ================ #
+
+FROM node:18-buster-slim as base
 
 WORKDIR /usr/src/app
 
-ENV NODE_ENV="development"
+ENV HUSKY=0
+ENV CI=true
+ENV FORCE_COLOR=true
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    build-essential \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends build-essential python3 libfontconfig1 dumb-init && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node yarn.lock .
 COPY --chown=node:node package.json .
+COPY --chown=node:node .yarnrc.yml .
+COPY --chown=node:node .yarn/ .yarn/
+
+RUN sed -i 's/"postinstall": "husky install .github\/husky"/"postinstall": ""/' ./package.json
+
+ENTRYPOINT ["dumb-init", "--"]
+
+# ================ #
+#   Builder Stage  #
+# ================ #
+
+FROM base as builder
+
+ENV NODE_ENV="development"
+
 COPY --chown=node:node tsconfig.base.json tsconfig.base.json
 COPY --chown=node:node src/ src/
 
-RUN yarn install --production=false --frozen-lockfile --link-duplicates
-
-RUN yarn build
+RUN yarn install --immutable
+RUN yarn run build
 
 # ================ #
 #   Runner Stage   #
 # ================ #
 
-FROM --platform=linux/amd64 node:15-buster-slim AS RUNNER
+FROM base AS runner
 
 ENV NODE_ENV="production"
+ENV NODE_OPTIONS="--enable-source-maps"
 
-WORKDIR /usr/src/app
+COPY --chown=node:node src/.env src/.env
+COPY --chown=node:node --from=builder /usr/src/app/dist dist
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    build-essential \
-	dumb-init \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev
-
-COPY --chown=node:node --from=BUILDER /usr/src/app/dist dist
-
-COPY --chown=node:node yarn.lock .
-COPY --chown=node:node package.json .
-
-RUN yarn install --production=true --frozen-lockfile --link-duplicates
+RUN yarn workspaces focus --all --production
+RUN chown node:node /usr/src/app/
 
 USER node
 
-CMD [ "dumb-init", "yarn", "start" ]
+CMD [ "yarn", "run", "start" ]
