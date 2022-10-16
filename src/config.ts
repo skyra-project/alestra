@@ -11,7 +11,7 @@ export const DEV = envParseString('NODE_ENV') !== 'production';
 export const EVLYN_HOST = envParseString('EVLYN_HOST');
 export const EVLYN_PORT = 3100;
 
-export const OWNERS: string[] = envParseArray('CLIENT_OWNERS');
+export const OWNERS = envParseArray('CLIENT_OWNERS');
 export const PREFIX = envParseString('CLIENT_PREFIX');
 export const VERSION = envParseString('CLIENT_VERSION');
 
