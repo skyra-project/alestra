@@ -2,8 +2,6 @@ import type { ArrayString, BooleanString, NumberString } from '@skyra/env-utilit
 
 declare module '@skyra/env-utilities' {
 	export interface Env {
-		PM2_HOME: string;
-
 		EVLYN_HOST: string;
 		EVLYN_PORT: NumberString;
 
@@ -14,6 +12,6 @@ declare module '@skyra/env-utilities' {
 		CLIENT_PRESENCE_NAME: string;
 		CLIENT_PRESENCE_TYPE: string;
 
-		CLIENT_TOKEN: string;
+		DISCORD_TOKEN: string;
 	}
 }
