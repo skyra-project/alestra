@@ -70,7 +70,16 @@ const defaultIdentifiers: [string, unknown][] = [
 		SyntaxError,
 		TypeError
 	}),
-	...filter(CanvasConstructor, ['resolveImage', 'registerFont', 'FontLibrary', 'Image', 'Path2D', 'fontRegExp'])
+	...filter(CanvasConstructor, [
+		'GlobalFonts',
+		'Image',
+		'fontRegExp',
+		'loadFont',
+		'loadFontsFromDirectory',
+		'loadImage',
+		'registerFont',
+		'resolveImage'
+	])
 ];
 
 const binaryOperators = new Map<string, (left: any, right: any) => unknown>()
