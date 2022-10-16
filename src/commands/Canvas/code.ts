@@ -16,7 +16,7 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 })
 export class UserCommand extends Command {
 	public async messageRun(message: Message, args: Args) {
-		const code = this.parseCodeblock(await args.rest('string'));
+		const code = this.parseCodeblock(await args.rest('string')).replaceAll('%22', '"');
 		const sw = new Stopwatch(5);
 		try {
 			let output = await evaluate(code, [
