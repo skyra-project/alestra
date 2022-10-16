@@ -14,7 +14,7 @@ const CODEBLOCK = /^```(?:js|javascript)?([\s\S]+)```$/;
 	description: 'Execute a sandboxed subset of JavaScript.',
 	quotes: []
 })
-export default class UserCommand extends Command {
+export class UserCommand extends Command {
 	public async messageRun(message: Message, args: Args) {
 		const code = this.parseCodeblock(await args.rest('string'));
 		const sw = new Stopwatch(5);
