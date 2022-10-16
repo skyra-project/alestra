@@ -25,6 +25,7 @@ const defaultIdentifiers: [string, unknown][] = [
 	// Function#bind allows the code to be censored
 	['fetch', boundResolveImage],
 	['resolveImage', boundResolveImage],
+	['loadImage', boundResolveImage],
 	...Object.entries({
 		undefined,
 		Infinity,
