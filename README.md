@@ -34,7 +34,7 @@ $ yarn pm2:start
 
 **Framework links**
 
--   [Sapphire's Website](https://sapphirejs.com/)
+-   [Sapphire's Website](https://www.sapphirejs.dev/)
 
 <!-- Link Dump -->
 
