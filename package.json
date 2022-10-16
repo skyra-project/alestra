@@ -72,7 +72,8 @@
 	},
 	"resolutions": {
 		"ansi-regex": "^5.0.1",
-		"minimist": "^1.2.7"
+		"minimist": "^1.2.7",
+		"@discordjs/builders": "^0.16.0"
 	},
 	"engines": {
 		"node": ">=16",
