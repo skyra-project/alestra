@@ -6,7 +6,7 @@ import { Time } from '@sapphire/time-utilities';
 import { roundNumber } from '@sapphire/utilities';
 import { envParseString } from '@skyra/env-utilities';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
-import { Message, MessageActionRow, MessageButton, MessageEmbed, Permissions, version } from 'discord.js';
+import { Message, MessageActionRow, MessageButton, MessageEmbed, Permissions, version as discordjsVersion } from 'discord.js';
 import { cpus, uptime, type CpuInfo } from 'node:os';
 
 @ApplyOptions<CommandOptions>({
@@ -82,7 +82,7 @@ export class UserCommand extends Command {
 				`• **Guilds**: ${stats.guilds}`,
 				`• **Channels**: ${stats.channels}`,
 				`• **Node.js**: ${stats.nodeJs}`,
-				`• **Discord.js**: ${stats.version}`,
+				`• **Discord.js**: ${stats.discordjsVersion}`,
 				`• **Sapphire Framework**: ${stats.sapphireVersion}`
 			].join('\n'),
 			uptime: [
@@ -129,14 +129,14 @@ export class UserCommand extends Command {
 			guilds: client.guilds.cache.size,
 			nodeJs: process.version,
 			users: client.guilds.cache.reduce((acc, val) => acc + (val.memberCount ?? 0), 0),
-			version: `v${version}`,
+			discordjsVersion: `v${discordjsVersion}`,
 			sapphireVersion: `v${sapphireVersion}`
 		};
 	}
 
 	private get uptimeStatistics(): StatsUptime {
 		const now = Date.now();
-		const nowSeconds = roundNumber(now / 1000);
+		const nowSeconds = roundNumber(now / 1_000);
 		return {
 			client: time(this.secondsFromMilliseconds(now - this.container.client.uptime!), TimestampStyles.RelativeTime),
 			host: time(roundNumber(nowSeconds - uptime()), TimestampStyles.RelativeTime),
@@ -148,16 +148,11 @@ export class UserCommand extends Command {
 		const usage = process.memoryUsage();
 		return {
 			cpuLoad: cpus().slice(0, 2).map(UserCommand.formatCpuInfo.bind(null)).join(' | '),
-			ramTotal: this.formatNumber(usage.heapTotal / 1048576),
-			ramUsed: this.formatNumber(usage.heapUsed / 1048576)
+			ramTotal: this.formatNumber(usage.heapTotal / 1_048_576),
+			ramUsed: this.formatNumber(usage.heapUsed / 1_048_576)
 		};
 	}
 
-	/**
-	 * Converts a number of milliseconds to seconds.
-	 * @param milliseconds The amount of milliseconds
-	 * @returns The amount of seconds `milliseconds` equals to.
-	 */
 	private secondsFromMilliseconds(milliseconds: number): number {
 		return roundNumber(milliseconds / Time.Second);
 	}
@@ -167,7 +162,7 @@ export class UserCommand extends Command {
 	}
 
 	private static formatCpuInfo({ times }: CpuInfo) {
-		return `${roundNumber(((times.user + times.nice + times.sys + times.irq) / times.idle) * 10000) / 100}%`;
+		return `${roundNumber(((times.user + times.nice + times.sys + times.irq) / times.idle) * 10_000) / 100}%`;
 	}
 }
 
@@ -176,7 +171,7 @@ interface StatsGeneral {
 	guilds: number;
 	nodeJs: string;
 	users: number;
-	version: string;
+	discordjsVersion: string;
 	sapphireVersion: string;
 }
 
