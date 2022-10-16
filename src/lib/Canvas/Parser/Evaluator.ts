@@ -162,7 +162,7 @@ async function fetch(...args: [string]): Promise<CanvasConstructor.Image> {
 	const ext = extname(url.pathname);
 	if (/^\.(jpe?g|png)$/.test(ext)) {
 		try {
-			return await CanvasConstructor.resolveImage(url.href);
+			return await CanvasConstructor.loadImage(url.href);
 		} catch {
 			throw new InternalError(new Error(`Could not load "${url.href}""`));
 		}

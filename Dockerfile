@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 
 ENV HUSKY=0
 ENV CI=true
+ENV FORCE_COLOR=true
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
