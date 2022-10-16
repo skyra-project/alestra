@@ -34,7 +34,7 @@ $ yarn pm2:start
 
 **Framework links**
 
--   [Sapphire's Website](https://sapphirejs.com/)
+-   [Klasa's Website](https://klasa.js.org)
 
 <!-- Link Dump -->
 
