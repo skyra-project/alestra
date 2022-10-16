@@ -8,11 +8,11 @@ import {
 	UnknownIdentifier
 } from '#lib/Canvas/Util/ValidateError';
 import { Parser } from 'acorn';
-import * as CanvasConstructor from 'canvas-constructor/skia';
+import * as CanvasConstructor from 'canvas-constructor/napi-rs';
 import { extname } from 'path';
 import { URL } from 'url';
 
-function* filter<T>(object: T, keys: readonly (keyof T)[]) {
+function* filter<T extends object>(object: T, keys: readonly (keyof T)[]) {
 	for (const [key, value] of Object.entries(object)) {
 		if (keys.includes(key as keyof T)) continue;
 		yield [key, value] as [string, T];

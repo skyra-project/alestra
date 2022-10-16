@@ -3,6 +3,7 @@ import { CLIENT_OPTIONS } from '#root/config';
 import { inspect } from 'util';
 
 import '@sapphire/plugin-editable-commands/register';
+import '@sapphire/plugin-logger/register';
 
 inspect.defaultOptions.depth = 1;
 

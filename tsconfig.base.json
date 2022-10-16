@@ -2,6 +2,6 @@
 	"extends": "@sapphire/ts-config",
 	"compilerOptions": {
 		"target": "ESNext",
-		"useDefineForClassFields": true
+		"removeComments": true
 	}
 }

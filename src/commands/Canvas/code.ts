@@ -4,7 +4,7 @@ import { Args, Command, CommandOptions } from '@sapphire/framework';
 import { Stopwatch } from '@sapphire/stopwatch';
 import { codeBlock } from '@sapphire/utilities';
 import { send } from '@skyra/editable-commands';
-import { Canvas } from 'canvas-constructor/skia';
+import { Canvas } from 'canvas-constructor/napi-rs';
 import { GuildMember, ImageURLOptions, Message, MessageAttachment, User } from 'discord.js';
 import { inspect } from 'util';
 
