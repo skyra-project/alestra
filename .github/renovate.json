@@ -16,10 +16,6 @@
 					"@sapphire/plugin-logger"
 				],
 				"enabled": false
-			},
-			{
-				"matchPackagePatterns": ["@influxdata"],
-				"groupName": "InfluxDB Dependencies"
 			}
 		]
 	}
