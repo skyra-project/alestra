@@ -13,8 +13,7 @@
 		"build": "tsc -b src",
 		"clean": "tsc -b src --clean",
 		"watch": "tsc -b src -w",
-		"dev": "yarn build && yarn start",
-		"postinstall": "husky install .github/husky"
+		"dev": "yarn build && yarn start"
 	},
 	"repository": {
 		"type": "git",
@@ -64,7 +63,6 @@
 		"cz-conventional-changelog": "^3.3.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-prettier": "^4.2.1",
-		"husky": "^8.0.1",
 		"lint-staged": "^13.0.3",
 		"prettier": "^2.7.1",
 		"pretty-quick": "^3.1.3",
