@@ -1,6 +1,11 @@
 # Alestra [![Discord](https://discordapp.com/api/guilds/254360814063058944/embed.png)](https://join.skyra.pw)
 
-Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official server][cc-server].
+**Alestra has been archived and is no longer maintained.** If you're looking for prototyping with [`canvas-constructor`],
+you can use the button below as well as ask the [official server][cc-server] for help.
+
+[![Edit on Stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/canvas-constructor-vite?file=main.js)
+
+~~Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official server][cc-server].~~
 
 ## Development Requirements
 
@@ -8,7 +13,7 @@ Alestra is a private Discord Bot used for [`canvas-constructor`]'s [official ser
 
 ## Set-Up
 
-Copy and paste the [`config.ts.example`] file and rename it to `config.ts`, then fill it with the precise variables.
+Copy and paste the [`.env`] file and rename it to `.env.development.local`, then fill it with the precise variables.
 Once all development requirements are set up:
 
 ```bash
@@ -41,4 +46,4 @@ $ yarn pm2:start
 [`canvas-constructor`]: https://github.com/kyranet/CanvasConstructor
 [cc-server]: https://discord.gg/taNgb9d
 [`node.js`]: https://nodejs.org/en/download/current/
-[`config.ts.example`]: /config.ts.example
+[`.env`]: /src/.env
